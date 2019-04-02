@@ -24,9 +24,15 @@ app.use( express.json()) ;
 // });
 
 app.get('/api/test', (req, res, next) => {
-    res.send({
-        success: true,
-        message: 'API up and running without issue'
+    const sql = 'SELECT * FROM `test`';
+
+    db.query(sql, (error, results) => {
+        console.log('DB Results: ', results);
+
+        res.send({
+            success: true,
+            wholefoods: results
+        });
     });
 });
 
