@@ -1,0 +1,33 @@
+{
+  "name": "wholeliving",
+  "version": "1.0.0",
+  "description": "Whole Living project built with NodeJS backend and ReactJS frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:client": "npm start --prefix client",
+    "dev:server": "nodemon index.js",
+    "bundle": "npm run bundle --prefix client",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthonybo/wholeliving.git"
+  },
+  "author": "Anthony Bocchino",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anthonybo/wholeliving/issues"
+  },
+  "homepage": "https://github.com/anthonybo/wholeliving#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "mysql": "^2.16.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10",
+    "npm-run-all": "^4.1.5"
+  }
+}
