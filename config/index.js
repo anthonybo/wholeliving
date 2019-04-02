@@ -1,3 +1,3 @@
-module.export = {
+module.exports = {
     dbConfig: require('./db')
 }
