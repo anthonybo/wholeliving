@@ -23,27 +23,36 @@ app.use( express.json()) ;
 //     next();
 // });
 
-app.get('/api/test', (req, res, next) => {
+app.get('/api/test', async (req, res, next) => {
     const sql = 'SELECT * FROM `test`';
 
-    db.query(sql, (error, results) => {
-        console.log('DB Results: ', results);
+    const wholefoods = await db.query(sql);
 
-        res.send({
-            success: true,
-            wholefoods: results
-        });
+    res.send({
+       success: true,
+       wholefoods: wholefoods
     });
 });
 
-app.post('/api/test', (req, res) => {
-    console.log('POST DATA: ', req.body);
+app.post('/api/test', async (req, res) => {
+    const { lat, lng, state } = req.body;
 
-    res.send({
-        success: true,
-        postDataReceived: req.body,
-        message: 'API POST test working'
-    });
+    try {
+        const sql = 'INSERT INTO `test` (`lat`, `lng`, `state`) VALUES (?, ?, ?)';
+        const inserts = [lat, lng, state];
+
+        const query = mysql.format(sql, inserts);
+
+        const insertResults = await db.query(query);
+
+        res.send({
+            success: true,
+            insertId: insertResults.insertId
+        });
+    } catch(error){
+        res.status(500).send('Server Error');
+    }
+
 });
 
 // app.get('/api/get-user', (req,res)=>{
