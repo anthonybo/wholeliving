@@ -16,7 +16,7 @@ class Test extends Component {
             resp: resp
         })
 
-        
+
         const postResp = await axios.post('/api/test', {
             lat: 34.0459443,
             lng: -118.2575671,
