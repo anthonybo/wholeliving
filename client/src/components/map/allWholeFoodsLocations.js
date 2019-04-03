@@ -17,13 +17,11 @@ class AllWholeFoodsLocations extends Component {
 
         wholefoods = wholefoods.data.geoJson;
 
-
         this.setState({
             wholefoods: wholefoods
         })
 
         this.createMap();
-
     }
 
     createMap(){
@@ -91,7 +89,6 @@ class AllWholeFoodsLocations extends Component {
              * */
             this.map.addSource('wholefoods', {
                 type: 'geojson',
-                // data: 'https://data.lacity.org/resource/7fvc-faax.geojson'
                 data: this.state.wholefoods
             });
 
@@ -214,7 +211,6 @@ class AllWholeFoodsLocations extends Component {
                 <div id='map'/>
             </Fragment>
         )
-
     }
 }
 
