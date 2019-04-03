@@ -27,7 +27,6 @@ class Test extends Component {
     }
 
     render() {
-
         const items = [];
 
         // console.log(this.state.resp);

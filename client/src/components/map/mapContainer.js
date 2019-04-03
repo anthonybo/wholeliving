@@ -13,7 +13,7 @@ class Map extends Component {
     async getData() {
         let wholefoods = await axios.get(`/api/wholefoods`);
 
-        console.log(wholefoods);
+        // console.log(wholefoods);
 
         wholefoods = wholefoods.data.geoJson;
 
@@ -119,15 +119,16 @@ class Map extends Component {
                         ]
                     },
                     // assign color values be applied to points depending on their density
+                    // R: 93 G: 188 B: 210
                     'heatmap-color': [
                         'interpolate',
                         ['linear'],
                         ['heatmap-density'],
-                        0, 'rgba(236,2,2,0)',
-                        0.2, 'rgb(208,2,2)',
-                        0.4, 'rgb(166,1,2)',
-                        0.6, 'rgb(103,1,2)',
-                        0.8, 'rgb(28,1,1)'
+                        0, 'rgba(93,188,210,0)',
+                        0.2, 'rgb(80,188,210)',
+                        0.4, 'rgb(70,188,210)',
+                        0.6, 'rgb(60,188,210)',
+                        0.8, 'rgb(50,188,210)'
                     ],
                     // increase radius as zoom increases
                     'heatmap-radius': {
@@ -178,7 +179,7 @@ class Map extends Component {
                             [60, 'rgb(1,108,89)']
                         ]
                     },
-                    'circle-stroke-color': 'red',
+                    'circle-stroke-color': 'green',
                     'circle-stroke-width': 1,
                     'circle-opacity': {
                         stops: [
@@ -195,7 +196,7 @@ class Map extends Component {
                 // this.createFeatureButtonLink();
                 new mapboxgl.Popup()
                     .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>Whole Foods</b>' + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>City:</b> ' + e.features[0].properties.City + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
+                    .setHTML('<b>Whole Foods</b>' + '<br><b>State:</b> ' + e.features[0].properties.State + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>City:</b> ' + e.features[0].properties.City + '<br><b>Zip:</b> ' + e.features[0].properties.Zip + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
                     .addTo(this.map);
                 // var features = e.features[0];
             });
