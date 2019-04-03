@@ -16,7 +16,7 @@ app.use( express.json()) ;
 // const parser = parse({
 //     delimiter:','
 // })
-
+//
 // parser.on('readable', function(){
 //     let record;
 //     while (record = parser.read()) {
@@ -32,7 +32,7 @@ app.use( express.json()) ;
 //         }
 //     }
 // })
-
+//
 // const readData = fs.createReadStream('./Whole_Foods_Markets.csv').pipe(parser);
 
 // The following will allow you to see what the parser is reading from the CSV, I had some empty columns in my CSV
@@ -46,7 +46,7 @@ const results = [];
 //         console.log(results);
 //     });
 
-
+// Middleware to see information on every request
 // app.use((req, res, next)=>{
 //     // Call db for user information
 //     console.log('I will get called with every request');
