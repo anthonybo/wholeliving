@@ -3,14 +3,14 @@ import 'materialize-css/dist/js/materialize.min';
 import '../assets/css/app.scss';
 import React from 'react';
 import Test from './test';
+import Map from './map/mapContainer';
+import './app.scss';
 
 const App = () => (
     <div>
-        <div className='container'>
-            <h1 className='center'>Frontend</h1>
-
-            <Test/>
-        </div>
+        <h1 className='center white-text'>Whole Living</h1>
+        <Map/>
+        <Test/>
     </div>
 );
 
