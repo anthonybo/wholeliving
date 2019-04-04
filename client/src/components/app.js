@@ -11,8 +11,17 @@ import './app.scss';
 const App = () => (
     <div className='application-container'>
         <h1 className='center white-text'>Whole Living</h1>
+        <div className='nav center-align container'>
+            <div className='row'>
+                <Link className='col s6' to='/generalMap'>General Map</Link>
+                <Link className='col s6' to='/'>Display Whole Foods Locations</Link>
+            </div>
+        </div>
+
         <Switch>
             <Route exact path='/' component={Homepage}/>
+            <Route exact path='/generalMap' component={Homepage}/>
+
         </Switch>
     </div>
 );
