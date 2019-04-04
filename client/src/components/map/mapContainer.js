@@ -1,5 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import AllWholeFoodsLocations from './allWholeFoodsLocations';
+import GeneralMap from './generalMap';
+import {withRouter} from 'react-router-dom';
 
 
 class MapContainer extends Component {
@@ -11,13 +13,23 @@ class MapContainer extends Component {
     }
 
     render(){
+        // console.log(this.props.location.pathname);
+
+        let path = this.props.location.pathname;
+        let mapType = null;
+
+        if(path === '/'){
+            mapType = <AllWholeFoodsLocations/>;
+        } else if (path === '/generalMap'){
+            mapType = <GeneralMap/>
+        }
+
         return(
                 <Fragment>
-                    <AllWholeFoodsLocations/>
+                    {mapType}
                 </Fragment>
             )
-
     }
 }
 
-export default MapContainer;
+export default withRouter(MapContainer);
