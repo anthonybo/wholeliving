@@ -2,6 +2,8 @@ import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
 import stateData from './us_states';
+import axios from "axios";
+import {withRouter} from 'react-router-dom';
 
 class GeneralMap extends Component {
 
@@ -78,12 +80,41 @@ class GeneralMap extends Component {
 
             this.map.on("click", "state-fills", (e) => {
                 console.log(e.features[0].properties);
+
                 // console.log(hoveredStateId);
 
-
+                this.locateWF(e.features[0].properties.STATE_ABB);
             });
 
         });
+    }
+
+    async locateWF(state){
+        console.log('Locate the wfs function');
+        console.log(this.props.history);
+
+
+
+        const postResp = await axios.post('/api/wholefoods/state', {
+            state: state
+        });
+
+        console.log(postResp.data.geoJson.features);
+
+        let wholefoodsCount = postResp.data.geoJson.features.length;
+
+        if(wholefoodsCount < 1){
+            console.log('No Results!');
+
+            M.toast({
+                html: 'No Wholefoods! \n Search again!',
+                displayLength: 2000,
+                classes: 'pulse'
+            })
+        } else {
+            this.props.history.push('/byState/' + state);
+        }
+
     }
 
     componentDidMount() {
@@ -99,4 +130,4 @@ class GeneralMap extends Component {
     }
 }
 
-export default GeneralMap;
+export default withRouter(GeneralMap);
