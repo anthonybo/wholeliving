@@ -103,15 +103,14 @@ app.get('/api/wholefoods', async (req, res, next) => {
 })
 
 app.post('/api/wholefoods/state', async (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
 
     const sql = 'SELECT * FROM `wholefoods` WHERE state = ?';
 
     let wholefoodsByState = await db.query(sql, req.body.state);
 
     wholefoodsByState = wholefoodsByState.map(item => {
-        console.log(item);
-
+        // console.log(item);
         item.type = "Feature",
             item.geometry = {
                 type:"Point",
@@ -144,6 +143,50 @@ app.post('/api/wholefoods/state', async (req, res, next) => {
             features: wholefoodsByState
         }
     });
+
+})
+
+app.post('/api/location', async (req, res, next) => {
+    // console.log(req.body);
+
+    const sql = 'SELECT * FROM `wholefoods` WHERE id = ?';
+
+    let wholeFoodsByLocation = await db.query(sql, req.body.id);
+
+    wholeFoodsByLocation = wholeFoodsByLocation.map(item => {
+        item.type = "Feature",
+            item.geometry = {
+                type:"Point",
+                coordinates:[item.lng, item.lat]
+            };
+        item.properties = {
+            Address: item['address'],
+            "City": item['city'],
+            "State": item['state'],
+            "Zip":item.zip,
+            Phone: item.phone,
+            "Hours": item['hours'],
+        }
+
+        delete item.lng;
+        delete item.lat;
+        delete item.address;
+        delete item.city;
+        delete item.state;
+        delete item.zip;
+        delete item.phone;
+        delete item.hours;
+        return item;
+    })
+
+    res.send({
+        success:true,
+        geoJson: {
+            type:"FeatureCollection",
+            features: wholeFoodsByLocation
+        }
+    });
+
 
 })
 

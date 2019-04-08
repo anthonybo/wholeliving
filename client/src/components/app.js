@@ -22,6 +22,7 @@ const App = () => (
             <Route exact path='/' component={Homepage}/>
             <Route exact path='/generalMap' component={Homepage}/>
             <Route path='/byState/:state' component={Homepage}/>
+            <Route path='/location/:id' component={Homepage}/>
         </Switch>
     </div>
 );

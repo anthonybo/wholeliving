@@ -9,16 +9,18 @@ class LocateByState extends Component {
     state = {
         wholefoods: null,
         center: [-97.2263, 37.7091],
-        zoom: 4,
-        state: ''
+        zoom: 18,
+        id: 0,
+        state: '',
+        city: ''
     }
 
     async getData() {
         let path = this.props.history.location.pathname;
-        let state = path.match( /byState\/(\w\w)/ )[1];
+        let id = path.match( /location\/(\d+)/ )[1];
 
-        let wholefoods = await axios.post('/api/wholefoods/state', {
-            state: state
+        let wholefoods = await axios.post('/api/location', {
+            id: id
         });
 
         if(wholefoods.data.geoJson.features.length < 1){
@@ -26,18 +28,22 @@ class LocateByState extends Component {
 
             this.setState({
                 zoom: 3,
-                state: state
+                state: 'Not Found'
             })
         } else {
             // console.log(wholefoods.data.geoJson.features[0].geometry.coordinates);
             let center = wholefoods.data.geoJson.features[0].geometry.coordinates;
 
             wholefoods = wholefoods.data.geoJson;
+            // console.log(wholefoods.features[0].properties.City);
+            let state = wholefoods.features[0].properties.State;
+            let city = wholefoods.features[0].properties.City;
 
             this.setState({
                 wholefoods: wholefoods,
                 center: center,
-                state: state
+                state: state,
+                city: city
             })
 
         }
@@ -52,13 +58,16 @@ class LocateByState extends Component {
         let statePre = document.createElement('pre');
         let stateSpan = document.createElement('span');
         let wfCount = document.createElement('span');
+        let citySpan = document.createElement('span');
+
 
         statePre.id = 'currentStateContainer';
-        stateSpan.innerText = 'Current State: ' + this.state.state;
-        wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
+        stateSpan.innerText = 'State: ' + this.state.state;
+        citySpan.innerText = 'City: ' + this.state.city;
+        // wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
         // console.log(this.state.wholefoods.features.length);
         mapDiv.append(statePre);
-        statePre.append(wfCount, stateSpan);
+        statePre.append(stateSpan, citySpan);
     }
 
     createMap(){

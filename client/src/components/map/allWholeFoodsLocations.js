@@ -190,7 +190,7 @@ class AllWholeFoodsLocations extends Component {
             }, 'waterway-label');
 
             this.map.on('click', 'wholefoods-point', (e) => {
-                console.log(e.features[0].properties);
+                // console.log(e.features[0].properties);
 
                 // this.createFeatureButtonLink();
                 new mapboxgl.Popup()
