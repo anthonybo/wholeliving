@@ -9477,7 +9477,7 @@ var stateData = {
             properties: {
                 STATE_ID: "23",
                 STATE_NAME: "Maine",
-                STATE_ABB: "Me"
+                STATE_ABB: "ME"
             },
             id: 23
         },

@@ -1,37 +1,71 @@
+import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
-import React, {Component, Fragment} from 'react';
-import axios from 'axios';
-import './map.scss';
+import axios from "axios";
+import {withRouter} from 'react-router-dom';
 
-class AllWholeFoodsLocations extends Component {
+class LocateByState extends Component {
 
     state = {
-        wholefoods: null
+        wholefoods: null,
+        center: [-97.2263, 37.7091],
+        zoom: 4,
+        state: ''
     }
 
     async getData() {
-        let wholefoods = await axios.get(`/api/wholefoods`);
+        let path = this.props.history.location.pathname;
+        let state = path.match( /byState\/(\w\w)/ )[1];
 
-        // console.log(wholefoods);
+        let wholefoods = await axios.post('/api/wholefoods/state', {
+            state: state
+        });
 
-        wholefoods = wholefoods.data.geoJson;
+        if(wholefoods.data.geoJson.features.length < 1){
+            console.log('No Results')
 
-        this.setState({
-            wholefoods: wholefoods
-        })
+            this.setState({
+                zoom: 3,
+                state: state
+            })
+        } else {
+            // console.log(wholefoods.data.geoJson.features[0].geometry.coordinates);
+            let center = wholefoods.data.geoJson.features[0].geometry.coordinates;
 
-        if(wholefoods !== null){
+            wholefoods = wholefoods.data.geoJson;
+
+            this.setState({
+                wholefoods: wholefoods,
+                center: center,
+                state: state
+            })
+
+        }
+
+        if(wholefoods !== null) {
             this.createMap();
         }
+    }
+
+    displayCurrentState = () => {
+        console.log(this.state.state);
+
+        let mapDiv = document.getElementById('map');
+        let statePre = document.createElement('pre');
+        let stateSpan = document.createElement('span');
+
+        statePre.id = 'currentStateContainer';
+        stateSpan.innerText = 'Current State: ' + this.state.state;
+        mapDiv.append(statePre);
+        statePre.append(stateSpan);
     }
 
     createMap(){
         this.map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
-            center: [-97.2263, 37.7091],
-            zoom: 2.6,
+            center: this.state.center,
+            zoom: this.state.zoom,
             pitch: 45,
             // minZoom: 7,
             // maxZoom: 20
@@ -200,10 +234,11 @@ class AllWholeFoodsLocations extends Component {
                 // var features = e.features[0];
             });
         });
+
+        this.displayCurrentState();
     }
 
     componentDidMount() {
-        // this.createMap();
         this.getData();
     }
 
@@ -217,6 +252,7 @@ class AllWholeFoodsLocations extends Component {
                 </Fragment>
             )
         } else {
+            console.log('No Data Yet');
             return (
                 <div className='spinnerContainer'>
                     <div className="preloader-wrapper big active">
@@ -235,7 +271,9 @@ class AllWholeFoodsLocations extends Component {
                 </div>
             )
         }
+
+
     }
 }
 
-export default AllWholeFoodsLocations;
+export default withRouter(LocateByState);

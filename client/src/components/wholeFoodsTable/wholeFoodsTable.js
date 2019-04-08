@@ -30,7 +30,6 @@ class WholeFoodsTable extends Component {
             }
         }
 
-
         return(
             <div>
                 {items}
