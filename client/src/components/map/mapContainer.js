@@ -3,6 +3,7 @@ import AllWholeFoodsLocations from './allWholeFoodsLocations';
 import GeneralMap from './generalMap';
 import {withRouter} from 'react-router-dom';
 import LocationByState from './locateByState';
+import LocatonById from './locateById';
 
 
 class MapContainer extends Component {
@@ -18,15 +19,15 @@ class MapContainer extends Component {
 
         let path = this.props.location.pathname;
         let mapType = null;
-        console.log(path);
 
         if(path === '/'){
             mapType = <AllWholeFoodsLocations/>;
         } else if (path === '/generalMap'){
             mapType = <GeneralMap/>
         } else if (path.match('/byState/') ){
-            console.log('Match By State!');
             mapType = <LocationByState/>;
+        } else if (path.match('/location/') ){
+            mapType = <LocatonById/>;
         }
 
         return(

@@ -79,8 +79,7 @@ class GeneralMap extends Component {
             });
 
             this.map.on("click", "state-fills", (e) => {
-                console.log(e.features[0].properties);
-
+                // console.log(e.features[0].properties);
                 // console.log(hoveredStateId);
 
                 this.locateWF(e.features[0].properties.STATE_ABB);
@@ -90,24 +89,16 @@ class GeneralMap extends Component {
     }
 
     async locateWF(state){
-        console.log('Locate the wfs function');
-        console.log(this.props.history);
-
-
-
         const postResp = await axios.post('/api/wholefoods/state', {
             state: state
         });
 
-        console.log(postResp.data.geoJson.features);
-
         let wholefoodsCount = postResp.data.geoJson.features.length;
 
         if(wholefoodsCount < 1){
-            console.log('No Results!');
-
+            // console.log('No Results!');
             M.toast({
-                html: 'No Wholefoods! \n Search again!',
+                html: 'Unable to find Whole Foods in this state!',
                 displayLength: 2000,
                 classes: 'pulse'
             })
