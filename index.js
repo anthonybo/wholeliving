@@ -7,6 +7,8 @@ const ENV = process.env.NODE_ENV || 'development';
 const fs = require('fs');
 const stream = require ('stream');
 const parse= require('csv-parse');
+const request = require('request');
+const fetch = require('node-fetch');
 
 const app = express();
 
@@ -189,6 +191,35 @@ app.post('/api/location', async (req, res, next) => {
 
 
 })
+
+app.post('/api/places', async (req,res,next) => {
+    console.log('Request: ', req.body);
+
+    let keyword = '';
+    let location = '33.6526719,-117.74766229999999';
+
+    if(req.body.keyword){
+        console.log('Keyword: ', req.body.keyword);
+        keyword = req.body.keyword;
+    }
+    if (req.body.location){
+        console.log('Location: ', req.body.location);
+        location = req.body.location;
+    }
+
+    // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
+    fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+        .then(res => res.json())
+        .then(data=> {
+
+
+
+                res.send({data})
+        })
+
+})
+
+
 
 app.get('/api/test', async (req, res, next) => {
     const sql = 'SELECT * FROM `test`';
