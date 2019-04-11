@@ -57,17 +57,12 @@ class Places extends Component {
         return(
             <div className='places-container '>
                 <form className='row' onSubmit={this.handleSubmit}>
-                    <div className=" col s6">
-                        <label>
-                            Keyword:
-                            <input className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange}/>
-                        </label>
+                    <div className="col s6">
+                            <input className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange} autoComplete='off' placeholder='search keyword'/>
+
                     </div>
                     <div className="col s6">
-                        <label>
-                            Location:
-                            <input className='white-text' type="text" location="location" name='location' ref='location' onChange={this.handleChange}/>
-                        </label>
+                            <input className='white-text' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
                     </div>
                     <div className="col s12">
                         <input type="submit" value='submit'/>

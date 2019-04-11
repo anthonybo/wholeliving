@@ -9,13 +9,18 @@ class CrossReference extends Component {
 
     state = {
         wholefoods: null,
+        wholefoodsLength: 0,
         keyword: null,
+        keywordLength: 0,
         center: [-97.2263, 37.7091]
     }
 
     async getData() {
-        let wholefoods = await axios.get(`/api/wholefoods`);
+        // let wholefoods = await axios.get(`/api/wholefoods`);
+        let wholefoodsLimited = null;
+        let wholefoodsLimitedLength = 0;
         let path = this.props.location.pathname;
+        let center = [];
 
         let keyword = this.props.match.params.keyword;
         let location = this.props.match.params.location;
@@ -27,16 +32,39 @@ class CrossReference extends Component {
         });
 
         userInput = userInput.data.geoJson;
+        // console.log(userInput.features.length);
+        // wholefoods = wholefoods.data.geoJson;
 
-        wholefoods = wholefoods.data.geoJson;
+        if(userInput.features.length == 0){
+            center = [-97.2263, 37.7091];
+        } else {
+            center = userInput.features[0].geometry.coordinates;
+            console.log(center);
+
+            let lat = userInput.features[0].geometry.coordinates[1];
+            let lng = userInput.features[0].geometry.coordinates[0];
+
+            wholefoodsLimited = await axios.post('/api/geoSpacial', {
+                lat: lat,
+                lng: lng
+            });
+
+            wholefoodsLimited = wholefoodsLimited.data.geoJson;
+            wholefoodsLimitedLength = wholefoodsLimited.features.length;
+
+            console.log(wholefoodsLimited);
+            console.log(wholefoodsLimitedLength)
+        }
 
         this.setState({
-            wholefoods: wholefoods,
+            wholefoods: wholefoodsLimited,
+            wholefoodsLength: wholefoodsLimitedLength,
             keyword: userInput,
-            center: userInput.features[0].geometry.coordinates
+            keywordLength: userInput.features.length,
+            center: center
         })
 
-        if(wholefoods !== null){
+        if(wholefoodsLimited !== null){
             this.createMap();
         }
     }
@@ -54,7 +82,7 @@ class CrossReference extends Component {
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
-            this.map.addControl(new mapboxgl.FullscreenControl());
+            // this.map.addControl(new mapboxgl.FullscreenControl());
 
             // if(!document.getElementById("menu")) {
             //     this.createMenu();
@@ -236,12 +264,17 @@ class CrossReference extends Component {
     }
 
     render(){
-        const { wholefoods, keyword } = this.state;
+        const { wholefoods, keyword, keywordLength, wholefoodsLength } = this.state;
 
-        if(wholefoods && keyword){
+        if(wholefoods && keyword ){
+            // let search_term = this.props.match.params.keyword;
             return(
                 <Fragment>
-                    <div id='map'></div>
+                    <div id='map'>
+                        <span className="new badge red" data-badge-caption="Found">{keywordLength}</span>
+                        <span className="new badge green" data-badge-caption="Found">{wholefoodsLength}</span>
+
+                    </div>
                 </Fragment>
             )
         } else {

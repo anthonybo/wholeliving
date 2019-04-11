@@ -75,3 +75,19 @@
     bottom: 0;
   }
 }
+
+/**
+* Badge for displaying number of search results found
+ */
+span.badge.new {
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: #fff;
+  background-color: #26a69a;
+  border-radius: 2px;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  right: 0;
+}
+
