@@ -4,7 +4,7 @@ import GeneralMap from './generalMap';
 import {withRouter} from 'react-router-dom';
 import LocationByState from './locateByState';
 import LocatonById from './locateById';
-
+import CrossReference from './crossReference';
 
 class MapContainer extends Component {
 
@@ -15,8 +15,6 @@ class MapContainer extends Component {
     }
 
     render(){
-        // console.log(this.props.location.pathname);
-
         let path = this.props.location.pathname;
         let mapType = null;
 
@@ -28,6 +26,8 @@ class MapContainer extends Component {
             mapType = <LocationByState/>;
         } else if (path.match('/location/') ){
             mapType = <LocatonById/>;
+        } else if (path.match('/crossReference/')) {
+            mapType = <CrossReference/>;
         }
 
         return(

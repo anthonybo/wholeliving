@@ -193,17 +193,14 @@ app.post('/api/location', async (req, res, next) => {
 })
 
 app.post('/api/places', async (req,res,next) => {
-    console.log('Request: ', req.body);
-
+    // console.log('Request: ', req.body);
     let keyword = '';
     let location = '33.6526719,-117.74766229999999';
 
     if(req.body.keyword){
-        console.log('Keyword: ', req.body.keyword);
         keyword = req.body.keyword;
     }
     if (req.body.location){
-        console.log('Location: ', req.body.location);
         location = req.body.location;
     }
 
@@ -211,11 +208,37 @@ app.post('/api/places', async (req,res,next) => {
     fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
         .then(res => res.json())
         .then(data=> {
+            data = data.results.map(item => {
+                // console.log(item);
 
+                item.type = "Feature",
+                    item.geometry = {
+                        type:"Point",
+                        coordinates:[item.geometry.location.lng, item.geometry.location.lat]
+                    };
+                item.properties = {
+                    Address: item.formatted_address,
+                    Name: item.name,
+                    Rating: item.rating
+                }
 
-
-                res.send({data})
+                delete item.lng;
+                delete item.lat;
+                delete item.formatted_address;
+                delete item.rating;
+                delete item.name;
+                return item;
+            })
+            // res.send({data})
+            res.send({
+                success:true,
+                geoJson: {
+                    type:"FeatureCollection",
+                    features: data
+                }
+            });
         })
+
 
 })
 
