@@ -238,10 +238,64 @@ app.post('/api/places', async (req,res,next) => {
                 }
             });
         })
-
-
 })
 
+app.post('/api/geoSpacial', async(req,res,next) => {
+    // console.log('Request: ' , req.body);
+
+    const sql = 'SELECT\n' +
+        '    id,lat,lng,address,city,state,zip,phone,hours, (\n' +
+        '      3959 * acos (\n' +
+        '      cos ( radians('+ req.body.lat +') )\n' +
+        '      * cos( radians( lat ) )\n' +
+        '      * cos( radians( lng ) - radians('+ req.body.lng +') )\n' +
+        '      + sin ( radians('+ req.body.lat +') )\n' +
+        '      * sin( radians( lat ) )\n' +
+        '    )\n' +
+        ') AS distance\n' +
+        'FROM wholefoods\n' +
+        'HAVING distance < 10\n' +
+        'ORDER BY distance\n';
+
+    // const sql = 'SELECT * FROM `wholefoods`';
+
+    let wholefoods = await db.query(sql);
+
+    wholefoods = wholefoods.map(item => {
+        // console.log(item);
+        item.type = "Feature",
+            item.geometry = {
+                type:"Point",
+                coordinates:[item.lng, item.lat]
+            };
+        item.properties = {
+            Address: item['address'],
+            "City": item['city'],
+            "State": item['state'],
+            "Zip":item.zip,
+            Phone: item.phone,
+            "Hours": item['hours'],
+        }
+
+        delete item.lng;
+        delete item.lat;
+        delete item.address;
+        delete item.city;
+        delete item.state;
+        delete item.zip;
+        delete item.phone;
+        delete item.hours;
+        return item;
+    })
+
+    res.send({
+        success:true,
+        geoJson: {
+            type:"FeatureCollection",
+            features: wholefoods
+        }
+    });
+})
 
 
 app.get('/api/test', async (req, res, next) => {
