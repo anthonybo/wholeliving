@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import axios from "axios";
+import {withRouter} from 'react-router-dom';
 // import Places from "google-places-web";
 // import axios from 'axios';
 // const Places = require("google-places-web").default; // instance of GooglePlaces Class;
@@ -14,14 +15,18 @@ class Places extends Component {
     }
 
     async getData(){
-        console.log('Grabbing Data from Google!');
+        // console.log('Grabbing Data from Google!');
 
-        let wholefoods = await axios.post(`/api/places`, {
-            keyword: this.state.keyword,
-            location: this.state.location
-        });
+        // let data = await axios.post(`/api/places`, {
+        //     keyword: this.state.keyword,
+        //     location: this.state.location
+        // });
 
-        console.log(wholefoods);
+        // console.log(data);
+        if(this.state.keyword && this.state.location){
+            // console.log('Props: ', this.props );
+            this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location);
+        }
 
     }
 
@@ -32,7 +37,14 @@ class Places extends Component {
     }
 
     handleSubmit = (event) => {
-        alert('A name was submitted: ' + this.state.keyword + ' ' + this.state.location);
+        // console.log(event.target.form.clear());
+        this.refs.keyword.value = '';
+        this.refs.location.value = '';
+
+        // alert('A name was submitted: ' + this.state.keyword + ' ' + this.state.location);
+        if(!this.state.keyword || !this.state.location){
+            alert('Please Complete Both Fields!');
+        }
         event.preventDefault();
         this.getData();
     }
@@ -48,13 +60,13 @@ class Places extends Component {
                     <div className=" col s6">
                         <label>
                             Keyword:
-                            <input className='white-text' type="text" keyword="keyword" name='keyword' onChange={this.handleChange}/>
+                            <input className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange}/>
                         </label>
                     </div>
                     <div className="col s6">
                         <label>
                             Location:
-                            <input className='white-text' type="text" location="location" name='location' onChange={this.handleChange}/>
+                            <input className='white-text' type="text" location="location" name='location' ref='location' onChange={this.handleChange}/>
                         </label>
                     </div>
                     <div className="col s12">
@@ -66,4 +78,4 @@ class Places extends Component {
     }
 }
 
-export default Places;
+export default withRouter(Places);
