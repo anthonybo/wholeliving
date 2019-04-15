@@ -31,7 +31,7 @@ const App = () => (
                 <Route exact path='/generalMap' component={Homepage}/>
                 <Route path='/byState/:state' component={Homepage}/>
                 <Route path='/location/:id' component={Homepage}/>
-                <Route path ='/crossReference/:keyword/:location' component={Homepage}/>
+                <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
             </Switch>
 
             <footer>
