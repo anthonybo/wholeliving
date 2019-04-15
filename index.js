@@ -242,6 +242,10 @@ app.post('/api/places', async (req,res,next) => {
 
 app.post('/api/geoSpacial', async(req,res,next) => {
     // console.log('Request: ' , req.body);
+    let range = 10;
+    if(req.body.range > 0){
+        range = req.body.range;
+    }
 
     const sql = 'SELECT\n' +
         '    id,lat,lng,address,city,state,zip,phone,hours, (\n' +
@@ -254,7 +258,7 @@ app.post('/api/geoSpacial', async(req,res,next) => {
         '    )\n' +
         ') AS distance\n' +
         'FROM wholefoods\n' +
-        'HAVING distance < 10\n' +
+        'HAVING distance <' + range + '\n' +
         'ORDER BY distance\n';
 
     // const sql = 'SELECT * FROM `wholefoods`';

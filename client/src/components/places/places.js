@@ -12,7 +12,8 @@ class Places extends Component {
 
     state = {
         keyword: '',
-        location: ''
+        location: '',
+        range: 10
     }
 
     async getData(){
@@ -26,7 +27,7 @@ class Places extends Component {
         // console.log(data);
         if(this.state.keyword && this.state.location){
             // console.log('Props: ', this.props );
-            this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location);
+            this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location + '/' + this.state.range);
         }
     }
 
@@ -52,7 +53,7 @@ class Places extends Component {
 
     componentDidMount() {
         // this.getData();
-        M.AutoInit();
+        // M.AutoInit();
     }
 
     render(){

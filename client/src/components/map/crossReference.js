@@ -24,7 +24,8 @@ class CrossReference extends Component {
 
         let keyword = this.props.match.params.keyword;
         let location = this.props.match.params.location;
-        // console.log(keyword, ' ', location)
+        let range = this.props.match.params.range;
+        // console.log(keyword, ' ', location, ' ', range);
 
         let userInput = await axios.post(`/api/places`, {
             keyword: keyword,
@@ -45,7 +46,8 @@ class CrossReference extends Component {
 
             wholefoodsLimited = await axios.post('/api/geoSpacial', {
                 lat: lat,
-                lng: lng
+                lng: lng,
+                range: range
             });
 
             wholefoodsLimited = wholefoodsLimited.data.geoJson;

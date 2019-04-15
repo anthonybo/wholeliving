@@ -52,13 +52,11 @@ class WholeFoodsTable extends Component {
     }
 
     async crossReference(){
-        console.log('Whole Foods Table Cross Reference!');
+        // console.log('Whole Foods Table Cross Reference!');
         let path = this.props.match;
         let keyword = path.params.keyword;
         let location = path.params.location;
-
-        console.log('Keyword: ', keyword);
-        console.log('Location: ', location);
+        let range = path.params.range;
 
         let userInput = await axios.post(`/api/places`, {
             keyword: keyword,
@@ -67,17 +65,14 @@ class WholeFoodsTable extends Component {
 
         userInput = userInput.data.geoJson;
 
-        console.log(userInput);
-
         let lat = userInput.features[0].geometry.coordinates[1];
         let lng = userInput.features[0].geometry.coordinates[0];
 
         let wholefoods = await axios.post('/api/geoSpacial', {
             lat: lat,
-            lng: lng
+            lng: lng,
+            range: range
         });
-
-        console.log(wholefoods);
 
         this.setState({
             crossReferenceUserInput: userInput,
@@ -171,7 +166,7 @@ class WholeFoodsTable extends Component {
             }
 
             for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
-                console.log(value.properties);
+                // console.log(value.properties);
                 userInput.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
             }
 
