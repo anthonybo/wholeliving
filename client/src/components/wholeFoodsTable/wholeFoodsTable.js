@@ -9,7 +9,10 @@ class WholeFoodsTable extends Component {
     state = {
         allWholeFoods: null,
         byState: null,
-        byId: null
+        byId: null,
+        crossReferenceUserInput: null,
+        crossReferenceWholeFoods: null,
+        keyword: ''
     }
 
     async getAllWholeFoods(){
@@ -48,6 +51,41 @@ class WholeFoodsTable extends Component {
         })
     }
 
+    async crossReference(){
+        console.log('Whole Foods Table Cross Reference!');
+        let path = this.props.match;
+        let keyword = path.params.keyword;
+        let location = path.params.location;
+
+        console.log('Keyword: ', keyword);
+        console.log('Location: ', location);
+
+        let userInput = await axios.post(`/api/places`, {
+            keyword: keyword,
+            location: location
+        });
+
+        userInput = userInput.data.geoJson;
+
+        console.log(userInput);
+
+        let lat = userInput.features[0].geometry.coordinates[1];
+        let lng = userInput.features[0].geometry.coordinates[0];
+
+        let wholefoods = await axios.post('/api/geoSpacial', {
+            lat: lat,
+            lng: lng
+        });
+
+        console.log(wholefoods);
+
+        this.setState({
+            crossReferenceUserInput: userInput,
+            crossReferenceWholeFoods: wholefoods,
+            keyword: keyword
+        })
+    }
+
     async componentDidMount() {
         const path = this.props.history.location.pathname;
 
@@ -63,6 +101,8 @@ class WholeFoodsTable extends Component {
             this.getWholeFoodsByState();
         } else if (path.match('/location/') ){
             this.getLocationById();
+        } else if (path.match('/crossReference/')){
+            this.crossReference();
         }
     }
 
@@ -76,7 +116,9 @@ class WholeFoodsTable extends Component {
                 this.setState({
                     allWholeFoods: null,
                     byState: null,
-                    byId: null
+                    byId: null,
+                    crossReferenceUserInput: null,
+                    crossReferenceWholeFoods: null
                 })
             } else if (path.match('/byState/') ){
                 this.getWholeFoodsByState();
@@ -84,14 +126,23 @@ class WholeFoodsTable extends Component {
                 this.setState({
                     allWholeFoods: null,
                     byState: null,
+                    crossReferenceUserInput: null,
+                    crossReferenceWholeFoods: null
                 })
                 this.getLocationById();
+            } else if (path.match('/crossReference/')){
+                this.setState({
+                    allWholeFoods: null,
+                    byState: null,
+                })
+                this.crossReference();
             }
         }
     }
 
     render(){
         const items = [];
+        const userInput = [];
         // console.log('State Response: ', this.state.resp);
 
         if(this.state.allWholeFoods){
@@ -112,6 +163,27 @@ class WholeFoodsTable extends Component {
                 // console.log(value.properties);
                 items.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
             }
+        } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
+            // console.log('We have wholefoods cross reference data!')
+            for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
+                // console.log(value.properties);
+                items.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
+            }
+
+            for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
+                console.log(value.properties);
+                userInput.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
+            }
+
+            return(
+                <div>
+                    <h5 className='green-text'>Whole Foods:</h5>
+                    {items}
+                    <h5 className='red-text'>{this.state.keyword}:</h5>
+                    {userInput}
+                </div>
+            )
+
         }
 
         return(
