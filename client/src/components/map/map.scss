@@ -91,3 +91,20 @@ span.badge.new {
   right: 0;
 }
 
+.progress {
+  position: absolute;
+  height: 4px;
+  display: block;
+  width: 100%;
+  background-color: #acece6;
+  border-radius: 2px;
+  margin: .5rem 0 1rem 0;
+  overflow: hidden;
+  z-index: 1000;
+  bottom: 0;
+}
+
+.mapboxgl-popup {
+  max-width: 80%;
+}
+

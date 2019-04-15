@@ -54,6 +54,12 @@ class Places extends Component {
     componentDidMount() {
         // this.getData();
         // M.AutoInit();
+
+        // M.updateData({
+        //     "Apple": null,
+        //     "Microsoft": null,
+        //     "Google": 'https://placehold.it/250x250'
+        // });
     }
 
     render(){
@@ -64,10 +70,10 @@ class Places extends Component {
                             <input className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange} autoComplete='off' placeholder='search keyword'/>
                     </div>
                     <div className="col s4">
-                            <input className='white-text' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
+                            <input id="autocomplete-input" className='white-text autocomplete' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
                     </div>
                     <div className="col s3">
-                        <input className='white-text' type="text" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='distance default 10'/>
+                        <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='miles'/>
                     </div>
                     <div className="col s12">
                         <input className='btn waves-effect waves-light' type="submit" value='submit'/>

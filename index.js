@@ -219,7 +219,8 @@ app.post('/api/places', async (req,res,next) => {
                 item.properties = {
                     Address: item.formatted_address,
                     Name: item.name,
-                    Rating: item.rating
+                    Rating: item.rating,
+                    PlaceId: item.place_id
                 }
 
                 delete item.lng;
@@ -227,6 +228,7 @@ app.post('/api/places', async (req,res,next) => {
                 delete item.formatted_address;
                 delete item.rating;
                 delete item.name;
+                delete item.place_id;
                 return item;
             })
             // res.send({data})
@@ -236,6 +238,22 @@ app.post('/api/places', async (req,res,next) => {
                     type:"FeatureCollection",
                     features: data
                 }
+            });
+        })
+})
+
+app.post('/api/places/details', async (req,res,next) => {
+    console.log(req.body);
+
+    fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+        .then(res => res.json())
+        .then(data=> {
+            console.log(data);
+
+            // res.send({data})
+            res.send({
+                success:true,
+                data: data
             });
         })
 })
