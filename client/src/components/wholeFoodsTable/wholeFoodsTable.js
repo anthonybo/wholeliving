@@ -129,6 +129,7 @@ class WholeFoodsTable extends Component {
                 this.setState({
                     allWholeFoods: null,
                     byState: null,
+                    byId: null
                 })
                 this.crossReference();
             }
@@ -162,7 +163,7 @@ class WholeFoodsTable extends Component {
             // console.log('We have wholefoods cross reference data!')
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
+                items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
             }
 
             for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){

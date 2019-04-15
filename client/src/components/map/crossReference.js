@@ -12,10 +12,14 @@ class CrossReference extends Component {
         wholefoodsLength: 0,
         keyword: null,
         keywordLength: 0,
-        center: [-97.2263, 37.7091]
+        center: [-97.2263, 37.7091],
+        loading: false
     }
 
     async getData() {
+        this.setState({
+            loading: true
+        })
         // let wholefoods = await axios.get(`/api/wholefoods`);
         let wholefoodsLimited = null;
         let wholefoodsLimitedLength = 0;
@@ -31,6 +35,7 @@ class CrossReference extends Component {
             keyword: keyword,
             location: location
         });
+        // console.log(userInput);
 
         userInput = userInput.data.geoJson;
         // console.log(userInput.features.length);
@@ -65,6 +70,16 @@ class CrossReference extends Component {
         if(wholefoodsLimited !== null){
             this.createMap();
         }
+    }
+
+    async getDetailedData(places_id){
+        // console.log('Getting Detailed Data...')
+        let detailedData = await axios.post(`/api/places/details`, {
+            places_id: places_id
+        });
+        // console.log(detailedData);
+
+        return detailedData;
     }
 
     createMap(){
@@ -238,15 +253,47 @@ class CrossReference extends Component {
             });
 
             this.map.on('click', 'keyword-point', (e) => {
-                console.log(e.features[0]);
+                this.setState({
+                    loading: true
+                })
+                // console.log(e.features[0]);
+                let keyword = e.features[0];
+                let detailedData = this.getDetailedData(e.features[0].properties.PlaceId);
+
+                detailedData.then((value)=>{
+                    let hours = 'unavailable';
+                    let website = 'unavailable';
+                    // console.log(value.data.data.result);
+                    if(value.data.data.result.opening_hours){
+                        var d = new Date();
+                        // console.log(d.getDay()-1 );
+                        hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
+                    }
+                    if(value.data.data.result.website) {
+                        // console.log('We have a website');
+                        website = '<a target="_blank" href="' + value.data.data.result.website + '">' + value.data.data.result.website + '</a>';
+                    }
+
+                    new mapboxgl.Popup()
+                        .setLngLat(keyword.geometry.coordinates)
+                        .setHTML('<b>'+ keyword.properties.Name +'</b>' + '<br><b>Rating:</b> ' + keyword.properties.Rating + '<br><b>Address:</b> ' + keyword.properties.Address + '<br><b>Phone:</b> ' + value.data.data.result.formatted_phone_number + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours)
+                        .addTo(this.map);
+
+                    this.setState({
+                        loading: false
+                    })
+                })
 
                 // this.createFeatureButtonLink();
-                new mapboxgl.Popup()
-                    .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>'+ e.features[0].properties.Name +'</b>' + '<br><b>Rating:</b> ' + e.features[0].properties.Rating + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
-                    .addTo(this.map);
+                // new mapboxgl.Popup()
+                //     .setLngLat(e.features[0].geometry.coordinates)
+                //     .setHTML('<b>'+ e.features[0].properties.Name +'</b>' + '<br><b>Rating:</b> ' + e.features[0].properties.Rating + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
+                //     .addTo(this.map);
                 // var features = e.features[0];
             });
+            this.setState({
+                loading: false
+            })
         });
     }
 
@@ -262,16 +309,29 @@ class CrossReference extends Component {
     }
 
     render(){
-        const { wholefoods, keyword, keywordLength, wholefoodsLength } = this.state;
+        const { wholefoods, keyword, keywordLength, wholefoodsLength, loading } = this.state;
 
-        if(wholefoods && keyword ){
+        if(loading){
+            return (
+                <Fragment>
+                    <div id='map'>
+                        <div className="progress">
+                            <div className="indeterminate"></div>
+                        </div>
+
+                        <span className="new badge red" data-badge-caption="Found">{keywordLength}</span>
+                        <span className="new badge green" data-badge-caption="Found">{wholefoodsLength}</span>
+                    </div>
+                </Fragment>
+
+            )
+        } else if(wholefoods && keyword ){
             // let search_term = this.props.match.params.keyword;
             return(
                 <Fragment>
                     <div id='map'>
                         <span className="new badge red" data-badge-caption="Found">{keywordLength}</span>
                         <span className="new badge green" data-badge-caption="Found">{wholefoodsLength}</span>
-
                     </div>
                 </Fragment>
             )
