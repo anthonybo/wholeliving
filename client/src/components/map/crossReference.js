@@ -39,7 +39,6 @@ class CrossReference extends Component {
             center = [-97.2263, 37.7091];
         } else {
             center = userInput.features[0].geometry.coordinates;
-            console.log(center);
 
             let lat = userInput.features[0].geometry.coordinates[1];
             let lng = userInput.features[0].geometry.coordinates[0];
@@ -51,9 +50,6 @@ class CrossReference extends Component {
 
             wholefoodsLimited = wholefoodsLimited.data.geoJson;
             wholefoodsLimitedLength = wholefoodsLimited.features.length;
-
-            console.log(wholefoodsLimited);
-            console.log(wholefoodsLimitedLength)
         }
 
         this.setState({
