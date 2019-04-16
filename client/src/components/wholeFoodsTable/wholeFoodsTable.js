@@ -57,6 +57,8 @@ class WholeFoodsTable extends Component {
         let keyword = path.params.keyword;
         let location = path.params.location;
         let range = path.params.range;
+        let lat = '';
+        let lng = '';
 
         let userInput = await axios.post(`/api/places`, {
             keyword: keyword,
@@ -64,9 +66,12 @@ class WholeFoodsTable extends Component {
         });
 
         userInput = userInput.data.geoJson;
+        console.log(userInput);
 
-        let lat = userInput.features[0].geometry.coordinates[1];
-        let lng = userInput.features[0].geometry.coordinates[0];
+        if(userInput.features.length > 0){
+            lat = userInput.features[0].geometry.coordinates[1];
+            lng = userInput.features[0].geometry.coordinates[0];
+        }
 
         let wholefoods = await axios.post('/api/geoSpacial', {
             lat: lat,
