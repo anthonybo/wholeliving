@@ -73,7 +73,7 @@ class WholeFoodsTable extends Component {
             lat = userInput.features[0].geometry.coordinates[1];
             lng = userInput.features[0].geometry.coordinates[0];
         } else {
-            console.log('Whole Foods Table: We have no results!');
+            // console.log('Whole Foods Table: We have no results!');
 
             M.toast({
                 html: 'We have no results, please try a new search!',
@@ -183,43 +183,76 @@ class WholeFoodsTable extends Component {
             // console.log(this.state.resp.data.wholefoods);
             for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{value.id}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
         } else if(this.state.byState){
             // console.log(this.state.byState.data.geoJson.features);
             for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
         } else if(this.state.byId){
             // console.log(this.state.byState.data.geoJson.features);
             for(const [index, value] of this.state.byId.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<div key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div>)
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
             // console.log('We have wholefoods cross reference data!');
-
             this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
 
             for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
                 // console.log(value.properties);
-                userInput.push(<div key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div>)
+                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{value.properties.Name}</td><td>{value.properties.Address}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
 
             return(
             <ul className="collapsible popout">
                 <li>
                     <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
-                    <div className="collapsible-body">{items}</div>
+                    <div className="collapsible-body">
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th>#</th>
+                                <th>State</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Zip</th>
+                                <th>Phone</th>
+                                <th>Hours</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {items}
+                            </tbody>
+                        </table>
+                    </div>
                 </li>
                 <li>
                     <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword}</div>
-                    <div className="collapsible-body">{userInput}</div>
+                    <div className="collapsible-body">
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                {/*<th>Phone</th>*/}
+                                {/*<th>Hours</th>*/}
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {userInput}
+                            </tbody>
+                        </table>
+                    </div>
                 </li>
             </ul>
             )
@@ -235,7 +268,25 @@ class WholeFoodsTable extends Component {
             <ul className="collapsible popout">
                 <li>
                     <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
-                    <div className="collapsible-body">{items}</div>
+                    <div className="collapsible-body">
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th>#</th>
+                                <th>State</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Zip</th>
+                                <th>Phone</th>
+                                <th>Hours</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                                {items}
+                            </tbody>
+                        </table>
+                    </div>
                 </li>
             </ul>
         )
