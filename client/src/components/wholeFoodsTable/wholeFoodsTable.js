@@ -3,6 +3,7 @@ import axios from 'axios';
 import {withRouter, Link} from 'react-router-dom';
 import AllWholeFoodsLocations from "../map/mapContainer";
 import './wholeFoodsTable.scss';
+import ReactDOM from "react-dom";
 
 class WholeFoodsTable extends Component {
 
@@ -12,7 +13,8 @@ class WholeFoodsTable extends Component {
         byId: null,
         crossReferenceUserInput: null,
         crossReferenceWholeFoods: null,
-        keyword: ''
+        keyword: '',
+        generalMap: false
     }
 
     async getAllWholeFoods(){
@@ -93,7 +95,7 @@ class WholeFoodsTable extends Component {
         })
     }
 
-    async componentDidMount() {
+    componentDidMount() {
         const path = this.props.history.location.pathname;
 
         if(path === '/'){
@@ -102,7 +104,8 @@ class WholeFoodsTable extends Component {
             this.setState({
                 allWholeFoods: null,
                 byState: null,
-                byId: null
+                byId: null,
+                generalMap: true
             })
         } else if (path.match('/byState/') ){
             this.getWholeFoodsByState();
@@ -111,6 +114,17 @@ class WholeFoodsTable extends Component {
         } else if (path.match('/crossReference/')){
             this.crossReference();
         }
+
+        const node = ReactDOM.findDOMNode(this);
+        let elem = null;
+
+        if (node instanceof HTMLElement) {
+            elem = document.querySelector('.collapsible.popout');
+        }
+
+        var instance = M.Collapsible.init(elem, {
+            accordion: true
+        });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -125,8 +139,10 @@ class WholeFoodsTable extends Component {
                     byState: null,
                     byId: null,
                     crossReferenceUserInput: null,
-                    crossReferenceWholeFoods: null
+                    crossReferenceWholeFoods: null,
+                    generalMap: true
                 })
+
             } else if (path.match('/byState/') ){
                 this.getWholeFoodsByState();
             } else if (path.match('/location/') ){
@@ -145,6 +161,16 @@ class WholeFoodsTable extends Component {
                 })
                 this.crossReference();
             }
+            const node = ReactDOM.findDOMNode(this);
+            let elem = null;
+
+            if (node instanceof HTMLElement) {
+                elem = document.querySelector('.collapsible.popout');
+            }
+
+            var instance = M.Collapsible.init(elem, {
+                accordion: true
+            });
         }
     }
 
@@ -157,49 +183,61 @@ class WholeFoodsTable extends Component {
             // console.log(this.state.resp.data.wholefoods);
             for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{value.id}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
+                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{value.id}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
             }
         } else if(this.state.byState){
             // console.log(this.state.byState.data.geoJson.features);
             for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
+                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
             }
         } else if(this.state.byId){
             // console.log(this.state.byState.data.geoJson.features);
             for(const [index, value] of this.state.byId.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
+                items.push(<div key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div>)
             }
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
-            console.log('We have wholefoods cross reference data!');
-            console.log(this.state.crossReferenceWholeFoods);
+            // console.log('We have wholefoods cross reference data!');
+
             this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
-                items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
+                items.push(<Link to={'/location/' + value.id} key={index}><div className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div></Link>)
             }
 
             for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
                 // console.log(value.properties);
-                userInput.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
+                userInput.push(<div key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</div>)
             }
 
             return(
-                <div>
-                    <h5 className='green-text'>Whole Foods:</h5>
-                    {items}
-                    <h5 className='red-text'>{this.state.keyword}:</h5>
-                    {userInput}
-                </div>
+            <ul className="collapsible popout">
+                <li>
+                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
+                    <div className="collapsible-body">{items}</div>
+                </li>
+                <li>
+                    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword}</div>
+                    <div className="collapsible-body">{userInput}</div>
+                </li>
+            </ul>
             )
-
+        } else if (this.state.generalMap) {
+            return (
+                <ul className="collapsible popout">
+                    <li></li>
+                </ul>
+            )
         }
 
         return(
-            <div>
-                {items}
-            </div>
+            <ul className="collapsible popout">
+                <li>
+                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
+                    <div className="collapsible-body">{items}</div>
+                </li>
+            </ul>
         )
     }
 }
