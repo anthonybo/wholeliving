@@ -20,70 +20,33 @@ class Places extends Component {
     }
 
     async getData(){
-        // console.log('Grabbing Data from Google!');
-
-        // let data = await axios.post(`/api/places`, {
-        //     keyword: this.state.keyword,
-        //     location: this.state.location
-        // });
-
-        // console.log(data);
         console.log('State At Push Time: ', this.state);
         if(this.state.keyword && this.state.location){
             // console.log('Props: ', this.props );
             this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location + '/' + this.state.range);
-        }
-    }
-
-    handleChange = (event) => {
-        // console.log('Setting Original State')
-        // console.log('New Location: ',this.refs.location.value);
-
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-
-        // console.log(this.state);
-    }
-
-    handleSubmit = (event) => {
-        // console.log(event.target.form.clear());
-        console.log(this.refs.location.value);
-        var newLoc = this.refs.location.value;
-
-        if(this.refs.location.value !== ''){
-            console.log('Setting new state: ', newLoc);
-            this.setState({
-                location: newLoc,
-            }, ()=>{
-                console.log('Callback State?: ',this.state);
-                if(!this.state.keyword || !this.state.location){
-                    // alert('Please Complete Both Fields!');
-                    // M.toast({
-                    //     html: 'Please complete both fields!',
-                    //     displayLength: 2000,
-                    //     classes: 'pulse'
-                    // })
-                } else {
-                    this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location + '/' + this.state.range);
-                }
-            });
-        }
-
-        this.refs.keyword.value = '';
-        this.refs.location.value = '';
-        this.refs.range.value = '';
-
-        // alert('A name was submitted: ' + this.state.keyword + ' ' + this.state.location);
-        if(!this.state.keyword || !this.state.location){
-            // alert('Please Complete Both Fields!');
-            console.log('Here?');
+        } else {
             M.toast({
                 html: 'Please complete both fields!',
                 displayLength: 2000,
                 classes: 'pulse'
             })
         }
+    }
+
+    handleChange = (event) => {
+        this.setState({
+            [event.target.name]: event.target.value
+        });
+    }
+
+    handleSubmit = (event) => {
+        console.log(this.refs.location.value);
+        var newLoc = this.refs.location.value;
+
+        this.refs.keyword.value = '';
+        this.refs.location.value = '';
+        this.refs.range.value = '';
+
         event.preventDefault();
         this.getData();
     }
@@ -95,12 +58,23 @@ class Places extends Component {
         if (node instanceof HTMLElement) {
             elems = node.querySelector('.autocomplete');
         }
-        // var elems = document.querySelector('.autocomplete');
-        var instances = M.Autocomplete.init(elems, {minLength: 2, limit: 10});
+        // var elems = document.querySelector('.autocomplete');     // OLD METHOD
+        var instances = M.Autocomplete.init(elems, {minLength: 2, limit: 10, onAutocomplete: this.autoComplete});
 
         instances.updateData(Cities);
 
-        // instances.open();
+        instances.open();
+    }
+
+    autoComplete = (value) => {
+        this.refs.keyword.value = '';
+        this.refs.location.value = '';
+        this.refs.range.value = '';
+
+        this.setState({
+            location: value
+        })
+        this.getData();
     }
 
     render(){
@@ -118,7 +92,7 @@ class Places extends Component {
                         <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='miles'/>
                     </div>
                     <div className="col s12">
-                        <input className='btn waves-effect waves-light' type="submit" value='submit'/>
+                        <input onClick={this.handleSubmit} className='btn waves-effect waves-light' type="submit" value='submit'/>
                     </div>
                 </form>
             </div>
