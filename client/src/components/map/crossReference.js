@@ -336,6 +336,9 @@ class CrossReference extends Component {
                 </Fragment>
             )
         } else {
+            console.log('WholeFoods Data: ', wholefoods);
+            console.log('Keyword Data: ', keyword);
+            console.log('loading Data: ', loading);
             return (
                 <div className='spinnerContainer'>
                     <div className="preloader-wrapper big active">

@@ -204,42 +204,47 @@ app.post('/api/places', async (req,res,next) => {
         location = req.body.location;
     }
 
-    // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
-    fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
-        .then(res => res.json())
-        .then(data=> {
-            data = data.results.map(item => {
-                // console.log(item);
+    try {
+        // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
+        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+            .then(res => res.json())
+            .then(data=> {
+                data = data.results.map(item => {
+                    // console.log(item);
 
-                item.type = "Feature",
-                    item.geometry = {
-                        type:"Point",
-                        coordinates:[item.geometry.location.lng, item.geometry.location.lat]
-                    };
-                item.properties = {
-                    Address: item.formatted_address,
-                    Name: item.name,
-                    Rating: item.rating,
-                    PlaceId: item.place_id
-                }
+                    item.type = "Feature",
+                        item.geometry = {
+                            type:"Point",
+                            coordinates:[item.geometry.location.lng, item.geometry.location.lat]
+                        };
+                    item.properties = {
+                        Address: item.formatted_address,
+                        Name: item.name,
+                        Rating: item.rating,
+                        PlaceId: item.place_id
+                    }
 
-                delete item.lng;
-                delete item.lat;
-                delete item.formatted_address;
-                delete item.rating;
-                delete item.name;
-                delete item.place_id;
-                return item;
+                    delete item.lng;
+                    delete item.lat;
+                    delete item.formatted_address;
+                    delete item.rating;
+                    delete item.name;
+                    delete item.place_id;
+                    return item;
+                })
+                // res.send({data})
+                res.send({
+                    success:true,
+                    geoJson: {
+                        type:"FeatureCollection",
+                        features: data
+                    }
+                });
             })
-            // res.send({data})
-            res.send({
-                success:true,
-                geoJson: {
-                    type:"FeatureCollection",
-                    features: data
-                }
-            });
-        })
+    } catch(error){
+        res.status(500).send('Server Error');
+    }
+
 })
 
 app.post('/api/places/details', async (req,res,next) => {

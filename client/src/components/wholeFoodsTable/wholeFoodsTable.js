@@ -71,6 +71,14 @@ class WholeFoodsTable extends Component {
         if(userInput.features.length > 0){
             lat = userInput.features[0].geometry.coordinates[1];
             lng = userInput.features[0].geometry.coordinates[0];
+        } else {
+            console.log('Whole Foods Table: We have no results!');
+
+            M.toast({
+                html: 'We have no results, please try a new search!',
+                displayLength: 2000,
+                classes: 'pulse'
+            })
         }
 
         let wholefoods = await axios.post('/api/geoSpacial', {
@@ -165,7 +173,8 @@ class WholeFoodsTable extends Component {
                 items.push(<li key={index} className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li>)
             }
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
-            // console.log('We have wholefoods cross reference data!')
+            console.log('We have wholefoods cross reference data!');
+            console.log(this.state.crossReferenceWholeFoods);
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
                 items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
