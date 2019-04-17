@@ -20,7 +20,6 @@ class Places extends Component {
     }
 
     async getData(){
-        console.log('State At Push Time: ', this.state);
         if(this.state.keyword && this.state.location){
             // console.log('Props: ', this.props );
             this.props.history.push(`/crossReference/` + this.state.keyword + '/' + this.state.location + '/' + this.state.range);
@@ -40,7 +39,6 @@ class Places extends Component {
     }
 
     handleSubmit = (event) => {
-        console.log(this.refs.location.value);
         var newLoc = this.refs.location.value;
 
         this.refs.keyword.value = '';

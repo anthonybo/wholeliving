@@ -66,7 +66,6 @@ class WholeFoodsTable extends Component {
         });
 
         userInput = userInput.data.geoJson;
-        console.log(userInput);
 
         if(userInput.features.length > 0){
             lat = userInput.features[0].geometry.coordinates[1];
@@ -175,6 +174,7 @@ class WholeFoodsTable extends Component {
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
             console.log('We have wholefoods cross reference data!');
             console.log(this.state.crossReferenceWholeFoods);
+            this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
                 items.push(<Link to={'/location/' + value.id} key={index}><li className='white-text wholefoods-details'>[{index+1}] {value.geometry.coordinates[1]} {value.geometry.coordinates[0]} {value.properties.State} {value.properties.Address} {value.properties.City} {value.properties.Zip} {value.properties.Phone} {value.properties.Hours}</li></Link>)
