@@ -13,7 +13,6 @@ const App = () => (
     <div className='application-container'>
         <aside>
             <nav>
-
                 <Link to='/'><img src={logo}/></Link>
                     <Link to="/"><i className="material-icons md-36">home</i><p>Home</p></Link>
                     <Link to="/generalMap"><i className="material-icons md-36">map</i><p>State Map</p></Link>
@@ -32,6 +31,7 @@ const App = () => (
                 <Route path='/byState/:state' component={Homepage}/>
                 <Route path='/location/:id' component={Homepage}/>
                 <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
+                <Route path='/busLookup/:id' component={Homepage}/>
             </Switch>
 
             <footer>

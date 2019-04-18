@@ -15,7 +15,8 @@ class WholeFoodsTable extends Component {
         crossReferenceWholeFoods: null,
         keyword: '',
         generalMap: false,
-        userInput: []
+        userInput: [],
+        byBusId: null
     }
 
     async getAllWholeFoods(){
@@ -52,6 +53,22 @@ class WholeFoodsTable extends Component {
         this.setState({
             byId: wholefoods
         })
+    }
+
+    async getLocationByBusId(){
+        console.log('We are in the getLocationByBusID Function!');
+        let path = this.props.history.location.pathname.split('/');
+        let id = path[2];
+
+        let businessData = await axios.post(`/api/places/details`, {
+            places_id: id
+        });
+
+        this.setState({
+            byBusId: businessData
+        })
+
+        console.log(businessData);
     }
 
     async crossReference(){
@@ -116,6 +133,8 @@ class WholeFoodsTable extends Component {
             this.getLocationById();
         } else if (path.match('/crossReference/')){
             this.crossReference();
+        } else if (path.match('/busLookup/')){
+            this.getLocationByBusId();
         }
 
         const node = ReactDOM.findDOMNode(this);
@@ -163,7 +182,14 @@ class WholeFoodsTable extends Component {
                     byId: null
                 })
                 this.crossReference();
-
+            } else if (path.match('/busLookup/')){
+                this.setState({
+                    allWholeFoods: null,
+                    byState: null,
+                    crossReferenceUserInput: null,
+                    crossReferenceWholeFoods: null
+                })
+                this.getLocationByBusId();
             }
             const node = ReactDOM.findDOMNode(this);
             let elem = null;
@@ -184,21 +210,20 @@ class WholeFoodsTable extends Component {
     }
 
     async getDetailedData(places_id){
-        // console.log('Getting Detailed Data...')
         let detailedData = await axios.post(`/api/places/details`, {
             places_id: places_id
         });
-        // console.log(detailedData);
 
         return detailedData;
     }
 
     createTableEntriesForUserSelection(){
         const userInput = [];
+        let placeId = '';
 
-        for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
+        for(const [index, original_value] of this.state.crossReferenceUserInput.features.entries()){
             // console.log(value.properties.PlaceId);
-            let getMoreData = this.getDetailedData(value.properties.PlaceId);
+            let getMoreData = this.getDetailedData(original_value.properties.PlaceId);
             getMoreData.then((value)=> {
                 let userInputData = value.data.data.result;
                 let hours = 'unavailable';
@@ -217,9 +242,9 @@ class WholeFoodsTable extends Component {
                 if(value.data.data.result.formatted_phone_number){
                     phone = userInputData.formatted_phone_number
                 }
+                placeId = original_value.properties.PlaceId;
 
-                // console.log(value.data.data.result);
-                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+                userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
                 this.setState({
                     userInput: userInput
                 })

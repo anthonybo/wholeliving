@@ -4,52 +4,63 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIze
 import axios from "axios";
 import {withRouter} from 'react-router-dom';
 
-class LocateByState extends Component {
+class LocateByBusId extends Component {
 
     state = {
-        wholefoods: null,
+        business: null,
         center: [-97.2263, 37.7091],
         zoom: 18,
-        id: 0,
+        id: '',
         state: '',
         city: ''
     }
 
     async getData() {
-        let path = this.props.history.location.pathname;
-        let id = path.match( /location\/(\d+)/ )[1];
+        let path = this.props.history.location.pathname.split('/');
+        let id = path[2];
+        let businessInfo = {};
+        var d = new Date();
+        let Hours = 'unavailable';
 
-        let wholefoods = await axios.post('/api/location', {
-            id: id
+        let businessData = await axios.post(`/api/places/details`, {
+            places_id: id
         });
 
-        if(wholefoods.data.geoJson.features.length < 1){
-            console.log('No Results')
-
-            this.setState({
-                zoom: 3,
-                state: 'Not Found'
-            })
-        } else {
-            // console.log(wholefoods.data.geoJson.features[0].geometry.coordinates);
-            let center = wholefoods.data.geoJson.features[0].geometry.coordinates;
-
-            wholefoods = wholefoods.data.geoJson;
-            // console.log(wholefoods.features[0].properties.City);
-            let state = wholefoods.features[0].properties.State;
-            let city = wholefoods.features[0].properties.City;
-
-            console.log(wholefoods);
-
-            this.setState({
-                wholefoods: wholefoods,
-                center: center,
-                state: state,
-                city: city
-            })
+        businessData = businessData.data.data.result;
+        if(businessData.opening_hours){
+            Hours = businessData.opening_hours.weekday_text[d.getDay()-1 ];
         }
 
-        if(wholefoods !== null) {
+        businessInfo.type = "Feature",
+            businessInfo.geometry = {
+                type:"Point",
+                coordinates:[businessData.geometry.location.lng, businessData.geometry.location.lat]
+            };
+        businessInfo.properties = {
+            Address: businessData.formatted_address,
+            Name: businessData.name,
+            Rating: businessData.rating,
+            website: businessData.website,
+            Phone: businessData.formatted_phone_number,
+            Hours: Hours
+        }
+
+        let business = {
+            success:true,
+            geoJson: {
+                type:"FeatureCollection",
+                features: [businessInfo]
+            }
+        }
+
+        let center = business.geoJson.features[0].geometry.coordinates;
+        business = business.geoJson;
+        this.setState({
+            business: business,
+            center: center
+        })
+
+        if(business !== null){
             this.createMap();
         }
     }
@@ -134,16 +145,16 @@ class LocateByState extends Component {
              * Adding the source for the crime data
              * Display the data with heat maps and pin points
              * */
-            this.map.addSource('wholefoods', {
+            this.map.addSource('business', {
                 type: 'geojson',
-                data: this.state.wholefoods
+                data: this.state.business
             });
 
             // add heatmap layer here
             this.map.addLayer({
-                id: 'wholefoods-heat',
+                id: 'business-heat',
                 type: 'heatmap',
-                source: 'wholefoods',
+                source: 'business',
                 maxzoom: 15,
                 paint: {
                     // increase weight as diameter breast height increases
@@ -194,9 +205,9 @@ class LocateByState extends Component {
 
             // add circle layer here
             this.map.addLayer({
-                id: 'wholefoods-point',
+                id: 'business-point',
                 type: 'circle',
-                source: 'wholefoods',
+                source: 'business',
                 minzoom: 14,
                 paint: {
                     // increase the radius of the circle as the zoom level and dbh value increases
@@ -234,19 +245,28 @@ class LocateByState extends Component {
                 }
             }, 'waterway-label');
 
-            this.map.on('click', 'wholefoods-point', (e) => {
+            this.map.on('click', 'business-point', (e) => {
                 // console.log(e.features[0].properties);
+                let busInfo = e.features[0].properties;
+
+                let hours = busInfo.Hours;
+                let website = 'unavailable';
+                // console.log(value.data.data.result);
+                if(busInfo.website) {
+                    // console.log('We have a website');
+                    website = '<a target="_blank" href="' + busInfo.website + '">' + 'Link' + '</a>';
+                }
 
                 // this.createFeatureButtonLink();
                 new mapboxgl.Popup()
                     .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>Whole Foods</b>' + '<br><b>State:</b> ' + e.features[0].properties.State + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>City:</b> ' + e.features[0].properties.City + '<br><b>Zip:</b> ' + e.features[0].properties.Zip + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
+                    .setHTML('<b>' + busInfo.Name + '</b>' + '<br><b>Rating:</b> ' + busInfo.Rating + '<br><b>Address:</b> ' + busInfo.Address + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours )
                     .addTo(this.map);
                 // var features = e.features[0];
             });
         });
 
-        this.displayCurrentState();
+        // this.displayCurrentState();
     }
 
     componentDidMount() {
@@ -254,9 +274,9 @@ class LocateByState extends Component {
     }
 
     render(){
-        const { wholefoods } = this.state;
+        const { business } = this.state;
 
-        if(wholefoods){
+        if(business){
             return(
                 <Fragment>
                     <div id='map'></div>
@@ -286,4 +306,4 @@ class LocateByState extends Component {
     }
 }
 
-export default withRouter(LocateByState);
+export default withRouter(LocateByBusId);

@@ -250,7 +250,7 @@ app.post('/api/places', async (req,res,next) => {
 app.post('/api/places/details', async (req,res,next) => {
     // console.log(req.body);
 
-    fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+    fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
         .then(res => res.json())
         .then(data=> {
             // console.log(data);
