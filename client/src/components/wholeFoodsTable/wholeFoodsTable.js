@@ -195,8 +195,10 @@ class WholeFoodsTable extends Component {
             // console.log(value.properties.PlaceId);
             let getMoreData = this.getDetailedData(value.properties.PlaceId);
             getMoreData.then((value)=> {
+                let userInputData = value.data.data.result;
                 let hours = 'unavailable';
                 let website = 'unavailable';
+                let phone = 'unavailable';
                 // console.log(value.data.data.result);
                 if(value.data.data.result.opening_hours){
                     var d = new Date();
@@ -207,10 +209,12 @@ class WholeFoodsTable extends Component {
                     // console.log('We have a website');
                     website = <a target="_blank" href={value.data.data.result.website}>Link</a>;
                 }
+                if(value.data.data.result.formatted_phone_number){
+                    phone = userInputData.formatted_phone_number
+                }
 
                 // console.log(value.data.data.result);
-                var userInputData = value.data.data.result;
-                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{userInputData.formatted_phone_number}</td><td>{hours}</td><td>{website}</td></tr>)
+                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
                 this.setState({
                     userInput: userInput
                 })
@@ -252,7 +256,7 @@ class WholeFoodsTable extends Component {
             return(
             <ul className="collapsible popout">
                 <li>
-                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
+                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods [{this.state.crossReferenceWholeFoods.data.geoJson.features.length}]</div>
                     <div className="collapsible-body">
                         <table className='responsive-table'>
                             <thead>
@@ -274,7 +278,7 @@ class WholeFoodsTable extends Component {
                     </div>
                 </li>
                 <li>
-                    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword}</div>
+                    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>
                     <div className="collapsible-body">
                         <table className='responsive-table'>
                             <thead>
