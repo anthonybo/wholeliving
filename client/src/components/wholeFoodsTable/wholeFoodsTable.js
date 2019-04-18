@@ -14,7 +14,8 @@ class WholeFoodsTable extends Component {
         crossReferenceUserInput: null,
         crossReferenceWholeFoods: null,
         keyword: '',
-        generalMap: false
+        generalMap: false,
+        userInput: []
     }
 
     async getAllWholeFoods(){
@@ -93,6 +94,8 @@ class WholeFoodsTable extends Component {
             crossReferenceWholeFoods: wholefoods,
             keyword: keyword
         })
+        this.createTableEntriesForUserSelection();
+
     }
 
     componentDidMount() {
@@ -160,6 +163,7 @@ class WholeFoodsTable extends Component {
                     byId: null
                 })
                 this.crossReference();
+
             }
             const node = ReactDOM.findDOMNode(this);
             let elem = null;
@@ -171,6 +175,46 @@ class WholeFoodsTable extends Component {
             var instance = M.Collapsible.init(elem, {
                 accordion: true
             });
+        }
+    }
+
+    async getDetailedData(places_id){
+        // console.log('Getting Detailed Data...')
+        let detailedData = await axios.post(`/api/places/details`, {
+            places_id: places_id
+        });
+        // console.log(detailedData);
+
+        return detailedData;
+    }
+
+    createTableEntriesForUserSelection(){
+        const userInput = [];
+
+        for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
+            // console.log(value.properties.PlaceId);
+            let getMoreData = this.getDetailedData(value.properties.PlaceId);
+            getMoreData.then((value)=> {
+                let hours = 'unavailable';
+                let website = 'unavailable';
+                // console.log(value.data.data.result);
+                if(value.data.data.result.opening_hours){
+                    var d = new Date();
+                    // console.log(d.getDay()-1 );
+                    hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
+                }
+                if(value.data.data.result.website) {
+                    // console.log('We have a website');
+                    website = <a target="_blank" href={value.data.data.result.website}>Link</a>;
+                }
+
+                // console.log(value.data.data.result);
+                var userInputData = value.data.data.result;
+                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{userInputData.formatted_phone_number}</td><td>{hours}</td><td>{website}</td></tr>)
+                this.setState({
+                    userInput: userInput
+                })
+            })
         }
     }
 
@@ -203,11 +247,6 @@ class WholeFoodsTable extends Component {
             for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
                 // console.log(value.properties);
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
-            }
-
-            for(const [index, value] of this.state.crossReferenceUserInput.features.entries()){
-                // console.log(value.properties);
-                userInput.push(<tr className='white-text' key={index}><td>[{index+1}]</td><td>{value.properties.Name}</td><td>{value.properties.Address}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
 
             return(
@@ -243,13 +282,14 @@ class WholeFoodsTable extends Component {
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Address</th>
-                                {/*<th>Phone</th>*/}
-                                {/*<th>Hours</th>*/}
+                                <th>Phone</th>
+                                <th>Hours</th>
+                                <th>Website</th>
                             </tr>
                             </thead>
 
                             <tbody>
-                            {userInput}
+                            {this.state.userInput}
                             </tbody>
                         </table>
                     </div>
