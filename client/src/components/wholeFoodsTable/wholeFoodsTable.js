@@ -172,9 +172,14 @@ class WholeFoodsTable extends Component {
                 elem = document.querySelector('.collapsible.popout');
             }
 
-            var instance = M.Collapsible.init(elem, {
+            M.Collapsible.init(elem, {
                 accordion: true
             });
+
+            var instance = M.Collapsible.getInstance(elem);
+
+            instance.close(0);
+            instance.close(1);
         }
     }
 

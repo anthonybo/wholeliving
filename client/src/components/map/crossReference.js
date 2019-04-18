@@ -271,7 +271,7 @@ class CrossReference extends Component {
                     }
                     if(value.data.data.result.website) {
                         // console.log('We have a website');
-                        website = '<a target="_blank" href="' + value.data.data.result.website + '">' + value.data.data.result.website + '</a>';
+                        website = '<a target="_blank" href="' + value.data.data.result.website + '">' + 'Link' + '</a>';
                     }
 
                     new mapboxgl.Popup()
