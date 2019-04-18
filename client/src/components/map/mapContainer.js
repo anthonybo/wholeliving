@@ -5,6 +5,7 @@ import {withRouter} from 'react-router-dom';
 import LocationByState from './locateByState';
 import LocatonById from './locateById';
 import CrossReference from './crossReference';
+import LocateByBusId from './locateByBusId';
 
 class MapContainer extends Component {
 
@@ -28,6 +29,8 @@ class MapContainer extends Component {
             mapType = <LocatonById/>;
         } else if (path.match('/crossReference/')) {
             mapType = <CrossReference/>;
+        } else if (path.match('/busLookup/')){
+            mapType = <LocateByBusId/>
         }
 
         return(
