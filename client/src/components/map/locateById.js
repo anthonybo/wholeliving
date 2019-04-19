@@ -38,9 +38,7 @@ class LocateByState extends Component {
             // console.log(wholefoods.features[0].properties.City);
             let state = wholefoods.features[0].properties.State;
             let city = wholefoods.features[0].properties.City;
-
-            console.log(wholefoods);
-
+            
             this.setState({
                 wholefoods: wholefoods,
                 center: center,
@@ -244,6 +242,11 @@ class LocateByState extends Component {
                     .addTo(this.map);
                 // var features = e.features[0];
             });
+
+            new mapboxgl.Popup()
+                .setLngLat(this.state.wholefoods.features[0].geometry.coordinates)
+                .setHTML('<b>Whole Foods</b>' + '<br><b>State:</b> ' + this.state.wholefoods.features[0].properties.State + '<br><b>Address:</b> ' + this.state.wholefoods.features[0].properties.Address + '<br><b>City:</b> ' + this.state.wholefoods.features[0].properties.City + '<br><b>Zip:</b> ' + this.state.wholefoods.features[0].properties.Zip + '<br><b>Phone:</b> ' + this.state.wholefoods.features[0].properties.Phone + '<br><b>Hours:</b> ' + this.state.wholefoods.features[0].properties.Hours)
+                .addTo(this.map);
         });
 
         this.displayCurrentState();
