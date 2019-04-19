@@ -56,7 +56,6 @@ class WholeFoodsTable extends Component {
     }
 
     async getLocationByBusId(){
-        console.log('We are in the getLocationByBusID Function!');
         let path = this.props.history.location.pathname.split('/');
         let id = path[2];
 
@@ -68,7 +67,30 @@ class WholeFoodsTable extends Component {
             byBusId: businessData
         })
 
-        console.log(businessData);
+        let userInputData = businessData.data.data.result;
+        let hours = 'unavailable';
+        let website = 'unavailable';
+        let phone = 'unavailable';
+        let userInput = [];
+
+        if(userInputData.opening_hours){
+            var d = new Date();
+            // console.log(d.getDay()-1 );
+            hours = userInputData.opening_hours.weekday_text[d.getDay()-1 ];
+        }
+        if(userInputData.website) {
+            // console.log('We have a website');
+            website = <a target="_blank" href={userInputData.website}>Link</a>;
+        }
+        if(userInputData.formatted_phone_number){
+            phone = userInputData.formatted_phone_number
+        }
+
+        userInput.push(<tr className='white-text' key='1'><td><Link to={'/busLookup/'+ id}>[1]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+
+        this.setState({
+            userInput: userInput
+        })
     }
 
     async crossReference(){
@@ -334,6 +356,32 @@ class WholeFoodsTable extends Component {
             return (
                 <ul className="collapsible popout">
                     <li></li>
+                </ul>
+            )
+        } else if (this.state.byBusId){
+            return(
+                <ul className="collapsible popout">
+                    <li>
+                        <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>
+                        <div className="collapsible-body">
+                            <table className='responsive-table'>
+                                <thead>
+                                <tr className='white-text'>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Phone</th>
+                                    <th>Hours</th>
+                                    <th>Website</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {this.state.userInput}
+                                </tbody>
+                            </table>
+                        </div>
+                    </li>
                 </ul>
             )
         }
