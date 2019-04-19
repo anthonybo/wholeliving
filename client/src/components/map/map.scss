@@ -161,3 +161,13 @@ span.badge.new {
 .mapboxgl-ctrl-top-left, .mapboxgl-ctrl-top-right, .mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right {
   pointer-events: all;
 }
+
+.directions-control.directions-control-directions {
+  height: 400px;
+}
+
+@media only screen and (max-width: 640px) {
+  .directions-control.directions-control-directions{
+    height: 250px;
+  }
+}
