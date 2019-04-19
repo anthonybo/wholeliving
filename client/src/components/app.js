@@ -14,8 +14,8 @@ const App = () => (
         <aside>
             <nav>
                 <Link to='/'><img src={logo}/></Link>
-                    <Link to="/"><i className="material-icons md-36">home</i><p>Home</p></Link>
-                    <Link to="/generalMap"><i className="material-icons md-36">map</i><p>State Map</p></Link>
+                <Link to="/"><i className="material-icons md-36">home</i><p>Home</p></Link>
+                <Link to="/generalMap"><i className="material-icons md-36">map</i><p>State Map</p></Link>
             </nav>
         </aside>
 

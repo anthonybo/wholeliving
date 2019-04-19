@@ -263,6 +263,20 @@ class LocateByBusId extends Component {
                     .addTo(this.map);
                 // var features = e.features[0];
             });
+
+            let busInfo = this.state.business.features[0].properties;
+            let hours = busInfo.Hours;
+            let website = 'unavailable';
+            // console.log(value.data.data.result);
+            if(busInfo.website) {
+                // console.log('We have a website');
+                website = '<a target="_blank" href="' + busInfo.website + '">' + 'Link' + '</a>';
+            }
+
+            new mapboxgl.Popup()
+                .setLngLat(this.state.business.features[0].geometry.coordinates)
+                .setHTML('<b>' + busInfo.Name + '</b>' + '<br><b>Rating:</b> ' + busInfo.Rating + '<br><b>Address:</b> ' + busInfo.Address + '<br><b>Phone:</b> ' + busInfo.Phone + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours )
+                .addTo(this.map);
         });
 
         // this.displayCurrentState();
