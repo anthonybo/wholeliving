@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 const MapboxDirections = require('@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions');
-mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
+mapboxgl.accessToken = 'pk.eyJ1IjoiYW50aG9ueWJvIiwiYSI6ImNqc25rbzdpejBkY3E0M3JyaWNob250d3AifQ.4SL7BrQE_33BETs630EOww';
 import axios from "axios";
 import {withRouter} from 'react-router-dom';
 import ReactDOM from "react-dom";
@@ -103,10 +103,11 @@ class LocateByBusId extends Component {
 
             this.locateUser = new mapboxgl.GeolocateControl({
                 positionOptions: {
-                    enableHighAccuracy: true
+                    enableHighAccuracy: false,
+                    timeout: 6000
                 },
                 trackUserLocation: true,
-                showUserLocation: false
+                showUserLocation: false,
             });
             this.map.addControl(this.directions, 'top-left');
             this.map.addControl(this.locateUser);
@@ -115,7 +116,7 @@ class LocateByBusId extends Component {
 
             this.locateUser.on('geolocate', (e)=> {
                 // console.log(e);
-                // this.directions.placeholderOrigin = e.coords.longitude +',' + e.coords.latitude;
+                this.directions.placeholderOrigin = 'test';
                 this.directions.setOrigin([e.coords.longitude, e.coords.latitude]);
             })
             this.setState({
@@ -161,6 +162,7 @@ class LocateByBusId extends Component {
             center: this.state.center,
             zoom: this.state.zoom,
             pitch: 45,
+            attributionControl: false
             // minZoom: 7,
             // maxZoom: 20
         });
@@ -380,7 +382,7 @@ class LocateByBusId extends Component {
                     <div id='map'>
                         <div id="div" className="mapboxgl-ctrl-bottom-right">
                             <a onClick={this.createDirections} className="directions-btn"><i className="material-icons
-   right">cloud</i>Directions</a>
+   right">directions_car</i>Directions</a>
                         </div>
                     </div>
                 </Fragment>
