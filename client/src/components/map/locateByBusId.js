@@ -248,7 +248,6 @@ class LocateByBusId extends Component {
             this.map.on('click', 'business-point', (e) => {
                 // console.log(e.features[0].properties);
                 let busInfo = e.features[0].properties;
-
                 let hours = busInfo.Hours;
                 let website = 'unavailable';
                 // console.log(value.data.data.result);
