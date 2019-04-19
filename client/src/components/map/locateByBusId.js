@@ -1,8 +1,10 @@
 import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+const MapboxDirections = require('@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
 import axios from "axios";
 import {withRouter} from 'react-router-dom';
+import ReactDOM from "react-dom";
 
 class LocateByBusId extends Component {
 
@@ -12,7 +14,8 @@ class LocateByBusId extends Component {
         zoom: 18,
         id: '',
         state: '',
-        city: ''
+        city: '',
+        directionsOpen: false
     }
 
     async getData() {
@@ -82,6 +85,75 @@ class LocateByBusId extends Component {
         statePre.append(stateSpan, citySpan);
     }
 
+    createDirections=()=> {
+
+        if (!this.state.directionsOpen){
+            this.map.addControl(new mapboxgl.FullscreenControl());
+
+            this.directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                interactive: false,
+                controls: {
+                    inputs: true,
+                    instructions: true,
+                    profileSwitcher: false
+                },
+                placeholderDestination: (this.state.business.features[0].geometry.coordinates[0]+','+ this.state.business.features[0].geometry.coordinates[1])
+            });
+
+            this.locateUser = new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true,
+                showUserLocation: false
+            });
+            this.map.addControl(this.directions, 'top-left');
+            this.map.addControl(this.locateUser);
+
+            this.directions.setDestination(this.state.business.features[0].geometry.coordinates);
+
+            this.locateUser.on('geolocate', (e)=> {
+                // console.log(e);
+                // this.directions.placeholderOrigin = e.coords.longitude +',' + e.coords.latitude;
+                this.directions.setOrigin([e.coords.longitude, e.coords.latitude]);
+            })
+            this.setState({
+                directionsOpen: true
+            })
+        } else {
+            // console.log(this.map);
+            this.map.removeControl(this.directions);
+            this.map.removeControl(this.locateUser);
+            // this.map.disable(this.map.transform);
+            //mapboxgl-ctrl-icon mapboxgl-ctrl-fullscreen
+
+            const node = ReactDOM.findDOMNode(this);
+            let elem = null;
+
+            if (node instanceof HTMLElement) {
+                elem = document.querySelector('.mapboxgl-ctrl.mapboxgl-ctrl-group');
+
+            }
+            // console.log(elem);
+
+            if(elem) {
+                elem.remove();
+            }
+
+            this.map.flyTo({
+                center: this.state.center,
+                speed: 0.6,
+                curve: 1,
+                easing: function (t) { return t; }
+            })
+
+            this.setState({
+                directionsOpen: false
+            })
+        }
+    }
+
     createMap(){
         this.map = new mapboxgl.Map({
             container: 'map',
@@ -95,8 +167,15 @@ class LocateByBusId extends Component {
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
-            this.map.addControl(new mapboxgl.FullscreenControl());
+            // this.map.addControl(new mapboxgl.FullscreenControl());
 
+            // this.createDirections();
+
+            // this.map.addControl(new MapboxDirections({
+            //     accessToken: mapboxgl.accessToken
+            // }), 'top-left');
+
+            // MapboxDirections.setDestination('test');
             // if(!document.getElementById("menu")) {
             //     this.createMenu();
             // }
@@ -286,13 +365,24 @@ class LocateByBusId extends Component {
         this.getData();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+
+    }
+
     render(){
         const { business } = this.state;
 
         if(business){
             return(
                 <Fragment>
-                    <div id='map'></div>
+
+                    <div id='map'>
+                        <div id="div" className="mapboxgl-ctrl-bottom-right">
+                            <a onClick={this.createDirections} className="directions-btn"><i className="material-icons
+   right">cloud</i>Directions</a>
+                        </div>
+                    </div>
                 </Fragment>
             )
         } else {
