@@ -3,7 +3,7 @@
   height: 59vh;
 }
 
-.mapboxgl-ctrl-bottom-right {
+.mapboxgl-ctrl-attrib-inner {
   display: none;
 }
 
@@ -108,3 +108,56 @@ span.badge.new {
   max-width: 60%;
 }
 
+.mapboxgl-ctrl-geocoder > input {
+  margin: 0 !important;
+  height: 39px !important;
+}
+
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+  margin: 0;
+}
+
+.directions-btn {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+  z-index: 1;
+  -webkit-transition: .3s ease-out;
+  transition: .3s ease-out;
+  text-decoration: none;
+  color: #fff;
+  background-color: #26a69a;
+  text-align: center;
+  letter-spacing: .5px;
+  -webkit-transition: background-color .2s ease-out;
+  transition: background-color .2s ease-out;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  border-radius: 2px;
+  display: inline-block;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 16px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #2196F3 !important;
+}
+
+.directions-container {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.mapboxgl-ctrl-top-left, .mapboxgl-ctrl-top-right, .mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right {
+  pointer-events: all;
+}
