@@ -361,8 +361,6 @@ class LocateByState extends Component {
                 </div>
             )
         }
-
-
     }
 }
 

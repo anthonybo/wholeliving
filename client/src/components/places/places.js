@@ -90,7 +90,7 @@ class Places extends Component {
                         <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='miles'/>
                     </div>
                     <div className="col s2">
-                        {/*<input onClick={this.handleSubmit} className='btn waves-effect waves-light' type="submit" value='submit'/>*/}
+                        <input onClick={this.handleSubmit} className='btn waves-effect waves-light hideThis' type="submit" value='submit'/>
                         <a onClick={this.handleSubmit} className="btn-floating btn waves-effect waves-light"><i className="material-icons
    right">search</i></a>
                     </div>
