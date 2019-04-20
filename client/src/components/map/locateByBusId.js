@@ -380,10 +380,9 @@ class LocateByBusId extends Component {
         if(business){
             return(
                 <Fragment>
-
                     <div id='map'>
                         <div id="div" className="mapboxgl-ctrl-bottom-right">
-                            <a onClick={this.createDirections} className="directions-btn"><i className="material-icons
+                            <a onClick={this.createDirections} className="btn-floating btn-large waves-effect waves-light blue"><i className="material-icons
    right">directions_car</i>Directions</a>
                         </div>
                     </div>
