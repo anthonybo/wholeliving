@@ -151,6 +151,11 @@ span.badge.new {
   -webkit-tap-highlight-color: transparent;
   background-color: #2196F3 !important;
 }
+@media (max-width: 601px) {
+  .mobile-submit {
+    display: none;
+  }
+}
 
 .directions-container {
   margin-left: auto;
