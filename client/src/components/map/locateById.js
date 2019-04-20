@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
+const MapboxDirections = require('@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions');
 import axios from "axios";
 import {withRouter} from 'react-router-dom';
 
@@ -66,6 +67,78 @@ class LocateByState extends Component {
         // console.log(this.state.wholefoods.features.length);
         mapDiv.append(statePre);
         statePre.append(stateSpan, citySpan);
+    }
+
+    createDirections =()=> {
+        if (!this.state.directionsOpen){
+            // this.map.addControl(new mapboxgl.FullscreenControl());
+
+            this.directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                interactive: false,
+                controls: {
+                    inputs: true,
+                    instructions: true,
+                    profileSwitcher: false
+                },
+                placeholderDestination: (this.state.wholefoods.features[0].geometry.coordinates[0]+','+ this.state.wholefoods.features[0].geometry.coordinates[1])
+            });
+
+            this.locateUser = new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: false,
+                    timeout: 6000
+                },
+                trackUserLocation: true,
+                showUserLocation: false,
+            });
+            // this.fullScreen = new mapboxgl.FullscreenControl();
+            // this.map.addControl(this.fullScreen);
+            this.map.addControl(this.directions, 'top-left');
+            this.map.addControl(this.locateUser);
+
+            this.directions.setDestination(this.state.wholefoods.features[0].geometry.coordinates);
+
+            this.locateUser.on('geolocate', (e)=> {
+                // console.log(e);
+                // this.directions.placeholderOrigin = 'test';
+                this.directions.setOrigin([e.coords.longitude, e.coords.latitude]);
+                // this.directions.query();
+            })
+            this.setState({
+                directionsOpen: true
+            })
+        } else {
+            this.map.removeControl(this.directions);
+            this.map.removeControl(this.locateUser);
+            // this.map.removeControl(this.fullScreen);
+            // this.map.disable(this.map.transform);
+            //mapboxgl-ctrl-icon mapboxgl-ctrl-fullscreen
+
+            // const node = ReactDOM.findDOMNode(this);
+            // let elem = null;
+            //
+            // if (node instanceof HTMLElement) {
+            //     elem = document.querySelector('.mapboxgl-ctrl.mapboxgl-ctrl-group');
+            //
+            // }
+            // // console.log(elem);
+            //
+            // if(elem) {
+            //     elem.remove();
+            // }
+
+            this.map.flyTo({
+                center: this.state.center,
+                speed: 0.6,
+                curve: 1,
+                easing: function (t) { return t; }
+            })
+
+            this.setState({
+                directionsOpen: false
+            })
+        }
     }
 
     createMap(){
@@ -261,7 +334,12 @@ class LocateByState extends Component {
         if(wholefoods){
             return(
                 <Fragment>
-                    <div id='map'></div>
+                    <div id='map'>
+                        <div id="div" className="mapboxgl-ctrl-bottom-right">
+                            <a onClick={this.createDirections} className="btn-floating btn-large waves-effect waves-light blue"><i className="material-icons
+   right">directions_car</i>Directions</a>
+                        </div>
+                    </div>
                 </Fragment>
             )
         } else {
