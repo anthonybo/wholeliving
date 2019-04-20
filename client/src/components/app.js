@@ -21,6 +21,7 @@ const App = () => (
 
         <nav className="mobile-nav">
             <Link to="/">Home</Link>
+            <img src={logo}/>
             <Link to="/generalMap">State Map</Link>
         </nav>
 

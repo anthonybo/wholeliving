@@ -86,11 +86,13 @@ class Places extends Component {
                         <i className="material-icons prefix">textsms</i>
                         <input id="autocomplete-input" className='white-text autocomplete' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
                     </div>
-                    <div className="col s3">
+                    <div className="col s2">
                         <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='miles'/>
                     </div>
-                    <div className="col s12">
-                        <input onClick={this.handleSubmit} className='btn waves-effect waves-light' type="submit" value='submit'/>
+                    <div className="col s2">
+                        {/*<input onClick={this.handleSubmit} className='btn waves-effect waves-light' type="submit" value='submit'/>*/}
+                        <a onClick={this.handleSubmit} className="btn-floating btn waves-effect waves-light"><i className="material-icons
+   right">search</i></a>
                     </div>
                 </form>
             </div>

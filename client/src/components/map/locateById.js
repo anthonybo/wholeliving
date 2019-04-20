@@ -5,7 +5,6 @@ import axios from "axios";
 import {withRouter} from 'react-router-dom';
 
 class LocateByState extends Component {
-
     state = {
         wholefoods: null,
         center: [-97.2263, 37.7091],

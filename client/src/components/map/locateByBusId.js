@@ -85,10 +85,9 @@ class LocateByBusId extends Component {
         statePre.append(stateSpan, citySpan);
     }
 
-    createDirections=()=> {
-
+    createDirections =()=> {
         if (!this.state.directionsOpen){
-            this.map.addControl(new mapboxgl.FullscreenControl());
+            // this.map.addControl(new mapboxgl.FullscreenControl());
 
             this.directions = new MapboxDirections({
                 accessToken: mapboxgl.accessToken,
@@ -109,6 +108,8 @@ class LocateByBusId extends Component {
                 trackUserLocation: true,
                 showUserLocation: false,
             });
+            this.fullScreen = new mapboxgl.FullscreenControl();
+            this.map.addControl(this.fullScreen);
             this.map.addControl(this.directions, 'top-left');
             this.map.addControl(this.locateUser);
 
@@ -116,31 +117,32 @@ class LocateByBusId extends Component {
 
             this.locateUser.on('geolocate', (e)=> {
                 // console.log(e);
-                this.directions.placeholderOrigin = 'test';
+                // this.directions.placeholderOrigin = 'test';
                 this.directions.setOrigin([e.coords.longitude, e.coords.latitude]);
+                // this.directions.query();
             })
             this.setState({
                 directionsOpen: true
             })
         } else {
-            // console.log(this.map);
             this.map.removeControl(this.directions);
             this.map.removeControl(this.locateUser);
+            this.map.removeControl(this.fullScreen);
             // this.map.disable(this.map.transform);
             //mapboxgl-ctrl-icon mapboxgl-ctrl-fullscreen
 
-            const node = ReactDOM.findDOMNode(this);
-            let elem = null;
-
-            if (node instanceof HTMLElement) {
-                elem = document.querySelector('.mapboxgl-ctrl.mapboxgl-ctrl-group');
-
-            }
-            // console.log(elem);
-
-            if(elem) {
-                elem.remove();
-            }
+            // const node = ReactDOM.findDOMNode(this);
+            // let elem = null;
+            //
+            // if (node instanceof HTMLElement) {
+            //     elem = document.querySelector('.mapboxgl-ctrl.mapboxgl-ctrl-group');
+            //
+            // }
+            // // console.log(elem);
+            //
+            // if(elem) {
+            //     elem.remove();
+            // }
 
             this.map.flyTo({
                 center: this.state.center,
