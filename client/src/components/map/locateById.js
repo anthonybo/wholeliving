@@ -81,7 +81,7 @@ class LocateByState extends Component {
                     instructions: true,
                     profileSwitcher: false
                 },
-                placeholderDestination: (this.state.wholefoods.features[0].geometry.coordinates[0]+','+ this.state.wholefoods.features[0].geometry.coordinates[1])
+                placeholderDestination: (this.state.wholefoods.features[0].properties.Address)
             });
 
             this.locateUser = new mapboxgl.GeolocateControl({
@@ -92,12 +92,21 @@ class LocateByState extends Component {
                 trackUserLocation: true,
                 showUserLocation: false,
             });
+
+            this.locateUser.on('error', (e)=>{
+                // console.log('Timeout has occurred: ', e);
+
+                let coords = sessionStorage.getItem('coords');
+                console.log(coords);
+                this.directions.setOrigin(coords);
+            })
+
             // this.fullScreen = new mapboxgl.FullscreenControl();
             // this.map.addControl(this.fullScreen);
             this.map.addControl(this.directions, 'top-left');
             this.map.addControl(this.locateUser);
 
-            this.directions.setDestination(this.state.wholefoods.features[0].geometry.coordinates);
+            this.directions.setDestination(this.state.wholefoods.features[0].properties.Address + ' ' + this.state.wholefoods.features[0].properties.City);
 
             this.locateUser.on('geolocate', (e)=> {
                 // console.log(e);
@@ -113,20 +122,6 @@ class LocateByState extends Component {
             this.map.removeControl(this.locateUser);
             // this.map.removeControl(this.fullScreen);
             // this.map.disable(this.map.transform);
-            //mapboxgl-ctrl-icon mapboxgl-ctrl-fullscreen
-
-            // const node = ReactDOM.findDOMNode(this);
-            // let elem = null;
-            //
-            // if (node instanceof HTMLElement) {
-            //     elem = document.querySelector('.mapboxgl-ctrl.mapboxgl-ctrl-group');
-            //
-            // }
-            // // console.log(elem);
-            //
-            // if(elem) {
-            //     elem.remove();
-            // }
 
             this.map.flyTo({
                 center: this.state.center,
