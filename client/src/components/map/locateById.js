@@ -97,7 +97,6 @@ class LocateByState extends Component {
                 // console.log('Timeout has occurred: ', e);
 
                 let coords = sessionStorage.getItem('coords');
-                console.log(coords);
                 this.directions.setOrigin(coords);
             })
 
