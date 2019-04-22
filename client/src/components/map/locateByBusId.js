@@ -122,7 +122,7 @@ class LocateByBusId extends Component {
 
             // this.directions.setDestination(this.state.business.features[0].geometry.coordinates);
             this.directions.setDestination(this.state.business.features[0].properties.Address);
-            
+
             this.locateUser.on('geolocate', (e)=> {
                 // console.log(e);
                 // this.directions.placeholderOrigin = 'test';
