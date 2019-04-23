@@ -17,7 +17,8 @@ class WholeFoodsTable extends Component {
         generalMap: false,
         userInput: [],
         byBusId: null,
-        medianHousingPrices: []
+        medianHousingPrices: [],
+        city: ''
     }
 
     async getAllWholeFoods(){
@@ -177,23 +178,26 @@ class WholeFoodsTable extends Component {
         // console.log('Getting Median Housing Prices....');
         let zip = 0;
         let medianHousingPricesList = [];
+        let city = '';
 
-        if(!this.state.crossReferenceWholeFoods.features <= 1) {
+        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
             zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
-        } else {
+            city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
+
+        } else if (!this.state.crossReferenceUserInput.features.length < 1) {
+            // let wfContainer = document.getElementById('wf-container');
+            // wfContainer.style.display === 'hide';
             // console.log('Busness Zip: ',this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(3));
             zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
+            city = this.props.match.params.location;
         }
+
         zip = zip.substring(0, 5);
-        // console.log(zip);
 
         let medianHousingPrices = await axios.post(`/api/housing/median`, {
             zip: zip
         });
-
-        // console.log(this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City);
-        // console.log(medianHousingPrices);
 
         for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
             // console.log(value);
@@ -203,7 +207,8 @@ class WholeFoodsTable extends Component {
             </tr>)
         }
         this.setState({
-            medianHousingPrices: medianHousingPricesList
+            medianHousingPrices: medianHousingPricesList,
+            city: city
         })
     }
 
@@ -344,7 +349,7 @@ class WholeFoodsTable extends Component {
             }
             return(
             <ul className="collapsible popout">
-                <li>
+                <li id='wf-container'>
                     <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods [{this.state.crossReferenceWholeFoods.data.geoJson.features.length}]</div>
                     <div className="collapsible-body">
                         <table className='responsive-table'>
@@ -388,7 +393,7 @@ class WholeFoodsTable extends Component {
                     </div>
                 </li>
                 <li>
-                    <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)}]</div>
+                    <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
                     <div className="collapsible-body">
                         <table className='responsive-table'>
                             <thead>
