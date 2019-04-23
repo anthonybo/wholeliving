@@ -244,23 +244,41 @@ app.post('/api/places', async (req,res,next) => {
     } catch(error){
         res.status(500).send('Server Error');
     }
+})
 
+app.post('/api/housing/median', async (req,res,next) => {
+    // console.log(req.body);
+
+    fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=bJuDKBZZsyeazf4kySm3`)
+        .then(res => res.json())
+        .then(data=> {
+            // console.log(data);
+
+            res.send({
+                success: true,
+                median_prices: data
+            })
+        })
 })
 
 app.post('/api/places/details', async (req,res,next) => {
     // console.log(req.body);
 
-    fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
-        .then(res => res.json())
-        .then(data=> {
-            // console.log(data);
+    try{
+        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+            .then(res => res.json())
+            .then(data=> {
+                // console.log(data);
 
-            // res.send({data})
-            res.send({
-                success:true,
-                data: data
-            });
-        })
+                // res.send({data})
+                res.send({
+                    success:true,
+                    data: data
+                });
+            })
+    } catch (error){
+        res.status(500).send('Server Error');
+    }
 })
 
 app.post('/api/geoSpacial', async(req,res,next) => {
