@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import axios from 'axios';
 import {withRouter, Link} from 'react-router-dom';
 import AllWholeFoodsLocations from "../map/mapContainer";
@@ -138,6 +138,7 @@ class WholeFoodsTable extends Component {
 
         this.createTableEntriesForUserSelection();
         this.housingMedian();
+        this.walkScore();
     }
 
     componentDidMount() {
@@ -194,11 +195,13 @@ class WholeFoodsTable extends Component {
         }
 
         zip = zip.substring(0, 5);
+        console.log(zip);
 
         let medianHousingPrices = await axios.post(`/api/housing/median`, {
             zip: zip
         });
 
+        console.log(medianHousingPrices);
         for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
             // console.log(value);
             medianHousingPricesList.push(<tr className='white-text' key={index}>
@@ -210,6 +213,71 @@ class WholeFoodsTable extends Component {
             medianHousingPrices: medianHousingPricesList,
             city: city
         })
+    }
+
+    async walkScore(){
+        const circle = document.querySelector('.js-circle');
+        const circleBike = document.querySelector('.js-bike-circle');
+        const scoreText = document.querySelector('.js-text');
+        const scoreBikeText = document.querySelector('.js-bike-text');
+        const scoreDescText = document.querySelector('.score-desc-text');
+        const scoreBikeDescText = document.querySelector('.score-bike-desc-text');
+        let address = '';
+        let lat = 0;
+        let lng = 0;
+
+        console.log(this.state.crossReferenceWholeFoods.data);
+
+
+        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+            // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
+            // zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
+            // city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
+            address = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Address;
+            lat = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[1];
+            lng = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[0];
+
+        } else if (!this.state.crossReferenceUserInput.features.length < 1) {
+            console.log(this.state.crossReferenceUserInput);
+            lat = this.state.crossReferenceUserInput.features[0].geometry.coordinates[1];
+            lng = this.state.crossReferenceUserInput.features[0].geometry.coordinates[0];
+            address = this.state.crossReferenceUserInput.features[0].properties.Address;
+
+            // let wfContainer = document.getElementById('wf-container');
+            // wfContainer.style.display === 'hide';
+            // console.log('Busness Zip: ',this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(3));
+            // zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
+            // city = this.props.match.params.location;
+        }
+
+        let walkScore = await axios.post(`/api/walkscore`, {
+            address: address,
+            lat: lat,
+            lng: lng
+        });
+        console.log(walkScore);
+
+        let walkscoreNum = walkScore.data.walkscore.walkscore;
+        let walkingDesc = walkScore.data.walkscore.description;
+        let bikescoreNum = walkScore.data.walkscore.bike.score;
+        let bikeDesc = walkScore.data.walkscore.bike.description;
+
+        const radius = circle.getAttribute('r');
+        const diameter = Math.round(Math.PI * radius * 2);
+        const getOffset = (val = 0) => Math.round((100 - val) / 100 * diameter);
+
+        const bikeradius = circleBike.getAttribute('r');
+        const bikediameter = Math.round(Math.PI * bikeradius * 2);
+        const bikegetOffset = (val = 0) => Math.round((100 - val) / 100 * bikediameter);
+
+        circle.style.strokeDashoffset = getOffset(walkscoreNum);
+        circleBike.style.strokeDashoffset = bikegetOffset(bikescoreNum);
+
+        scoreText.textContent = `${walkscoreNum}%`;
+        scoreDescText.textContent = `${walkingDesc}`;
+
+        scoreBikeText.textContent = `${bikescoreNum}%`;
+        scoreBikeDescText.textContent = `${bikeDesc}`;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -348,68 +416,92 @@ class WholeFoodsTable extends Component {
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
             return(
-            <ul className="collapsible popout">
-                <li id='wf-container'>
-                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods [{this.state.crossReferenceWholeFoods.data.geoJson.features.length}]</div>
-                    <div className="collapsible-body">
-                        <table className='responsive-table'>
-                            <thead>
-                            <tr className='white-text'>
-                                <th>#</th>
-                                <th>State</th>
-                                <th>Address</th>
-                                <th>City</th>
-                                <th>Zip</th>
-                                <th>Phone</th>
-                                <th>Hours</th>
-                            </tr>
-                            </thead>
+                <Fragment>
+                    <ul className="collapsible popout">
+                        <li id='wf-container'>
+                            <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods [{this.state.crossReferenceWholeFoods.data.geoJson.features.length}]</div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>#</th>
+                                        <th>State</th>
+                                        <th>Address</th>
+                                        <th>City</th>
+                                        <th>Zip</th>
+                                        <th>Phone</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                    </thead>
 
-                            <tbody>
-                            {items}
-                            </tbody>
-                        </table>
-                    </div>
-                </li>
-                <li>
-                    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>
-                    <div className="collapsible-body">
-                        <table className='responsive-table'>
-                            <thead>
-                            <tr className='white-text'>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Address</th>
-                                <th>Phone</th>
-                                <th>Hours</th>
-                                <th>Website</th>
-                            </tr>
-                            </thead>
+                                    <tbody>
+                                    {items}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Phone</th>
+                                        <th>Hours</th>
+                                        <th>Website</th>
+                                    </tr>
+                                    </thead>
 
-                            <tbody>
-                            {this.state.userInput}
-                            </tbody>
-                        </table>
-                    </div>
-                </li>
-                <li>
-                    <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
-                    <div className="collapsible-body">
-                        <table className='responsive-table'>
-                            <thead>
-                            <tr className='white-text'>
-                                <th>Date</th>
-                                <th>Price</th>
-                            </tr>
-                            </thead>
+                                    <tbody>
+                                    {this.state.userInput}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>Date</th>
+                                        <th>Price</th>
+                                    </tr>
+                                    </thead>
 
-                            <tbody>
-                            {this.state.medianHousingPrices}
-                            </tbody>
-                        </table>
-                    </div>
-                </li>
-            </ul>
+                                    <tbody>
+                                    {this.state.medianHousingPrices}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
+                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                fill="none"></circle>
+                        <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                fill="none"></circle>
+                        <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
+                        <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                    </svg>
+
+                    <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
+                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                fill="none"></circle>
+                        <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                fill="none"></circle>
+                        <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
+                        <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                    </svg>
+                </Fragment>
             )
         } else if (this.state.generalMap) {
             return (

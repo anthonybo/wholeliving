@@ -261,6 +261,24 @@ app.post('/api/housing/median', async (req,res,next) => {
         })
 })
 
+app.post('/api/walkscore', async (req,res,next)=>{
+    console.log(req.body);
+    let address = req.body.address;
+    let lat = req.body.lat;
+    let lng = req.body.lng;
+
+    fetch(`http://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lng}&transit=1&bike=1&wsapikey=f02b1d13f4bfd1098b20d5cee723ca0d`)
+        .then(res => res.json())
+        .then(data=> {
+            // console.log(data);
+
+            res.send({
+                success: true,
+                walkscore: data
+            })
+        })
+})
+
 app.post('/api/places/details', async (req,res,next) => {
     // console.log(req.body);
 
