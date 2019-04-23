@@ -16,7 +16,8 @@ class WholeFoodsTable extends Component {
         keyword: '',
         generalMap: false,
         userInput: [],
-        byBusId: null
+        byBusId: null,
+        medianHousingPrices: []
     }
 
     async getAllWholeFoods(){
@@ -133,8 +134,9 @@ class WholeFoodsTable extends Component {
             crossReferenceWholeFoods: wholefoods,
             keyword: keyword
         })
-        this.createTableEntriesForUserSelection();
 
+        this.createTableEntriesForUserSelection();
+        this.housingMedian();
     }
 
     componentDidMount() {
@@ -171,6 +173,40 @@ class WholeFoodsTable extends Component {
         });
     }
 
+    async housingMedian(){
+        // console.log('Getting Median Housing Prices....');
+        let zip = 0;
+        let medianHousingPricesList = [];
+
+        if(!this.state.crossReferenceWholeFoods.features <= 1) {
+            // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
+            zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
+        } else {
+            // console.log('Busness Zip: ',this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(3));
+            zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
+        }
+        zip = zip.substring(0, 5);
+        // console.log(zip);
+
+        let medianHousingPrices = await axios.post(`/api/housing/median`, {
+            zip: zip
+        });
+
+        // console.log(this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City);
+        // console.log(medianHousingPrices);
+
+        for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
+            // console.log(value);
+            medianHousingPricesList.push(<tr className='white-text' key={index}>
+                <td>{value[0]}</td>
+                <td>${value[1].toLocaleString()}</td>
+            </tr>)
+        }
+        this.setState({
+            medianHousingPrices: medianHousingPricesList
+        })
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         const path = this.props.history.location.pathname;
 
@@ -201,7 +237,8 @@ class WholeFoodsTable extends Component {
                 this.setState({
                     allWholeFoods: null,
                     byState: null,
-                    byId: null
+                    byId: null,
+                    medianHousingPrices: []
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -228,6 +265,7 @@ class WholeFoodsTable extends Component {
 
             instance.close(0);
             instance.close(1);
+            instance.close(2);
         }
     }
 
@@ -304,7 +342,6 @@ class WholeFoodsTable extends Component {
                 // console.log(value.properties);
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
-
             return(
             <ul className="collapsible popout">
                 <li>
@@ -346,6 +383,23 @@ class WholeFoodsTable extends Component {
 
                             <tbody>
                             {this.state.userInput}
+                            </tbody>
+                        </table>
+                    </div>
+                </li>
+                <li>
+                    <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)}]</div>
+                    <div className="collapsible-body">
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th>Date</th>
+                                <th>Price</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {this.state.medianHousingPrices}
                             </tbody>
                         </table>
                     </div>
