@@ -247,7 +247,7 @@ app.post('/api/places', async (req,res,next) => {
 })
 
 app.post('/api/housing/median', async (req,res,next) => {
-    console.log('Median: ', req.body);
+    // console.log('Median: ', req.body);
     //ZHVIAH -All home data code
     //MLPAH -Median home data code
     //Documentation: https://www.quandl.com/data/ZILLOW-Zillow-Real-Estate-Research
@@ -265,7 +265,7 @@ app.post('/api/housing/median', async (req,res,next) => {
 })
 
 app.post('/api/walkscore', async (req,res,next)=>{
-    console.log(req.body);
+    // console.log(req.body);
     let address = req.body.address;
     let lat = req.body.lat;
     let lng = req.body.lng;
@@ -278,6 +278,21 @@ app.post('/api/walkscore', async (req,res,next)=>{
             res.send({
                 success: true,
                 walkscore: data
+            })
+        })
+})
+
+app.post('/api/wiki', async (req,res,next)=>{
+    // console.log(req.body);
+
+    fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=${req.body.city},_${req.body.state}`)
+        .then(res => res.json())
+        .then(data=> {
+            // console.log(data);
+
+            res.send({
+                success: true,
+                wiki: data
             })
         })
 })

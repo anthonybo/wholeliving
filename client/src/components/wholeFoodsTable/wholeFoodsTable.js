@@ -20,7 +20,8 @@ class WholeFoodsTable extends Component {
         byBusId: null,
         medianHousingPrices: [],
         city: '',
-        nearByLocations: []
+        nearByLocations: [],
+        cityDesc: []
     }
 
     async getAllWholeFoods(){
@@ -142,6 +143,7 @@ class WholeFoodsTable extends Component {
         this.housingMedian();
         this.walkScore();
         this.nearByLocations();
+        this.wikiData();
     }
 
     componentDidMount() {
@@ -366,6 +368,43 @@ class WholeFoodsTable extends Component {
         this.props.history.push(`/crossReference/` + keyword + '/' + city+','+state + '/' + range);
     }
 
+    async wikiData(){
+        let state = '';
+        let city = '';
+        let cityDesc = [];
+
+        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+            state = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.State;
+            // city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1);
+        } else if (!this.state.crossReferenceUserInput.features.length < 1) {
+            state = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(1,2);
+            // city = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[1].substr(1);
+        }
+
+        city = this.props.match.params.location;
+
+        if (city.indexOf(',') > -1){
+            city = city.substr(0,city.length-3)
+        }
+
+        let cityInfo = await axios.post('/api/wiki', {
+            city: city,
+            state: state
+        });
+
+        cityInfo = cityInfo.data.wiki.query.pages;
+        cityInfo = cityInfo[Object.keys(cityInfo)[0]].extract;
+
+        if(cityInfo == undefined){
+            cityInfo = 'Sorry, data currently unavailable.';
+        }
+
+        cityDesc.push(<tr className='white-text' key='123890'><td>{cityInfo}</td></tr>)
+        this.setState({
+            cityDesc: cityDesc
+        })
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         const path = this.props.history.location.pathname;
 
@@ -399,7 +438,8 @@ class WholeFoodsTable extends Component {
                     byId: null,
                     medianHousingPrices: [],
                     nearByLocations: [],
-                    city: ''
+                    city: '',
+                    cityDesc: []
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -427,6 +467,7 @@ class WholeFoodsTable extends Component {
             instance.close(0);
             instance.close(1);
             instance.close(2);
+            instance.close(3);
         }
     }
 
@@ -567,6 +608,17 @@ class WholeFoodsTable extends Component {
 
                                     <tbody>
                                     {this.state.medianHousingPrices}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">description</i>City Description</div>
+                            <div className="collapsible-body">
+                                <table className='centered'>
+                                    <tbody>
+                                    {this.state.cityDesc}
                                     </tbody>
                                 </table>
                             </div>
