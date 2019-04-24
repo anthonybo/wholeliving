@@ -427,6 +427,7 @@ i.material-icons.prefix {
   background: #ebebeb;
   z-index: 100;
   transition: 0.5s padding, 0.5s background;
+  max-width: 100%;
 }
 
 .city-menu-dropdown:after {

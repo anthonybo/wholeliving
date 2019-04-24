@@ -227,13 +227,23 @@ class WholeFoodsTable extends Component {
             }
         }
 
-        for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
-            // console.log(value);
-            medianHousingPricesList.push(<tr className='white-text' key={index}>
-                <td>{value[0]}</td>
-                <td>${value[1].toLocaleString()}</td>
-            </tr>)
+        if(medianHousingPrices.data.median_prices.hasOwnProperty('dataset')){
+            for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
+                // console.log(value);
+                medianHousingPricesList.push(<tr className='white-text' key={index}>
+                    <td>{value[0]}</td>
+                    <td>${value[1].toLocaleString()}</td>
+                </tr>)
+            }
+        } else {
+            medianHousingPricesList.push(<tr className='white-text' key='0912389123'>
+                <td>No Data Available</td>
+                <td>No Data Available</td>
+            </tr>);
+            location = 'unavailable'
         }
+
+
         this.setState({
             medianHousingPrices: medianHousingPricesList,
             city: location
@@ -269,10 +279,19 @@ class WholeFoodsTable extends Component {
             lng: lng
         });
 
-        let walkscoreNum = walkScore.data.walkscore.walkscore;
-        let walkingDesc = walkScore.data.walkscore.description;
-        let bikescoreNum = walkScore.data.walkscore.bike.score;
-        let bikeDesc = walkScore.data.walkscore.bike.description;
+        let walkscoreNum = 0;
+        let walkingDesc = 'unavailable';
+        let bikescoreNum = 0;
+        let bikeDesc = 'unavailable';
+        if(walkScore.data.walkscore.hasOwnProperty('bike')){
+            bikescoreNum = walkScore.data.walkscore.bike.score;
+            bikeDesc = walkScore.data.walkscore.bike.description;
+        }
+
+        if(walkScore.data.walkscore.hasOwnProperty('walkscore')){
+            walkscoreNum = walkScore.data.walkscore.walkscore;
+            walkingDesc = walkScore.data.walkscore.description;
+        }
 
         const radius = circle.getAttribute('r');
         const diameter = Math.round(Math.PI * radius * 2);
@@ -478,12 +497,17 @@ class WholeFoodsTable extends Component {
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
-            // console.log('We have wholefoods cross reference data!');
             this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-            for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
-                // console.log(value.properties);
-                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+            // console.log('We have wholefoods cross reference data!');
+            if(this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1){
+                items.push(<tr className='white-text' key='1342'><td></td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td></tr>)
+            } else {
+                for(const [index, value] of this.state.crossReferenceWholeFoods.data.geoJson.features.entries()){
+                    // console.log(value.properties);
+                    items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                }
             }
+
             return(
                 <Fragment>
                     <ul className="collapsible popout">
