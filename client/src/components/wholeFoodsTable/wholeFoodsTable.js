@@ -214,9 +214,8 @@ class WholeFoodsTable extends Component {
         });
 
         if(medianHousingPrices.data.median_prices.quandl_error !== undefined) {
-            console.log('Failed to get median price data!')
-            var rad = zipcodes.radius(zip, 20);
-            console.log(rad);
+            console.log('Failed to get median price data!, Running counter measures...')
+            var rad = zipcodes.radius(zip, 5);
             for(var index = 0; index < rad.length; index++){
                 medianHousingPrices = await axios.post(`/api/housing/median`, {
                     zip: rad[index]
@@ -320,8 +319,8 @@ class WholeFoodsTable extends Component {
         cityList = cityList.slice(0,10);
 
         for(const [index, value] of cityList.entries()) {
-            nearByLocations.push(<span className='white-text' onClick={() => this.updateLocation(value)} value={value} key={index}>
-                {value},
+            nearByLocations.push(<span className='city-items' onClick={() => this.updateLocation(value)} value={value} key={index}>
+                {value}
             </span>)
 
             // nearByLocations.push(<tr className='white-text' onClick={() => this.updateLocation(value)} value={value} key={index}>
@@ -380,7 +379,8 @@ class WholeFoodsTable extends Component {
                     byState: null,
                     byId: null,
                     medianHousingPrices: [],
-                    nearByLocations: []
+                    nearByLocations: [],
+                    city: ''
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -533,7 +533,6 @@ class WholeFoodsTable extends Component {
                         <li>
                             <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
                             <div className="collapsible-body">
-                                <span className='white-text nearby-locations'>Nearby Cities: {this.state.nearByLocations}</span>
                                 <table className='responsive-table'>
                                     <thead>
                                     <tr className='white-text'>
@@ -549,6 +548,18 @@ class WholeFoodsTable extends Component {
                             </div>
                         </li>
                     </ul>
+
+                    <ul className="city-hList">
+                        <li>
+                            <span className="city-menu">
+                                <h2 className="city-menu-title">Nearby Cities</h2>
+                                <ul className="city-menu-dropdown">
+                                    {this.state.nearByLocations}
+                                </ul>
+                            </span>
+                        </li>
+                    </ul>
+
                     <div className='scores-container'>
                         <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
                             <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
