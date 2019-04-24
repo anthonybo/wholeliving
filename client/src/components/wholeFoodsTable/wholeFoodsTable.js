@@ -4,6 +4,7 @@ import {withRouter, Link} from 'react-router-dom';
 import AllWholeFoodsLocations from "../map/mapContainer";
 import './wholeFoodsTable.scss';
 import ReactDOM from "react-dom";
+var zipcodes = require('zipcodes');
 
 class WholeFoodsTable extends Component {
 
@@ -18,7 +19,8 @@ class WholeFoodsTable extends Component {
         userInput: [],
         byBusId: null,
         medianHousingPrices: [],
-        city: ''
+        city: '',
+        nearByLocations: []
     }
 
     async getAllWholeFoods(){
@@ -139,6 +141,7 @@ class WholeFoodsTable extends Component {
         this.createTableEntriesForUserSelection();
         this.housingMedian();
         this.walkScore();
+        this.nearByLocations();
     }
 
     componentDidMount() {
@@ -177,31 +180,54 @@ class WholeFoodsTable extends Component {
 
     async housingMedian(){
         // console.log('Getting Median Housing Prices....');
+        let path = this.props.match;
+        let keyword = path.params.keyword;
+        let location = path.params.location;
+        let range = path.params.range;
         let zip = 0;
         let medianHousingPricesList = [];
         let city = '';
+        let state = '';
 
-        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+        var lookup = zipcodes.lookupByName(location, state);
+
+        if(!lookup.length < 1){
+            zip = lookup[0].zip;
+        } else if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
             zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
-            city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
-
+            city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1);
+            state = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.State;
         } else if (!this.state.crossReferenceUserInput.features.length < 1) {
             // let wfContainer = document.getElementById('wf-container');
             // wfContainer.style.display === 'hide';
             // console.log('Busness Zip: ',this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(3));
             zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
             city = this.props.match.params.location;
+            state = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(1,2);
         }
 
         zip = zip.substring(0, 5);
-        console.log(zip);
 
         let medianHousingPrices = await axios.post(`/api/housing/median`, {
             zip: zip
         });
 
-        console.log(medianHousingPrices);
+        if(medianHousingPrices.data.median_prices.quandl_error !== undefined) {
+            console.log('Failed to get median price data!')
+            var rad = zipcodes.radius(zip, 20);
+            console.log(rad);
+            for(var index = 0; index < rad.length; index++){
+                medianHousingPrices = await axios.post(`/api/housing/median`, {
+                    zip: rad[index]
+                });
+
+                if(medianHousingPrices.data.median_prices.quandl_error == undefined){
+                    break;
+                }
+            }
+        }
+
         for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
             // console.log(value);
             medianHousingPricesList.push(<tr className='white-text' key={index}>
@@ -211,7 +237,7 @@ class WholeFoodsTable extends Component {
         }
         this.setState({
             medianHousingPrices: medianHousingPricesList,
-            city: city
+            city: location
         })
     }
 
@@ -226,28 +252,16 @@ class WholeFoodsTable extends Component {
         let lat = 0;
         let lng = 0;
 
-        console.log(this.state.crossReferenceWholeFoods.data);
-
-
         if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
-            // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
-            // zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
-            // city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
             address = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Address;
             lat = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[1];
             lng = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[0];
 
         } else if (!this.state.crossReferenceUserInput.features.length < 1) {
-            console.log(this.state.crossReferenceUserInput);
+            // console.log(this.state.crossReferenceUserInput);
             lat = this.state.crossReferenceUserInput.features[0].geometry.coordinates[1];
             lng = this.state.crossReferenceUserInput.features[0].geometry.coordinates[0];
             address = this.state.crossReferenceUserInput.features[0].properties.Address;
-
-            // let wfContainer = document.getElementById('wf-container');
-            // wfContainer.style.display === 'hide';
-            // console.log('Busness Zip: ',this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(3));
-            // zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
-            // city = this.props.match.params.location;
         }
 
         let walkScore = await axios.post(`/api/walkscore`, {
@@ -255,7 +269,6 @@ class WholeFoodsTable extends Component {
             lat: lat,
             lng: lng
         });
-        console.log(walkScore);
 
         let walkscoreNum = walkScore.data.walkscore.walkscore;
         let walkingDesc = walkScore.data.walkscore.description;
@@ -278,6 +291,61 @@ class WholeFoodsTable extends Component {
 
         scoreBikeText.textContent = `${bikescoreNum}%`;
         scoreBikeDescText.textContent = `${bikeDesc}`;
+    }
+
+    nearByLocations(){
+        let zip = 0;
+        let city = '';
+        let cityList = [];
+        let nearByLocations = [];
+
+        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+            zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
+            city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
+
+        } else if (!this.state.crossReferenceUserInput.features.length < 1) {
+            zip = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(4);
+            city = this.props.match.params.location;
+        }
+
+        let radius = zipcodes.radius(zip, 10);
+        // radius = radius.slice(0,10);
+        for(let index = 0; index < radius.length; index++){
+            var lookup = zipcodes.lookup(radius[index]);
+            // console.log(lookup.city);
+            cityList.push(lookup.city);
+        }
+
+        cityList = cityList.filter((item,index,self) => self.indexOf(item)==index);
+        cityList = cityList.slice(0,10);
+
+        for(const [index, value] of cityList.entries()) {
+            nearByLocations.push(<span className='white-text' onClick={() => this.updateLocation(value)} value={value} key={index}>
+                {value},
+            </span>)
+
+            // nearByLocations.push(<tr className='white-text' onClick={() => this.updateLocation(value)} value={value} key={index}>
+            //     <td>{value}</td>
+            // </tr>)
+        }
+        this.setState({
+            nearByLocations: nearByLocations
+        })
+    }
+
+    updateLocation(city){
+        let path = this.props.match;
+        let keyword = path.params.keyword;
+        let location = path.params.location;
+        let range = path.params.range;
+        let state = '';
+
+        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+            state = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.State;
+        } else if (!this.state.crossReferenceUserInput.features.length < 1) {
+            state = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(1,2);
+        }
+        this.props.history.push(`/crossReference/` + keyword + '/' + city+','+state + '/' + range);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -311,7 +379,8 @@ class WholeFoodsTable extends Component {
                     allWholeFoods: null,
                     byState: null,
                     byId: null,
-                    medianHousingPrices: []
+                    medianHousingPrices: [],
+                    nearByLocations: []
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -464,6 +533,7 @@ class WholeFoodsTable extends Component {
                         <li>
                             <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
                             <div className="collapsible-body">
+                                <span className='white-text nearby-locations'>Nearby Cities: {this.state.nearByLocations}</span>
                                 <table className='responsive-table'>
                                     <thead>
                                     <tr className='white-text'>
@@ -479,28 +549,29 @@ class WholeFoodsTable extends Component {
                             </div>
                         </li>
                     </ul>
+                    <div className='scores-container'>
+                        <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
+                            <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
 
-                    <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
-                        <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-
-                    <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
-                        <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
+                        <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
+                            <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
+                    </div>
                 </Fragment>
             )
         } else if (this.state.generalMap) {

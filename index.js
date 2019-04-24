@@ -247,7 +247,10 @@ app.post('/api/places', async (req,res,next) => {
 })
 
 app.post('/api/housing/median', async (req,res,next) => {
-    // console.log(req.body);
+    console.log('Median: ', req.body);
+    //ZHVIAH -All home data code
+    //MLPAH -Median home data code
+    //Documentation: https://www.quandl.com/data/ZILLOW-Zillow-Real-Estate-Research
 
     fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=bJuDKBZZsyeazf4kySm3`)
         .then(res => res.json())
