@@ -284,21 +284,11 @@ i.material-icons.prefix {
   font: bold 2rem "Poppins", Helvetica, Arial, sans-serif;
 }
 
-//body {
-//  display: flex;
-//  flex-flow: column nowrap;
-//  width: 100vw;
-//  height: 100vh;
-//  justify-content: center;
-//  align-items: center;
-//}
-
-.button {
-  margin-top: 2rem;
-  font: bold 1.75rem "Poppins", Helvetica, Arial, sans-serif;
-  padding: 0.5rem 1.5rem;
-  background: transparent;
-  border: 6px solid;
-  cursor: pointer;
-  box-shadow: 3px 3px 0 #1e1935;
+.scores-container {
+  display: flex;
+  //flex-flow: column nowrap;
+  //width: 100vw;
+  //height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
