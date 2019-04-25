@@ -304,7 +304,9 @@ class CrossReference extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if(prevProps.location.pathname !== this.props.location.pathname) {
-            this.map.remove();
+            if(this.map !== undefined){
+                this.map.remove();
+            }
             this.getData();
         }
     }

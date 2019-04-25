@@ -21,7 +21,8 @@ class WholeFoodsTable extends Component {
         medianHousingPrices: [],
         city: '',
         nearByLocations: [],
-        cityDesc: []
+        cityDesc: [],
+        noResults: false
     }
 
     async getAllWholeFoods(){
@@ -119,6 +120,15 @@ class WholeFoodsTable extends Component {
             lng = userInput.features[0].geometry.coordinates[0];
         } else {
             // console.log('Whole Foods Table: We have no results!');
+
+            // this.nearByLocations(true);
+
+            this.setState({
+                crossReferenceUserInput: null,
+                crossReferenceWholeFoods: null,
+                keyword: keyword,
+                noResults: true
+            });
 
             M.toast({
                 html: 'We have no results, please try a new search!',
@@ -314,14 +324,18 @@ class WholeFoodsTable extends Component {
         scoreBikeDescText.textContent = `${bikeDesc}`;
     }
 
-    nearByLocations(){
+    nearByLocations(noLocations){
+
         // Zip Code Resource: https://www.npmjs.com/package/zipcodes
         let zip = 0;
         let city = '';
         let cityList = [];
         let nearByLocations = [];
 
-        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+        if(noLocations){
+            console.log('We have no locations, FALL BACK PLAN!')
+            zip = 92653;
+        } else if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
             city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1)
 
@@ -415,6 +429,15 @@ class WholeFoodsTable extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname){
             if(path === '/'){
                 this.getAllWholeFoods();
+                this.setState({
+                    allWholeFoods: null,
+                    byState: null,
+                    byId: null,
+                    crossReferenceUserInput: null,
+                    crossReferenceWholeFoods: null,
+                    generalMap: true,
+                    noResults: false
+                })
             } else if (path === '/generalMap'){
                 this.setState({
                     allWholeFoods: null,
@@ -422,7 +445,8 @@ class WholeFoodsTable extends Component {
                     byId: null,
                     crossReferenceUserInput: null,
                     crossReferenceWholeFoods: null,
-                    generalMap: true
+                    generalMap: true,
+                    noResults: false
                 })
 
             } else if (path.match('/byState/') ){
@@ -432,7 +456,8 @@ class WholeFoodsTable extends Component {
                     allWholeFoods: null,
                     byState: null,
                     crossReferenceUserInput: null,
-                    crossReferenceWholeFoods: null
+                    crossReferenceWholeFoods: null,
+                    noResults: false
                 })
                 this.getLocationById();
             } else if (path.match('/crossReference/')){
@@ -443,7 +468,8 @@ class WholeFoodsTable extends Component {
                     medianHousingPrices: [],
                     nearByLocations: [],
                     city: '',
-                    cityDesc: []
+                    cityDesc: [],
+                    noResults: false
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -451,7 +477,8 @@ class WholeFoodsTable extends Component {
                     allWholeFoods: null,
                     byState: null,
                     crossReferenceUserInput: null,
-                    crossReferenceWholeFoods: null
+                    crossReferenceWholeFoods: null,
+                    noResults: false
                 })
                 this.getLocationByBusId();
             }
@@ -523,7 +550,10 @@ class WholeFoodsTable extends Component {
         const userInput = [];
         // console.log('State Response: ', this.state.resp);
 
-        if(this.state.allWholeFoods){
+            if(this.state.noResults){
+                items.push(<tr className='white-text' key='1342'><td></td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td></tr>)
+            }
+            else if(this.state.allWholeFoods){
             // console.log(this.state.resp.data.wholefoods);
             for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
                 // console.log(value.properties);
