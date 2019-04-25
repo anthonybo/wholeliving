@@ -253,6 +253,7 @@ class WholeFoodsTable extends Component {
     }
 
     async walkScore(){
+        // Walk Score Resource: https://www.walkscore.com/professional/api.php
         const circle = document.querySelector('.js-circle');
         const circleBike = document.querySelector('.js-bike-circle');
         const scoreText = document.querySelector('.js-text');
@@ -314,6 +315,7 @@ class WholeFoodsTable extends Component {
     }
 
     nearByLocations(){
+        // Zip Code Resource: https://www.npmjs.com/package/zipcodes
         let zip = 0;
         let city = '';
         let cityList = [];
@@ -386,6 +388,8 @@ class WholeFoodsTable extends Component {
         if (city.indexOf(',') > -1){
             city = city.substr(0,city.length-3)
         }
+
+        city = city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
         let cityInfo = await axios.post('/api/wiki', {
             city: city,
