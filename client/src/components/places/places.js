@@ -62,6 +62,8 @@ class Places extends Component {
         instances.updateData(Cities);
 
         instances.open();
+
+        this.animatePlaceholder();
     }
 
     autoComplete = (value) => {
@@ -75,12 +77,61 @@ class Places extends Component {
         this.getData();
     }
 
+    animatePlaceholder(){
+        let phrases = [
+            'Search Keyword',
+            'Crossfit',
+            '24 Hour Fitness',
+            'LA Fitness',
+            'Chipotle',
+            'Anytime Fitness',
+            'In N Out',
+            'Planet Fitness',
+            'Cinepolis Luxury Cinemas',
+            'UFC',
+            'Stadium Brewery',
+            'Kinetic'
+        ];
+
+        // Will Print each word one by one
+        // for (var index = 0; index < phrases.length; index++) {
+        //     (function(index) {
+        //         setTimeout(function() {
+        //             // Created textNode to append
+        //             document.getElementsByName('keyword')[0].placeholder=phrases[index];
+        //
+        //
+        //         }, 3000 * index);
+        //     }(index));
+        // }
+
+        // Will print each letter of each word one by one
+        var  i = 0;
+        var count = 0;
+        var selectedText = '';
+        var text = '';
+        (function type() {
+            var delta = 200 - Math.random() * 100;
+            if (count == phrases.length) {
+                count = 0;
+            }
+            selectedText = phrases[count];
+            text = selectedText.slice(0, ++i);
+            document.getElementsByName('keyword')[0].placeholder=text;
+            if (text.length === selectedText.length) {
+                count++;
+                i = 0;
+            }
+            setTimeout(type, delta);
+        }());
+    }
+
     render(){
         return(
             <div className='places-container '>
                 <form className='row' onSubmit={this.handleSubmit}>
                     <div className="col s4">
-                            <input className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange} autoComplete='off' placeholder='search keyword'/>
+                            <input id='search-keyword' className='white-text' type="text" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange} autoComplete='off' placeholder='search keyword'/>
                     </div>
                     <div className="col s4 input-field">
                         <i className="material-icons prefix">textsms</i>
