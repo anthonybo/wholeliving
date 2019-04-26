@@ -82,6 +82,28 @@ class CrossReference extends Component {
         return detailedData;
     }
 
+    displayCurrentState = () => {
+        let mapDiv = document.getElementById('map');
+        let cityPre = document.createElement('pre');
+        let citySpan = document.createElement('span');
+        let keywordSpan = document.createElement('span');
+
+        let path = this.props.match.params;
+        let city = path.location;
+        let keyword = path.keyword;
+        keyword = keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        if (city.indexOf(',') > -1){
+            city = city.substr(0,city.length-3)
+        }
+        city = city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        
+        cityPre.id = 'currentStateContainer';
+        citySpan.innerText = 'Current City: ' + city;
+        keywordSpan.innerText = 'Keyword: ' + keyword;
+        mapDiv.append(cityPre);
+        cityPre.append(keywordSpan,citySpan);
+    }
+
     createMap(){
         this.map = new mapboxgl.Map({
             container: 'map',
@@ -294,6 +316,8 @@ class CrossReference extends Component {
             this.setState({
                 loading: false
             })
+
+            this.displayCurrentState();
         });
     }
 
@@ -306,6 +330,7 @@ class CrossReference extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname) {
             if(this.map !== undefined){
                 this.map.remove();
+                document.getElementById('currentStateContainer').remove();
             }
             this.getData();
         }

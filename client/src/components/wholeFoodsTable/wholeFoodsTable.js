@@ -638,7 +638,7 @@ class WholeFoodsTable extends Component {
                         <li>
                             <div className="collapsible-header"><i className="material-icons">local_atm</i>
                                 {
-                                    this.state.loadingTextMedianHousing ? <span className='wait'>Median Housing - Loading</span> : <span>Median Housing [{this.state.city}]</span>
+                                    this.state.loadingTextMedianHousing ? <span className='wait'>Median Housing - Loading</span> : <span>Median Housing</span>
                                 }
                             </div>
                             <div className="collapsible-body">
@@ -672,8 +672,10 @@ class WholeFoodsTable extends Component {
                             </div>
                         </li>
                     </ul>
-
                     <ul className="city-hList">
+                        {/*{*/}
+                        {/*    this.state.city ? <span className='city-keyword-title'>{this.state.city}</span> : <span></span>*/}
+                        {/*}*/}
                         <li>
                             <span className="city-menu">
                                 <h2 className="city-menu-title">Nearby Cities</h2>
@@ -682,6 +684,10 @@ class WholeFoodsTable extends Component {
                                 </ul>
                             </span>
                         </li>
+                        {/*{*/}
+                        {/*    this.state.city ? <span className='city-keyword-title'>{this.state.keyword}</span> : <span></span>*/}
+                        {/*}*/}
+
                     </ul>
 
                     <div className='scores-container'>
