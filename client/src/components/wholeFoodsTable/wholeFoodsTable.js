@@ -228,7 +228,7 @@ class WholeFoodsTable extends Component {
         });
 
         if(medianHousingPrices.data.median_prices.quandl_error !== undefined) {
-            console.log('Failed to get median price data!, Running counter measures...')
+            // console.log('Failed to get median price data!, Running counter measures...')
             var rad = zipcodes.radius(zip, 5);
             for(var index = 0; index < rad.length; index++){
                 medianHousingPrices = await axios.post(`/api/housing/median`, {
