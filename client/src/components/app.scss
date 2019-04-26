@@ -508,6 +508,8 @@ ul.city-hList {
   text-align: center;
 }
 
+
+// Loading Animation for city description & median housing data
 .wait:after {
   content: ' .';
   animation: dots 3s steps(1, end) infinite;
@@ -534,4 +536,20 @@ ul.city-hList {
   87.5%, 100%{
     text-shadow: .5em 0, 1em 0, 1.5em 0, 2em 0, 2.5em;
   }
+}
+@import url(https://fonts.googleapis.com/css?family=Fjalla+One);
+.city-keyword-title {
+  transform: skew(-10deg);
+  display: block;
+  float: left;
+  text-shadow: #533d4a 1px 1px, #533d4a 2px 2px, #533d4a 3px 3px, #533d4a 4px 4px, #533d4a 5px 5px, #533d4a 6px 6px;
+  min-width: 10px;
+  min-height: 10px;
+  position: relative;
+  color: #fff;
+  text-transform: uppercase;
+  /* font-size: 42px; */
+  margin: 0;
+  //line-height: 47px;
+  letter-spacing: 2px;
 }
