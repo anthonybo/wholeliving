@@ -22,7 +22,9 @@ class WholeFoodsTable extends Component {
         city: '',
         nearByLocations: [],
         cityDesc: [],
-        noResults: false
+        noResults: false,
+        loadingTextDesc: true,
+        loadingTextMedianHousing: true
     }
 
     async getAllWholeFoods(){
@@ -258,7 +260,8 @@ class WholeFoodsTable extends Component {
 
         this.setState({
             medianHousingPrices: medianHousingPricesList,
-            city: location
+            city: location,
+            loadingTextMedianHousing: false
         })
     }
 
@@ -419,7 +422,8 @@ class WholeFoodsTable extends Component {
 
         cityDesc.push(<tr className='white-text' key='123890'><td>{cityInfo}</td></tr>)
         this.setState({
-            cityDesc: cityDesc
+            cityDesc: cityDesc,
+            loadingTextDesc: false
         })
     }
 
@@ -469,7 +473,9 @@ class WholeFoodsTable extends Component {
                     nearByLocations: [],
                     city: '',
                     cityDesc: [],
-                    noResults: false
+                    noResults: false,
+                    loadingTextDesc: true,
+                    loadingTextMedianHousing: true
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -630,7 +636,11 @@ class WholeFoodsTable extends Component {
                             </div>
                         </li>
                         <li>
-                            <div className="collapsible-header"><i className="material-icons">local_atm</i>Median Housing [{this.state.city}]</div>
+                            <div className="collapsible-header"><i className="material-icons">local_atm</i>
+                                {
+                                    this.state.loadingTextMedianHousing ? <span className='wait'>Median Housing - Loading</span> : <span>Median Housing [{this.state.city}]</span>
+                                }
+                            </div>
                             <div className="collapsible-body">
                                 <table className='responsive-table'>
                                     <thead>
@@ -648,7 +658,11 @@ class WholeFoodsTable extends Component {
                         </li>
 
                         <li>
-                            <div className="collapsible-header"><i className="material-icons">description</i>City Description</div>
+                            <div className="collapsible-header"><i className="material-icons">description</i>
+                                {
+                                    this.state.loadingTextDesc ? <span id='wait' className='wait'>City Description - Loading</span> : <span id='wait' className=''>City Description</span>
+                                }
+                            </div>
                             <div className="collapsible-body">
                                 <table className='centered'>
                                     <tbody>
