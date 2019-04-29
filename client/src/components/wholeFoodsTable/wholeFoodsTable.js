@@ -673,9 +673,6 @@ class WholeFoodsTable extends Component {
                         </li>
                     </ul>
                     <ul className="city-hList">
-                        {/*{*/}
-                        {/*    this.state.city ? <span className='city-keyword-title'>{this.state.city}</span> : <span></span>*/}
-                        {/*}*/}
                         <li>
                             <span className="city-menu">
                                 <h2 className="city-menu-title">Nearby Cities</h2>
@@ -684,10 +681,6 @@ class WholeFoodsTable extends Component {
                                 </ul>
                             </span>
                         </li>
-                        {/*{*/}
-                        {/*    this.state.city ? <span className='city-keyword-title'>{this.state.keyword}</span> : <span></span>*/}
-                        {/*}*/}
-
                     </ul>
 
                     <div className='scores-container'>
