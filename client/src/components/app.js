@@ -8,6 +8,7 @@ import WholeFoodsTable from './wholeFoodsTable/wholeFoodsTable';
 import Homepage from './homepage';
 import './app.scss';
 import logo from '../../dist/logo_transparent2.png';
+import Error404 from './general/error404';
 
 const App = () => (
     <div className='application-container'>
@@ -33,6 +34,8 @@ const App = () => (
                 <Route path='/location/:id' component={Homepage}/>
                 <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
                 <Route path='/busLookup/:id' component={Homepage}/>
+
+                <Route component={Error404}/>
             </Switch>
 
             <footer>
