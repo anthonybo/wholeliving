@@ -7,6 +7,10 @@ import {withRouter} from 'react-router-dom';
 
 class GeneralMap extends Component {
 
+    state = {
+        popup: null
+    }
+
     createMap () {
         this.map = new mapboxgl.Map({
             container: 'map',
@@ -58,7 +62,7 @@ class GeneralMap extends Component {
             });
 
             // When the user moves their mouse over the state-fill layer, we'll update the
-// feature state for the feature under the mouse.
+            // feature state for the feature under the mouse.
             this.map.on("mousemove", "state-fills", (e) => {
                 if (e.features.length > 0) {
                     if (hoveredStateId) {
@@ -66,12 +70,43 @@ class GeneralMap extends Component {
                     }
                     hoveredStateId = e.features[0].id;
                     this.map.setFeatureState({source: 'states', id: hoveredStateId}, { hover: true});
+
+                    if(this.state.popup !== null){
+                        this.state.popup.remove();
+                    }
+
+                    this.map.getCanvas().style.cursor = 'crosshair';
+
+                    var wfCount = this.getWFCount(e.features[0].properties.STATE_ABB);
+
+                    let keyword = e.features[0];
+
+                    wfCount.then( (value)=>{
+                        if(this.state.popup !== null){
+                            this.state.popup.remove();
+                        }
+
+                        var popup = new mapboxgl.Popup({
+                            offset: [0, -15],
+                            closeButton: false,
+                            anchor: 'bottom-left'
+                        })
+                            .setLngLat(e.lngLat)
+                            .setHTML('<b>State: </b>' + keyword.properties.STATE_NAME + '<br><b>WF Count: </b>' + value)
+                            .addTo(this.map);
+
+                        this.setState({
+                            popup: popup
+                        })
+                    })
+
+
                 }
             });
 
-// When the mouse leaves the state-fill layer, update the feature state of the
-// previously hovered feature.
-            this.map.on("mouseleave", "state-fills", () => {
+            // When the mouse leaves the state-fill layer, update the feature state of the
+            // previously hovered feature.
+            this.map.on("mouseleave", "state-fills", (e) => {
                 if (hoveredStateId) {
                     this.map.setFeatureState({source: 'states', id: hoveredStateId}, { hover: false});
                 }
@@ -79,13 +114,24 @@ class GeneralMap extends Component {
             });
 
             this.map.on("click", "state-fills", (e) => {
-                // console.log(e.features[0].properties);
                 // console.log(hoveredStateId);
 
                 this.locateWF(e.features[0].properties.STATE_ABB);
             });
 
         });
+    }
+
+    async getWFCount(state){
+        // console.log('Getting Detailed Data...')
+        const stateData = await axios.post('/api/wholefoods/state', {
+            state: state
+        });
+        // console.log(stateData.data.geoJson.features.length);
+
+        var wfCount = stateData.data.geoJson.features.length;
+
+        return wfCount;
     }
 
     async locateWF(state){
