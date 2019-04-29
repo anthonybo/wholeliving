@@ -60,7 +60,7 @@ class Modal extends Component {
         return(
             <Fragment>
                 <div id='tutorial-modal' className="tutorial-modal closed-no-animations">
-                    <a id='close-tutorial' href="#" className="close"><i className="material-icons ion-close">close</i></a>
+                    <a id='close-tutorial' className="close"><i className="material-icons ion-close">close</i></a>
 
                     <figure>
                         <figcaption>
