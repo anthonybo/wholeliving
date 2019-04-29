@@ -51,16 +51,18 @@ img {
 /* =========== Sidebar =========== */
 
 aside {
-  position: fixed;
+  //position: fixed;
   background: #222;
   top: 0px;
   left: 0px;
-  width: 120px;
-  height: 100%;
-  overflow: none;
+  width: 10%;
+  height: 100vh;
+  overflow: auto;
   z-index: 1;
   text-align: center;
   padding: 0;
+  display: inline-block;
+  vertical-align: top;
 }
 
 aside img {
@@ -107,10 +109,14 @@ main {
   //max-width: 980px;
   background: #000;
   //margin-left: 20%;
-  margin-left: 10%;
+  //margin-left: 10%;
   //padding: 12px 50px 12px 50px;
   padding: 12px 8px 12px 8px;
   height: 100vh;
+  padding: 12px 8px 12px 8px;
+  display: inline-block;
+  width: 90%;
+  overflow: auto;
 }
 
 /* =========== Home =========== */
@@ -166,7 +172,7 @@ footer {
 /* =========== Media Queries =========== */
 @media (max-width: 1030px) {
   main {
-    margin-left: 15%;
+    //margin-left: 15%;
   }
 }
 
