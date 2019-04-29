@@ -61,6 +61,10 @@ class WholeFoodsTable extends Component {
         this.setState({
             byId: wholefoods
         })
+
+        this.housingMedian();
+        this.walkScore();
+        this.wikiData();
     }
 
     async getLocationByBusId(){
@@ -99,6 +103,10 @@ class WholeFoodsTable extends Component {
         this.setState({
             userInput: userInput
         })
+
+        this.housingMedian();
+        this.walkScore();
+        this.wikiData();
     }
 
     async crossReference(){
@@ -202,11 +210,18 @@ class WholeFoodsTable extends Component {
         let medianHousingPricesList = [];
         let city = '';
         let state = '';
+        var lookup = '';
 
-        var lookup = zipcodes.lookupByName(location, state);
+        if(location !== undefined){
+            lookup = zipcodes.lookupByName(location, state);
+        }
 
         if(!lookup.length < 1){
             zip = lookup[0].zip;
+        } else if (this.state.byBusId !== null){
+            zip = this.state.byBusId.data.data.result.formatted_address.split(",")[2].substr(4);
+        } else if(this.state.byId !== null){
+            zip = this.state.byId.data.geoJson.features[0].properties.Zip;
         } else if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             // console.log('WHolfoods: ',this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip);
             zip = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Zip;
@@ -221,7 +236,7 @@ class WholeFoodsTable extends Component {
             state = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[2].substr(1,2);
         }
 
-        zip = zip.substring(0, 5);
+        zip = zip.substr(0, 5);
 
         let medianHousingPrices = await axios.post(`/api/housing/median`, {
             zip: zip
@@ -277,7 +292,15 @@ class WholeFoodsTable extends Component {
         let lat = 0;
         let lng = 0;
 
-        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+        if(this.state.byBusId !== null){
+            address = this.state.byBusId.data.data.result.formatted_address;
+            lat = this.state.byBusId.data.data.result.geometry.location.lat;
+            lng = this.state.byBusId.data.data.result.geometry.location.lng;
+        } else if(this.state.byId !== null){
+            address = this.state.byId.data.geoJson.features[0].properties.Address;
+            lat = this.state.byId.data.geoJson.features[0].geometry.coordinates[1];
+            lng = this.state.byId.data.geoJson.features[0].geometry.coordinates[0];
+        } else if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             address = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.Address;
             lat = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[1];
             lng = this.state.crossReferenceWholeFoods.data.geoJson.features[0].geometry.coordinates[0];
@@ -392,7 +415,13 @@ class WholeFoodsTable extends Component {
         let city = '';
         let cityDesc = [];
 
-        if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
+        if(this.state.byBusId !== null){
+            state = this.state.byBusId.data.data.result.formatted_address.split(",")[2].substr(1,3);
+            city = this.state.byBusId.data.data.result.formatted_address.split(",")[1].substr(1);
+        } else if(this.state.byId !== null){
+            state = this.state.byId.data.geoJson.features[0].properties.State;
+            city = this.state.byId.data.geoJson.features[0].properties.City.substr(1);
+        } else if(!this.state.crossReferenceWholeFoods.data.geoJson.features.length < 1) {
             state = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.State;
             // city = this.state.crossReferenceWholeFoods.data.geoJson.features[0].properties.City.substr(1);
         } else if (!this.state.crossReferenceUserInput.features.length < 1) {
@@ -400,13 +429,14 @@ class WholeFoodsTable extends Component {
             // city = this.state.crossReferenceUserInput.features[0].properties.Address.split(",")[1].substr(1);
         }
 
-        city = this.props.match.params.location;
+        if(this.props.match.params.location !== undefined){
+            city = this.props.match.params.location;
 
-        if (city.indexOf(',') > -1){
-            city = city.substr(0,city.length-3)
+            if (city.indexOf(',') > -1){
+                city = city.substr(0,city.length-3)
+            }
+            city = city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         }
-
-        city = city.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
         let cityInfo = await axios.post('/api/wiki', {
             city: city,
@@ -440,7 +470,11 @@ class WholeFoodsTable extends Component {
                     crossReferenceUserInput: null,
                     crossReferenceWholeFoods: null,
                     generalMap: true,
-                    noResults: false
+                    noResults: false,
+                    medianHousingPrices: [],
+                    cityDesc: [],
+                    loadingTextDesc: true,
+                    byBusId: null
                 })
             } else if (path === '/generalMap'){
                 this.setState({
@@ -450,7 +484,11 @@ class WholeFoodsTable extends Component {
                     crossReferenceUserInput: null,
                     crossReferenceWholeFoods: null,
                     generalMap: true,
-                    noResults: false
+                    noResults: false,
+                    medianHousingPrices: [],
+                    cityDesc: [],
+                    loadingTextDesc: true,
+                    byBusId: null
                 })
 
             } else if (path.match('/byState/') ){
@@ -461,7 +499,11 @@ class WholeFoodsTable extends Component {
                     byState: null,
                     crossReferenceUserInput: null,
                     crossReferenceWholeFoods: null,
-                    noResults: false
+                    noResults: false,
+                    medianHousingPrices: [],
+                    cityDesc: [],
+                    loadingTextDesc: true,
+                    byBusId: null
                 })
                 this.getLocationById();
             } else if (path.match('/crossReference/')){
@@ -475,7 +517,8 @@ class WholeFoodsTable extends Component {
                     cityDesc: [],
                     noResults: false,
                     loadingTextDesc: true,
-                    loadingTextMedianHousing: true
+                    loadingTextMedianHousing: true,
+                    byBusId: null
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -484,7 +527,11 @@ class WholeFoodsTable extends Component {
                     byState: null,
                     crossReferenceUserInput: null,
                     crossReferenceWholeFoods: null,
-                    noResults: false
+                    noResults: false,
+                    medianHousingPrices: [],
+                    cityDesc: [],
+                    loadingTextDesc: true,
+                    byBusId: null
                 })
                 this.getLocationByBusId();
             }
@@ -577,6 +624,93 @@ class WholeFoodsTable extends Component {
                 // console.log(value.properties);
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
             }
+
+            return(
+                <Fragment>
+                    <ul className="collapsible popout">
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">place</i>Whole Foods</div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Phone</th>
+                                        <th>Hours</th>
+                                        <th>Website</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {items}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">local_atm</i>
+                                {
+                                    this.state.loadingTextMedianHousing ? <span className='wait'>Median Housing - Loading</span> : <span>Median Housing</span>
+                                }
+                            </div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>Date</th>
+                                        <th>Price</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {this.state.medianHousingPrices}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">description</i>
+                                {
+                                    this.state.loadingTextDesc ? <span id='wait' className='wait'>City Description - Loading</span> : <span id='wait' className=''>City Description</span>
+                                }
+                            </div>
+                            <div className="collapsible-body">
+                                <table className='centered'>
+                                    <tbody>
+                                    {this.state.cityDesc}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div className='scores-container'>
+                        <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
+                            <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
+
+                        <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
+                            <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
+                    </div>
+                </Fragment>
+            )
         } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
             this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             // console.log('We have wholefoods cross reference data!');
@@ -716,29 +850,90 @@ class WholeFoodsTable extends Component {
             )
         } else if (this.state.byBusId){
             return(
-                <ul className="collapsible popout">
-                    <li>
-                        <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>
-                        <div className="collapsible-body">
-                            <table className='responsive-table'>
-                                <thead>
-                                <tr className='white-text'>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Address</th>
-                                    <th>Phone</th>
-                                    <th>Hours</th>
-                                    <th>Website</th>
-                                </tr>
-                                </thead>
+                <Fragment>
+                    <ul className="collapsible popout">
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Phone</th>
+                                        <th>Hours</th>
+                                        <th>Website</th>
+                                    </tr>
+                                    </thead>
 
-                                <tbody>
-                                {this.state.userInput}
-                                </tbody>
-                            </table>
-                        </div>
-                    </li>
-                </ul>
+                                    <tbody>
+                                    {this.state.userInput}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">local_atm</i>
+                                {
+                                    this.state.loadingTextMedianHousing ? <span className='wait'>Median Housing - Loading</span> : <span>Median Housing</span>
+                                }
+                            </div>
+                            <div className="collapsible-body">
+                                <table className='responsive-table'>
+                                    <thead>
+                                    <tr className='white-text'>
+                                        <th>Date</th>
+                                        <th>Price</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {this.state.medianHousingPrices}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="collapsible-header"><i className="material-icons">description</i>
+                                {
+                                    this.state.loadingTextDesc ? <span id='wait' className='wait'>City Description - Loading</span> : <span id='wait' className=''>City Description</span>
+                                }
+                            </div>
+                            <div className="collapsible-body">
+                                <table className='centered'>
+                                    <tbody>
+                                    {this.state.cityDesc}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div className='scores-container'>
+                        <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
+                            <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
+
+                        <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
+                            <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
+                                    fill="none"></circle>
+                            <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
+                                    r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
+                                    fill="none"></circle>
+                            <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
+                            <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
+                            <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
+                        </svg>
+                    </div>
+                </Fragment>
             )
         }
 
