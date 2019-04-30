@@ -8,7 +8,8 @@ import {withRouter} from 'react-router-dom';
 class GeneralMap extends Component {
 
     state = {
-        popup: null
+        popup: null,
+        prevState: ''
     }
 
     createMap () {
@@ -23,7 +24,6 @@ class GeneralMap extends Component {
         });
 
         var hoveredStateId =  null;
-
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
@@ -64,7 +64,8 @@ class GeneralMap extends Component {
             // When the user moves their mouse over the state-fill layer, we'll update the
             // feature state for the feature under the mouse.
             this.map.on("mousemove", "state-fills", (e) => {
-                if (e.features.length > 0) {
+                // console.log('Previous State: ',this.state.prevState, ' Current State: ', e.features[0].properties.STATE_NAME);
+                if (e.features.length > 0 && this.state.prevState !== e.features[0].properties.STATE_NAME) {
                     if (hoveredStateId) {
                         this.map.setFeatureState({source: 'states', id: hoveredStateId}, { hover: false});
                     }
@@ -96,11 +97,10 @@ class GeneralMap extends Component {
                             .addTo(this.map);
 
                         this.setState({
-                            popup: popup
+                            popup: popup,
+                            prevState: keyword.properties.STATE_NAME
                         })
                     })
-
-
                 }
             });
 
