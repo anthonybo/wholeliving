@@ -123,6 +123,7 @@ class WholeFoodsTable extends Component {
 
         })
 
+
         for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
             // console.log(value.properties);
             if(index < this.state.wholeFoodsCount){
@@ -1076,7 +1077,7 @@ class WholeFoodsTable extends Component {
                             {
                                 items.length > 0 ? <span></span> :
                                  <Fragment>
-                                 <br/>
+                                 <br/><br/>
                                  <div className="pagination-wrapper">
                                     <svg className="btn-pagination btn--prev" id='behind' height="96" viewBox="0 0 24 24" width="96" xmlns="">
                                     <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>

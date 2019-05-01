@@ -75,12 +75,13 @@ class LocateByBusId extends Component {
         let wfCount = document.createElement('span');
         let citySpan = document.createElement('span');
 
+        let state = this.state.business.features[0].properties.Address.split(",")[2].substr(1,2);
+        let city = this.state.business.features[0].properties.Address.split(",")[1].substr(1);
 
         statePre.id = 'currentStateContainer';
-        stateSpan.innerText = 'State: ' + this.state.state;
-        citySpan.innerText = 'City: ' + this.state.city;
-        // wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
-        // console.log(this.state.wholefoods.features.length);
+        stateSpan.innerText = 'State: ' + state;
+        citySpan.innerText = 'City: ' + city;
+        // // wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
         mapDiv.append(statePre);
         statePre.append(stateSpan, citySpan);
     }
@@ -356,7 +357,7 @@ class LocateByBusId extends Component {
                 .addTo(this.map);
         });
 
-        // this.displayCurrentState();
+        this.displayCurrentState();
     }
 
     componentDidMount() {
