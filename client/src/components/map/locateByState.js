@@ -243,6 +243,14 @@ class LocateByState extends Component {
         this.getData();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.location.pathname !== this.props.location.pathname) {
+            if(this.map !== undefined){
+                this.map.remove();
+            }
+        }
+    }
+
     render(){
         const { wholefoods } = this.state;
 
