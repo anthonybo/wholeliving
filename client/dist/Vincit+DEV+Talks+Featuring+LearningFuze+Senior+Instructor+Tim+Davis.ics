@@ -1,0 +1,49 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Meetup//RemoteApi//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-ORIGINAL-URL:https://www.meetup.com/LearningFuze/events/260582240/ical/
+ Vincit+DEV+Talks+Featuring+LearningFuze+Senior+Instructor+Tim+Davis.ics
+X-WR-CALNAME:Events - Vincit DEV Talks Featuring LearningFuze Senior Inst
+ ructor Tim Davis.ics
+X-MS-OLK-FORCEINSPECTOROPEN:TRUE
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+TZURL:http://tzurl.org/zoneinfo-outlook/America/Los_Angeles
+X-LIC-LOCATION:America/Los_Angeles
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+TZNAME:PDT
+DTSTART:19700308T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+TZNAME:PST
+DTSTART:19701101T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:20190430T173750Z
+DTSTART;TZID=America/Los_Angeles:20190502T180000
+DTEND;TZID=America/Los_Angeles:20190502T200000
+STATUS:CONFIRMED
+SUMMARY:Vincit DEV Talks Featuring LearningFuze Senior Instructor Tim Dav
+ is
+DESCRIPTION:LearningFuze\nThursday\, May 2 at 6:00 PM\n\nLearningFuze Ins
+ tructor Tim Davis will be speaking at Vincit Dev Talks.  Come join us at
+  Vincit for an evening of networking. Talks will be brief but ...\n\nhtt
+ ps://www.meetup.com/LearningFuze/events/260582240/
+CLASS:PUBLIC
+CREATED:20190412T235320Z
+GEO:33.70;-117.70
+LOCATION:WeWork (200 Spectrum Center Dr Suite 300\, Irvine\, CA 92618)
+URL:https://www.meetup.com/LearningFuze/events/260582240/
+LAST-MODIFIED:20190412T235320Z
+UID:event_260582240@meetup.com
+END:VEVENT
+END:VCALENDAR

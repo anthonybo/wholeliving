@@ -24,16 +24,119 @@ class WholeFoodsTable extends Component {
         cityDesc: [],
         noResults: false,
         loadingTextDesc: true,
-        loadingTextMedianHousing: true
+        loadingTextMedianHousing: true,
+        allWholeFoodsTable: [],
+        wholeFoodsCount: 5,
+        wholeFoodsIndex: 0
     }
 
     async getAllWholeFoods(){
         const resp = await axios('/api/wholefoods');
 
-        // console.log(resp.data);
-
         this.setState({
             allWholeFoods: resp.data
+        })
+
+        this.getAllWholeFoodsCreateTable();
+        this.fancyButtons();
+
+    }
+
+    fancyButtons(){
+        var btns = document.querySelectorAll('.btn-pagination');
+        var paginationWrapper = document.querySelector('.pagination-wrapper');
+        var bigDotContainer = document.querySelector('.big-dot-container');
+        var littleDot = document.querySelector('.little-dot');
+
+        for(var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('click', btnClick);
+        }
+
+        function btnClick() {
+            if(this.classList.contains('btn--prev')) {
+                paginationWrapper.classList.add('transition-prev');
+            } else {
+                paginationWrapper.classList.add('transition-next');
+            }
+
+            var timeout = setTimeout(cleanClasses, 500);
+        }
+
+        function cleanClasses() {
+            if(paginationWrapper.classList.contains('transition-next')) {
+                paginationWrapper.classList.remove('transition-next')
+            } else if(paginationWrapper.classList.contains('transition-prev')) {
+                paginationWrapper.classList.remove('transition-prev')
+            }
+        }
+    }
+
+    getAllWholeFoodsCreateTable(){
+        let items = [];
+        let wholeFoodsCount = 10;
+        let wholeFoodsIndex = 0;
+
+        var behind = document.getElementById('behind');
+        var forward = document.getElementById('forward');
+
+        behind.addEventListener('click', ()=> {
+            if(wholeFoodsIndex >= 5 && this.state.wholeFoodsCount >= 10){
+                wholeFoodsIndex -= 5;
+                this.state.wholeFoodsCount -= 10;
+
+                // console.log(this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
+                items = [];
+
+                for(this.state.wholeFoodsCount; this.state.wholeFoodsCount < wholeFoodsIndex; this.state.wholeFoodsCount++){
+                    // console.log('Count: ', this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
+                    // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
+                    let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
+
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                }
+
+                this.setState({
+                    allWholeFoodsTable: items,
+                })
+            }
+        })
+
+        forward.addEventListener('click', ()=> {
+            if(wholeFoodsIndex < 485){
+                wholeFoodsIndex += 5;
+
+                // console.log(this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
+                items = [];
+
+                for(this.state.wholeFoodsCount; this.state.wholeFoodsCount < wholeFoodsIndex; this.state.wholeFoodsCount++){
+                    // console.log('Count: ', this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
+                    // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
+                    let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
+
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                }
+
+                this.setState({
+                    allWholeFoodsTable: items,
+                })
+            }
+
+        })
+
+        if(this.state.wholeFoodsCount <= 10){
+
+        }
+
+        for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
+            // console.log(value.properties);
+            if(index < this.state.wholeFoodsCount){
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                wholeFoodsIndex++;
+            }
+        }
+
+        this.setState({
+            allWholeFoodsTable: items,
         })
     }
 
@@ -474,7 +577,10 @@ class WholeFoodsTable extends Component {
                     medianHousingPrices: [],
                     cityDesc: [],
                     loadingTextDesc: true,
-                    byBusId: null
+                    byBusId: null,
+                    allWholeFoodsTable: [],
+                    wholeFoodsCount: 5,
+                    wholeFoodsIndex: 0
                 })
             } else if (path === '/generalMap'){
                 this.setState({
@@ -488,7 +594,10 @@ class WholeFoodsTable extends Component {
                     medianHousingPrices: [],
                     cityDesc: [],
                     loadingTextDesc: true,
-                    byBusId: null
+                    byBusId: null,
+                    allWholeFoodsTable: [],
+                    wholeFoodsCount: 5,
+                    wholeFoodsIndex: 0
                 })
 
             } else if (path.match('/byState/') ){
@@ -503,7 +612,10 @@ class WholeFoodsTable extends Component {
                     medianHousingPrices: [],
                     cityDesc: [],
                     loadingTextDesc: true,
-                    byBusId: null
+                    byBusId: null,
+                    allWholeFoodsTable: [],
+                    wholeFoodsCount: 5,
+                    wholeFoodsIndex: 0
                 })
                 this.getLocationById();
             } else if (path.match('/crossReference/')){
@@ -518,7 +630,10 @@ class WholeFoodsTable extends Component {
                     noResults: false,
                     loadingTextDesc: true,
                     loadingTextMedianHousing: true,
-                    byBusId: null
+                    byBusId: null,
+                    allWholeFoodsTable: [],
+                    wholeFoodsCount: 5,
+                    wholeFoodsIndex: 0
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -531,7 +646,10 @@ class WholeFoodsTable extends Component {
                     medianHousingPrices: [],
                     cityDesc: [],
                     loadingTextDesc: true,
-                    byBusId: null
+                    byBusId: null,
+                    allWholeFoodsTable: [],
+                    wholeFoodsCount: 5,
+                    wholeFoodsIndex: 0
                 })
                 this.getLocationByBusId();
             }
@@ -605,25 +723,21 @@ class WholeFoodsTable extends Component {
 
             if(this.state.noResults){
                 items.push(<tr className='white-text' key='1342'><td></td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td></tr>)
-            }
-            else if(this.state.allWholeFoods){
+            } else if(this.state.allWholeFoods){
             // console.log(this.state.resp.data.wholefoods);
-            for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
-                // console.log(value.properties);
-                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
-            }
-        } else if(this.state.byState){
+
+            } else if(this.state.byState){
             // console.log(this.state.byState.data.geoJson.features);
-            for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
+                for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
                 // console.log(value.properties);
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
-            }
-        } else if(this.state.byId){
+                }
+            } else if(this.state.byId){
             // console.log(this.state.byState.data.geoJson.features);
-            for(const [index, value] of this.state.byId.data.geoJson.features.entries()){
+                for(const [index, value] of this.state.byId.data.geoJson.features.entries()){
                 // console.log(value.properties);
                 items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
-            }
+                }
 
             return(
                 <Fragment>
@@ -956,9 +1070,39 @@ class WholeFoodsTable extends Component {
                             </thead>
 
                             <tbody>
-                                {items}
+                                {
+                                    items.length > 0 ? items : this.state.allWholeFoodsTable
+                                }
                             </tbody>
                         </table>
+
+                            {
+                                items.length > 0 ? <span></span> :
+                                 <Fragment>
+                                 <br/>
+                                 <div className="pagination-wrapper">
+                                    <svg className="btn-pagination btn--prev" id='behind' height="96" viewBox="0 0 24 24" width="96" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
+                                    <path d="M0-.5h24v24H0z" fill="none"/>
+                                    </svg>
+
+                                    <div className="pagination-container">
+                                    <div className="little-dot  little-dot--first"></div>
+                                    <div className="little-dot">
+                                    <div className="big-dot-container">
+                                    <div className="big-dot"></div>
+                                    </div>
+                                    </div>
+                                    <div className="little-dot  little-dot--last"></div>
+                                    </div>
+
+                                    <svg className="btn-pagination btn--next" id='forward' height="96" viewBox="0 0 24 24" width="96" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
+                                    <path d="M0-.25h24v24H0z" fill="none"/>
+                                    </svg>
+                                </div>
+                                 </Fragment>
+                            }
                     </div>
                 </li>
             </ul>
