@@ -158,6 +158,14 @@ class GeneralMap extends Component {
         this.createMap();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.location.pathname !== this.props.location.pathname) {
+            if(this.map !== undefined){
+                this.map.remove();
+            }
+        }
+    }
+
     render() {
         return (
             <Fragment>

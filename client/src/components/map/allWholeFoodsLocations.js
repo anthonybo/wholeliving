@@ -3,6 +3,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIze
 import React, {Component, Fragment} from 'react';
 import axios from 'axios';
 import './map.scss';
+import {withRouter} from 'react-router-dom';
 
 class AllWholeFoodsLocations extends Component {
 
@@ -207,6 +208,14 @@ class AllWholeFoodsLocations extends Component {
         this.getData();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.location.pathname !== this.props.location.pathname) {
+            if(this.map !== undefined){
+                this.map.remove();
+            }
+        }
+    }
+
     render(){
         const { wholefoods } = this.state;
 
@@ -238,4 +247,4 @@ class AllWholeFoodsLocations extends Component {
     }
 }
 
-export default AllWholeFoodsLocations;
+export default withRouter(AllWholeFoodsLocations);
