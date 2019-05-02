@@ -81,7 +81,6 @@ class LocateByBusId extends Component {
         statePre.id = 'currentStateContainer';
         stateSpan.innerText = 'State: ' + state;
         citySpan.innerText = 'City: ' + city;
-        // // wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
         mapDiv.append(statePre);
         statePre.append(stateSpan, citySpan);
     }

@@ -83,8 +83,6 @@ class WholeFoodsTable extends Component {
             if(wholeFoodsIndex >= 5 && this.state.wholeFoodsCount >= 10){
                 wholeFoodsIndex -= 5;
                 this.state.wholeFoodsCount -= 10;
-
-                // console.log(this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
                 items = [];
 
                 for(this.state.wholeFoodsCount; this.state.wholeFoodsCount < wholeFoodsIndex; this.state.wholeFoodsCount++){
@@ -92,7 +90,7 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
@@ -113,21 +111,19 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
                     allWholeFoodsTable: items,
                 })
             }
-
         })
-
 
         for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
             // console.log(value.properties);
             if(index < this.state.wholeFoodsCount){
-                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 wholeFoodsIndex++;
             }
         }
