@@ -9,6 +9,7 @@ const stream = require ('stream');
 const parse= require('csv-parse');
 const request = require('request');
 const fetch = require('node-fetch');
+const sha1 = require('sha1');
 
 const app = express();
 
@@ -409,6 +410,41 @@ app.post('/api/test', async (req, res) => {
         res.status(500).send('Server Error');
     }
 
+});
+
+app.post('/api/new/user', async (req,res) => {
+    let {email, password, lastLogin} = req.body;
+    password = sha1(password);
+
+    delete req.body.password;
+    console.log(req.body);
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }console.log("client IP is *********************" + ip);
+
+    console.log(ip);
+
+    try {
+        const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`) VALUES (?, ?, ?)';
+        const inserts = [email, password, lastLogin];
+
+        const query = mysql.format(sql, inserts);
+
+        const insertResults = await db.query(query);
+
+        res.send({
+            success: true,
+            insertId: insertResults.insertId
+        })
+    } catch (error){
+        res.status(500).send('Server Error');
+        console.log(error);
+    }
 });
 
 
