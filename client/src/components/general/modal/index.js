@@ -66,7 +66,8 @@ class Modal extends Component {
                         <figcaption>
                             <h1>About Us</h1>
                             <p>The purpose of this application is to allow you to query places that you would need in your life and
-                                cross reference those locations with our database filled with over 485 Whole Foods located in America.</p>
+                                we will cross reference those locations with our database filled with over 485 Whole Foods located
+                                in America.</p>
                         </figcaption>
                     </figure>
 
