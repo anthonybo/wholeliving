@@ -40,6 +40,15 @@ class WholeFoodsTable extends Component {
         this.getAllWholeFoodsCreateTable();
         this.fancyButtons();
 
+        // Login Setup
+        // var date = new Date();
+        // var dateStr = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        //
+        // let test = await axios.post('/api/new/user', {
+        //     email: 'testing@gmail.com',
+        //     password: 'testing',
+        //     lastLogin: dateStr
+        // });
     }
 
     fancyButtons(){
