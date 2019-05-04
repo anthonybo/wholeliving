@@ -1,5 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import './modal.scss';
+import Login from '../../login/login';
 
 class Modal extends Component {
 
@@ -52,8 +53,6 @@ class Modal extends Component {
         }
 
         this.clickHandler();
-
-
     }
 
     render(){
@@ -73,9 +72,10 @@ class Modal extends Component {
 
                 </div>
 
-                <span className='tutorial'>
-                    <a><i id='tutorial-modal-icon' className='material-icons tutorial-icon'>help</i></a>
-                </span>
+                <Login/>
+                {/*<span className='tutorial'>*/}
+                {/*    <a><i id='tutorial-modal-icon' className='material-icons tutorial-icon'>help</i></a>*/}
+                {/*</span>*/}
             </Fragment>
 
         )

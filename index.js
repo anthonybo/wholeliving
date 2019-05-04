@@ -10,6 +10,7 @@ const parse= require('csv-parse');
 const request = require('request');
 const fetch = require('node-fetch');
 const sha1 = require('sha1');
+const http = require('http');
 
 const app = express();
 
@@ -414,40 +415,155 @@ app.post('/api/test', async (req, res) => {
 
 app.post('/api/new/user', async (req,res) => {
     let {email, password, lastLogin} = req.body;
+    let ipv4 = "127.0.0.1";
     password = sha1(password);
 
     delete req.body.password;
-    console.log(req.body);
-    var ip;
-    if (req.headers['x-forwarded-for']) {
-        ip = req.headers['x-forwarded-for'].split(",")[0];
-    } else if (req.connection && req.connection.remoteAddress) {
-        ip = req.connection.remoteAddress;
-    } else {
-        ip = req.ip;
-    }console.log("client IP is *********************" + ip);
+    // console.log(req.body);
+    // var ip;
+    // if (req.headers['x-forwarded-for']) {
+    //     ip = req.headers['x-forwarded-for'].split(",")[0];
+    // } else if (req.connection && req.connection.remoteAddress) {
+    //     ip = req.connection.remoteAddress;
+    // } else {
+    //     ip = req.ip;
+    // }console.log("client IP is *********************" + ip);
+    //
+    // console.log(ip);
 
-    console.log(ip);
+    var options = {
+        host: 'ipv4bot.whatismyipaddress.com',
+        port: 80,
+        path: '/'
+    };
 
-    try {
-        const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`) VALUES (?, ?, ?)';
-        const inserts = [email, password, lastLogin];
+    http.get(options, function(httpRes) {
+        // console.log("status: " + httpRes.statusCode);
 
-        const query = mysql.format(sql, inserts);
+        httpRes.on("data", async function(chunk) {
+            // console.log("BODY: " + chunk);
+            ipv4 = chunk;
 
-        const insertResults = await db.query(query);
+            try {
+                const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`, `ipv4`) VALUES (?, ?, ?, ?)';
+                const inserts = [email, password, lastLogin, ipv4];
 
-        res.send({
-            success: true,
-            insertId: insertResults.insertId
-        })
-    } catch (error){
-        res.status(500).send('Server Error');
-        console.log(error);
-    }
+                const query = mysql.format(sql, inserts);
+
+                const insertResults = await db.query(query);
+
+                res.send({
+                    success: true,
+                    insertId: insertResults.insertId
+                })
+            } catch (error){
+                res.status(500).send('Server Error');
+            }
+
+
+        });
+    }).on('error', function(e) {
+        console.log("error: " + e.message);
+    });
+
+
 });
 
+app.post('/api/login', (request, response) => {
+    console.log(request.body);
+    try {
+        const email = request.body.email;
+        if (email === undefined || request.body.password === undefined) {
+            throw new Error ('Email & Password are required fields.');
+        }
+        const password = sha1(request.body.password);
+        delete request.body.password;
+        const query = `SELECT id, email FROM users WHERE email = ? AND password = ?`;
 
+        db.query(query, [email,password], (error,data) =>{
+            try {
+                if (!error) {
+                    console.log(data);
+                    if (data.length === 1) {
+                        response.send({
+                            success: true,
+                            user: {
+                                id: data[0].id,
+                                email: data[0].email,
+                                message: 'User exists'
+                            }
+                        })
+                    } else {
+                        console.log('In here?')
+                        response.send({
+                            success: false,
+                            user: {
+                                message: 'User does not exist'
+                            }
+                        })
+                        // throw new Error('email or password is invalid')
+                    }
+                } else {
+                    throw new Error(error);
+                }
+            } catch (err) {
+                handleError(response, err.message);
+            }
+
+        });
+    } catch (err) {
+        handleError(response, err.message);
+    }
+})
+
+app.post('/api/login/check', (request, response) => {
+    console.log(request.body);
+    try {
+        const email = request.body.email;
+        if (email === undefined) {
+            throw new Error ('Email & Password are required fields.');
+        }
+        const query = `SELECT id, email FROM users WHERE email = ?`;
+
+        db.query(query, [email], (error,data) =>{
+            try {
+                if (!error) {
+                    console.log(data);
+                    if (data.length === 1) {
+                        response.send({
+                            success: true,
+                            user: {
+                                id: data[0].id,
+                                email: data[0].email,
+                                message: 'User exists'
+                            }
+                        })
+                    } else {
+                        console.log('In here?')
+                        response.send({
+                            success: false,
+                            user: {
+                                message: 'User does not exist'
+                            }
+                        })
+                        // throw new Error('email or password is invalid')
+                    }
+                } else {
+                    throw new Error(error);
+                }
+            } catch (err) {
+                handleError(response, err.message);
+            }
+
+        });
+    } catch (err) {
+        handleError(response, err.message);
+    }
+})
+
+function handleError( response, error ){
+    response.status(500).send( {success: false, error: [error]} );
+}
 
 // app.get('/api/get-user', (req,res)=>{
 //    res.send(req.user);
