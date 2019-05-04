@@ -1,0 +1,121 @@
+@import url("https://use.fontawesome.com/releases/v5.8.1/css/all.css");
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700");
+
+.closed-registration-form {
+  display: none;
+}
+
+.registration-form {
+  position: fixed;
+  width: 365px;
+  //height: 50%;
+  margin: 50px auto 100px;
+  text-align: center;
+  background: #eeeeef;
+  padding: 40px;
+  -webkit-border-radius: 40px 0 0 0;
+  -moz-border-radius: 40px 0 0 0;
+  border-radius: 50px 7px 50px 7px;
+  //box-shadow: -9px -11px 0px 2px #eef1fb38, inset 10px 7px 0px 0px #a3a7b1f2;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  top: 0;
+  z-index: 10000;
+}
+
+.title-registration-form {
+  text-align: center;
+  padding: 30px 0px 0px 0px;
+  font: 25px Oswald;
+  color: #FFF;
+  text-transform: uppercase;
+  text-shadow: #000 0px 1px 5px;
+  margin: 0px;
+}
+
+.close-registration-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 2rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  cursor: pointer;
+}
+
+.close-registration-button:hover {
+  background-color: rgba(0, 0, 0, 0.94);
+}
+
+.hide-popup {
+  display: none !important;
+}
+
+.message {
+  background: #eee;
+  box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.31);
+  border-radius: 1em;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 40em;
+  margin: 2em auto;
+}
+
+.message header {
+  background: #9E9E9E;
+  width: 100%;
+  padding: .5em;
+}
+.message i:after {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  content: '\f128';
+  font-style: normal;
+  color: #eee;
+  background: #353535;
+  padding: 1em .75em;
+  font-size: 1.25em;
+  display: block;
+  width: 2.5em;
+  height: 100%;
+  text-align: center;
+}
+.message h2 {
+  margin: .75em;
+  font-size: 1.25em;
+  position: relative;
+  display: block;
+  width: calc(100% - 2.5em - 1.5em);
+}
+.message h2 span {
+  color: #9E9E9E;
+}
+.message h2:after {
+  content: '';
+  border-bottom: 0.1em solid #9E9E9E;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.success header {
+  background: #388E3C;
+}
+.success i:after {
+  background: #253226;
+  color: #7bcb7e;
+  content: "\f058";
+}
+.success h2 span {
+  color: #388E3C;
+}
+.success h2:after {
+  border-bottom: 0.1em solid #388E3C;
+}
