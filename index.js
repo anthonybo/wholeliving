@@ -15,7 +15,7 @@ const http = require('http');
 const app = express();
 
 app.use( cors() );
-app.use( express.json()) ;
+app.use( express.json() );
 
 // const parser = parse({
 //     delimiter:','
@@ -249,7 +249,6 @@ app.post('/api/places', async (req,res,next) => {
 })
 
 app.post('/api/housing/median', async (req,res,next) => {
-    // console.log('Median: ', req.body);
     //ZHVIAH -All home data code
     //MLPAH -Median home data code
     //Documentation: https://www.quandl.com/data/ZILLOW-Zillow-Real-Estate-Research
@@ -285,13 +284,9 @@ app.post('/api/walkscore', async (req,res,next)=>{
 })
 
 app.post('/api/wiki', async (req,res,next)=>{
-    // console.log(req.body);
-
     fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=${req.body.city},_${req.body.state}`)
         .then(res => res.json())
         .then(data=> {
-            // console.log(data);
-
             res.send({
                 success: true,
                 wiki: data
@@ -300,8 +295,6 @@ app.post('/api/wiki', async (req,res,next)=>{
 })
 
 app.post('/api/places/details', async (req,res,next) => {
-    // console.log(req.body);
-
     try{
         fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
             .then(res => res.json())
@@ -320,7 +313,6 @@ app.post('/api/places/details', async (req,res,next) => {
 })
 
 app.post('/api/geoSpacial', async(req,res,next) => {
-    // console.log('Request: ' , req.body);
     let range = 10;
     if(req.body.range > 0){
         range = req.body.range;
