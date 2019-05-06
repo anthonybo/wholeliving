@@ -480,7 +480,7 @@ app.post('/api/login', (request, response) => {
         delete request.body.password;
         const query = `SELECT id, email FROM users WHERE email = ? AND password = ?`;
 
-        db.query(query, [email,password], (error,data) =>{
+        db.query(query, [email,password], (error,data)=>{
             try {
                 if (!error) {
                     console.log(data);
@@ -492,9 +492,32 @@ app.post('/api/login', (request, response) => {
                                 email: data[0].email,
                                 message: 'User exists'
                             }
-                        })
+                        });
+
+                        var options = {
+                            host: 'ipv4bot.whatismyipaddress.com',
+                            port: 80,
+                            path: '/'
+                        };
+
+                        http.get(options, function(httpRes) {
+                            httpRes.on("data", async function(chunk) {
+                                var ipv4 = chunk;
+
+                                try {
+                                    const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ? WHERE id = ?`;
+                                    const inserts = [ipv4, request.body.lastLogin, data[0].id];
+                                    const updateIpQuery = mysql.format(updateIpSql, inserts);
+                                    const insertResults = db.query(updateIpQuery);
+                                } catch (error){
+                                    response.status(500).send('Server Error');
+                                }
+                            });
+                        }).on('error', function(e) {
+                            console.log("error: " + e.message);
+                        });
+
                     } else {
-                        console.log('In here?')
                         response.send({
                             success: false,
                             user: {
