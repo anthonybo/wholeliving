@@ -33,8 +33,6 @@ class Login extends Component {
     }
 
     toggleRegistrationClicked=()=>{
-        console.log('Toggle Registration Clicked!');
-
         this.setState({
             loginOpen: false,
             registrationClicked: true
@@ -73,6 +71,8 @@ class Login extends Component {
         let registrationForm = document.getElementById('registration-form');
         let errorOutput = document.getElementById('error-output');
         let problems = false;
+        var date = new Date();
+        var dateStr = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
 
         if(this.state.password.length < 6){
@@ -95,7 +95,8 @@ class Login extends Component {
         if(this.state.loginOpen){
             let loginDataConfirm = await axios.post('/api/login', {
                 email: this.state.email,
-                password: this.state.password
+                password: this.state.password,
+                lastLogin: dateStr
             });
 
             if(loginDataConfirm.data.success){
@@ -125,8 +126,6 @@ class Login extends Component {
 
         if(!problems && !this.state.loginOpen){
             registrationForm.classList.add('closed-registration-form');
-            var date = new Date();
-            var dateStr = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
             let loginData = await axios.post('/api/new/user', {
                 email: this.state.email,

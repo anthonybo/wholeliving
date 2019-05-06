@@ -51,7 +51,6 @@ class Modal extends Component {
             tutorialModal.classList.remove('closed-no-animations');
             // tutorialModal.classList.add('closed');
         }
-
         this.clickHandler();
     }
 
@@ -69,13 +68,9 @@ class Modal extends Component {
                                 in America.</p>
                         </figcaption>
                     </figure>
-
                 </div>
 
                 <Login/>
-                {/*<span className='tutorial'>*/}
-                {/*    <a><i id='tutorial-modal-icon' className='material-icons tutorial-icon'>help</i></a>*/}
-                {/*</span>*/}
             </Fragment>
 
         )
