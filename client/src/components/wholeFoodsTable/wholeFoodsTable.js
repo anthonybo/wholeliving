@@ -184,8 +184,11 @@ class WholeFoodsTable extends Component {
 
         if(userInputData.opening_hours){
             var d = new Date();
-            // console.log(d.getDay()-1 );
-            hours = userInputData.opening_hours.weekday_text[d.getDay()-1 ];
+            var currentDay = d.getDay()-1;
+            if(d.getDay()-1 < 0){
+                currentDay = 6;
+            }
+            hours = userInputData.opening_hours.weekday_text[currentDay];
         }
         if(userInputData.website) {
             // console.log('We have a website');

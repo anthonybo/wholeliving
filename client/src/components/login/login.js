@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import './login.scss';
 import axios from 'axios';
 import ReactDOM from "react-dom";
+import {withRouter} from 'react-router-dom';
 
 class Login extends Component {
 
@@ -9,18 +10,49 @@ class Login extends Component {
         registrationOpen: false,
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        loginOpen: false,
+        registrationClicked: false,
+        userLoggedIn: false
     }
 
     clickHandler(){
-        let loginIcon = document.getElementById('registration-icon');
+        let registrationIcon = document.getElementById('registration-icon');
+        let loginIcon = document.getElementById('login-icon');
         let closeRegistration = document.getElementById('close-registration');
 
-        loginIcon.addEventListener('click', this.toggleLogin);
-        closeRegistration.addEventListener('click', this.toggleLogin);
+        // registrationIcon.addEventListener('click', this.toggleRegistrationClicked);
+        // loginIcon.addEventListener('click', this.toggleLogin);
+        closeRegistration.addEventListener('click', this.toggleRegistration);
+    }
+
+    toggleLogout=()=>{
+        this.setState({
+            userLoggedIn: false
+        })
+    }
+
+    toggleRegistrationClicked=()=>{
+        console.log('Toggle Registration Clicked!');
+
+        this.setState({
+            loginOpen: false,
+            registrationClicked: true
+        })
+
+        this.toggleRegistration();
     }
 
     toggleLogin=()=>{
+        this.setState({
+            loginOpen: true,
+            registrationClicked: false
+        })
+
+        this.toggleRegistration();
+    }
+
+    toggleRegistration=()=>{
         let errorOutput = document.getElementById('error-output');
         errorOutput.innerHTML = '';
 
@@ -42,11 +74,7 @@ class Login extends Component {
         let errorOutput = document.getElementById('error-output');
         let problems = false;
 
-        if(this.state.password != this.state.confirmPassword) {
-            errorOutput.innerHTML = "*Passwords Do Not Match!";
-            errorOutput.style.color = "red";
-            problems = true;
-        }
+
         if(this.state.password.length < 6){
             errorOutput.innerHTML = "*Your password must be at least 6 characters";
             errorOutput.style.color = "red";
@@ -64,26 +92,41 @@ class Login extends Component {
             problems = true;
         }
 
-        // let loginDataConfirm = await axios.post('/api/login', {
-        //     email: this.state.email,
-        //     password: this.state.password
-        // });
+        if(this.state.loginOpen){
+            let loginDataConfirm = await axios.post('/api/login', {
+                email: this.state.email,
+                password: this.state.password
+            });
 
-        let loginDataConfirm = await axios.post('/api/login/check', {
-            email: this.state.email,
-        });
+            if(loginDataConfirm.data.success){
+                this.loginSuccess();
+            } else {
+                errorOutput.innerHTML = "*Email or Password Incorrect!";
+                errorOutput.style.color = "red";
+            }
+        } else {
+            if(this.state.password != this.state.confirmPassword) {
+                errorOutput.innerHTML = "*Passwords Do Not Match!";
+                errorOutput.style.color = "red";
+                problems = true;
+            }
 
-        if(loginDataConfirm.data.success){
-            problems = true;
-            errorOutput.innerHTML = "*User already exists!";
+            let loginDataConfirm = await axios.post('/api/login/check', {
+                email: this.state.email,
+            });
+
+            if(loginDataConfirm.data.success){
+                problems = true;
+                errorOutput.innerHTML = "*User already exists!";
+                errorOutput.style.color = "red";
+            }
         }
 
-        if(!problems){
+
+        if(!problems && !this.state.loginOpen){
             registrationForm.classList.add('closed-registration-form');
             var date = new Date();
             var dateStr = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +  date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
-
 
             let loginData = await axios.post('/api/new/user', {
                 email: this.state.email,
@@ -106,10 +149,25 @@ class Login extends Component {
         }
     }
 
-    componentDidMount() {
-        // this.sendLoginDetails();
-        // this.getFormData();
+    loginSuccess=()=>{
+        let registrationForm = document.getElementById('registration-form');
+        registrationForm.classList.add('closed-registration-form');
 
+        let popupMessage = document.getElementById('popupMessage');
+        popupMessage.classList.remove('hide-popup');
+        let successMessage = document.getElementById('successMessage');
+        successMessage.innerHTML = "You have Logged In!";
+        this.fade();
+
+        this.setState({
+            registrationOpen: !this.state.registrationOpen,
+            password: '',
+            email: '',
+            userLoggedIn: true
+        })
+    }
+
+    componentDidMount() {
         const node = ReactDOM.findDOMNode(this);
         let elem = null;
         let tooltipElem = null;
@@ -124,7 +182,6 @@ class Login extends Component {
             hoverEnabled: true
         });
 
-
         var toolTip_instances = M.Tooltip.init(tooltipElem, {
             position: 'top',
             exitDelay: 200
@@ -136,7 +193,9 @@ class Login extends Component {
     handleSubmit = (event) => {
         this.refs.email.value = '';
         this.refs.password.value = '';
-        this.refs.confirmPassword.value = '';
+        if(!this.state.loginOpen){
+            this.refs.confirmPassword.value = '';
+        }
 
         event.preventDefault();
 
@@ -186,6 +245,11 @@ class Login extends Component {
         return;
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+
+    }
+
     render(){
         return(
             <Fragment>
@@ -195,30 +259,46 @@ class Login extends Component {
 
                 <form id='registration-form' className='closed-registration-form registration-form' onSubmit={this.handleSubmit}>
                     <a id='close-registration' className="close-registration-button"><i className="material-icons ion-close">close</i></a>
-                    <h5 className='title-registration-form'>REGISTER FOR AN ACCOUNT</h5>
+                    {this.state.loginOpen ? <h5 className='title-registration-form'>Login</h5> : <h5 className='title-registration-form'>REGISTER FOR AN ACCOUNT</h5>}
                     <div><label htmlFor="useremail">Email Address</label></div>
                     <input className="" ref="email" name="email" id="useremail" type="email" placeholder="Enter email" maxLength="50" onChange={this.handleChange} autoComplete="none"/>
                            <div><label htmlFor="userPass">Password</label></div>
                     <input className="" ref="password" name="password" id="userPass" type="password" placeholder="Enter password" maxLength="20"
                            pattern=".{6,20}" title="6 to 20 characters" onChange={this.handleChange}/>
-                           <div><label htmlFor="userConfirmPass">Confirm password</label></div>
-                    <input className="" ref="confirmPassword" name="confirmPassword" id="userConfirmPass" type="password"
-                           placeholder="Confirm password" maxLength="20" pattern=".{6,20}"
-                           title="6 to 20 characters" onChange={this.handleChange}/>
+                    {
+                        this.state.loginOpen ? <span></span> :
+                            <Fragment>
+                            <div><label htmlFor="userConfirmPass">Confirm password</label></div>
+                            <input className="" ref="confirmPassword" name="confirmPassword" id="userConfirmPass" type="password"
+                                   placeholder="Confirm password" maxLength="20" pattern=".{6,20}"
+                                   title="6 to 20 characters" onChange={this.handleChange}/>
+                            </Fragment>
+                    }
                            <span id="info"></span>
                     <input className="btn waves-effect waves-light" type="submit" value="Send" name="submit" onClick={this.handleSubmit}/>
                     <div id='error-output'></div>
                 </form>
-                
+
                 <div className="fixed-action-btn horizontal">
-                    <a className="btn-floating btn-large red">
-                        <i className="large material-icons">help</i>
+                    <a className="btn-floating btn-large light">
+                        <i className="large material-icons">menu</i>
                     </a>
                     <ul>
                         <li><a id='tutorial-modal-icon' className="btn-floating blue tooltipped" data-position="top" data-delay="50"
                                data-tooltip="About Us"><i className="material-icons">help</i></a></li>
-                        <li><a id='registration-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></a></li>
-                        <li><a id='login-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></a></li>
+                        {
+                            this.state.userLoggedIn ?
+                                <Fragment>
+                                <li><a onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip="Logout"><i className="material-icons">account_box</i></a></li>
+                                    <li className='hide'><a></a></li>
+                                </Fragment>
+                                :
+                                <Fragment>
+                                <li><a onClick={this.toggleRegistrationClicked} id='registration-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></a></li>
+                                <li><a onClick={this.toggleLogin} id='login-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></a></li>
+                                </Fragment>
+
+                        }
                     </ul>
                 </div>
 
@@ -234,4 +314,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default withRouter(Login);
