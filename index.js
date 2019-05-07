@@ -477,14 +477,14 @@ app.post('/api/login', (request, response) => {
                 if (!error) {
                     console.log(data);
                     if (data.length === 1) {
-                        response.send({
-                            success: true,
-                            user: {
-                                id: data[0].id,
-                                email: data[0].email,
-                                message: 'User exists'
-                            }
-                        });
+                        // response.send({
+                        //     success: true,
+                        //     user: {
+                        //         id: data[0].id,
+                        //         email: data[0].email,
+                        //         message: 'User exists'
+                        //     }
+                        // });
 
                         var options = {
                             host: 'ipv4bot.whatismyipaddress.com',
@@ -496,11 +496,31 @@ app.post('/api/login', (request, response) => {
                             httpRes.on("data", async function(chunk) {
                                 var ipv4 = chunk;
 
+                                var rand = function() {
+                                    return Math.random().toString(36).substr(2); // remove `0.`
+                                };
+
+                                var token = function() {
+                                    return rand() + rand(); // to make it longer
+                                };
+
+                                var generatedToken = token();
+
                                 try {
-                                    const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ? WHERE id = ?`;
-                                    const inserts = [ipv4, request.body.lastLogin, data[0].id];
+                                    const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ?, token = ? WHERE id = ?`;
+                                    const inserts = [ipv4, request.body.lastLogin, generatedToken, data[0].id];
                                     const updateIpQuery = mysql.format(updateIpSql, inserts);
                                     const insertResults = db.query(updateIpQuery);
+
+                                    response.send({
+                                        success: true,
+                                        user: {
+                                            id: data[0].id,
+                                            email: data[0].email,
+                                            token: generatedToken,
+                                            message: 'User exists'
+                                        }
+                                    });
                                 } catch (error){
                                     response.status(500).send('Server Error');
                                 }
@@ -531,12 +551,49 @@ app.post('/api/login', (request, response) => {
     }
 })
 
-app.get('/api/login/auth', (request, response) => {
-    console.log('Auth Check: ');
+app.post('/api/login/token', (request, response) => {
+    console.log('Token Check: ', request.body);
 
-    response.send({
-        success: true,
-    })
+    try {
+        const email = request.body.email;
+        if (email === undefined) {
+            throw new Error ('Email & Password are required fields.');
+        }
+        const query = `SELECT id, email FROM users WHERE token = ?`;
+
+        db.query(query, [request.body.token], (error,data) =>{
+            try {
+                if (!error) {
+                    console.log(data);
+                    if (data.length === 1) {
+                        response.send({
+                            success: true,
+                            user: {
+                                id: data[0].id,
+                                email: data[0].email,
+                                message: 'User exists'
+                            }
+                        })
+                    } else {
+                        response.send({
+                            success: false,
+                            user: {
+                                message: 'User does not exist'
+                            }
+                        })
+                        // throw new Error('email or password is invalid')
+                    }
+                } else {
+                    throw new Error(error);
+                }
+            } catch (err) {
+                handleError(response, err.message);
+            }
+
+        });
+    } catch (err) {
+        handleError(response, err.message);
+    }
 })
 
 app.post('/api/login/check', (request, response) => {

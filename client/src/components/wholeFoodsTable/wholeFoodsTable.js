@@ -162,19 +162,22 @@ class WholeFoodsTable extends Component {
         let wholeFoodsCount = 10;
         let wholeFoodsIndex = 0;
 
-        for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
-            if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
-                let star_type = await this.checkFavorites(value.id);
+        if(this.state.allWholeFoods !== null){
+            for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
+                if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
+                    let star_type = await this.checkFavorites(value.id);
 
-                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
-                wholeFoodsIndex++;
+                    items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    wholeFoodsIndex++;
+                }
             }
+
+            this.setState({
+                allWholeFoodsTable: items,
+                wholeFoodsIndex: wholeFoodsIndex
+            })
         }
 
-        this.setState({
-            allWholeFoodsTable: items,
-            wholeFoodsIndex: wholeFoodsIndex
-        })
     }
 
     async addUserFavorite(location) {
@@ -183,27 +186,19 @@ class WholeFoodsTable extends Component {
             user_id: this.state.user_id,
             location: location,
         })
-
-        // console.log(checkFavorite);
-
+        
         if(!checkFavorite.data.results.length > 0){
             let insertFavorite = await axios.post('/api/user/insert/favorites', {
                 location: location,
                 email: this.state.email,
                 user_id: this.state.user_id
             })
-
-            console.log('Location has been added to your favorites!: ', this.state.wholeFoodsIndex, ' ', this.state.wholeFoodsCount);
-            // console.log(insertFavorite);
             this.updateWFTableRecords()
         } else {
-            console.log('You have already added that location!');
             let removeFavorites = await axios.post('/api/user/remove/favorites', {
                 location: location,
                 user_id: this.state.user_id
             })
-
-            console.log(removeFavorites);
             this.updateWFTableRecords()
         }
     }

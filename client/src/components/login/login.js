@@ -14,7 +14,8 @@ class Login extends Component {
         loginOpen: false,
         registrationClicked: false,
         userLoggedIn: false,
-        users_id: 0
+        users_id: 0,
+        tokenConfirmed: false
     }
 
     clickHandler(){
@@ -34,6 +35,10 @@ class Login extends Component {
         this.setState({
             userLoggedIn: false
         })
+
+        // localStorage.clear();
+        localStorage.removeItem('email');
+        localStorage.removeItem('token');
     }
 
     toggleRegistrationClicked=()=>{
@@ -103,9 +108,11 @@ class Login extends Component {
                 lastLogin: dateStr
             });
 
-            // console.log(loginDataConfirm);
-
             if(loginDataConfirm.data.success){
+                localStorage.setItem('token', loginDataConfirm.data.user.token);
+                localStorage.setItem('email', loginDataConfirm.data.user.email);
+                localStorage.setItem('user_id', loginDataConfirm.data.user.id);
+
                 this.setState({
                     email: loginDataConfirm.data.user.email,
                     users_id: loginDataConfirm.data.user.id
@@ -256,11 +263,44 @@ class Login extends Component {
         return;
     }
 
-    componentDidUpdate =(prevProps, prevState, snapshot)=> {
-        // console.log(this.props);
-        // this.props.onEmailChange(this.state.email);
-        // this.props.onEmailChange = this.state.email;
+    async confirmToken(){
+        let email = localStorage.getItem('email');
+        let user_id = localStorage.getItem('user_id');
+        let token = localStorage.getItem('token');
 
+        let tokenData = await axios.post('/api/login/token', {
+            email: email,
+            user_id: user_id,
+            token: token
+        })
+
+        if(tokenData.data.success){
+            this.setState({
+                tokenConfirmed: true
+            })
+        }
+    }
+
+    componentDidUpdate =(prevProps, prevState, snapshot)=> {
+
+        if(this.state.email == '' && this.state.users_id == 0 && localStorage.getItem('email') !== null){
+            this.confirmToken();
+            if(this.state.tokenConfirmed){
+                let email = localStorage.getItem('email');
+                let user_id = localStorage.getItem('user_id');
+                let token = localStorage.getItem('token');
+
+                this.setState({
+                    email: email,
+                    users_id: user_id,
+                    userLoggedIn: true
+                })
+
+                this.props.onEmailChange(email);
+                this.props.onIdChange(user_id);
+            }
+
+        }
     }
 
     render(){
