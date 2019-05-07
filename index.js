@@ -531,6 +531,14 @@ app.post('/api/login', (request, response) => {
     }
 })
 
+app.get('/api/login/auth', (request, response) => {
+    console.log('Auth Check: ');
+
+    response.send({
+        success: true,
+    })
+})
+
 app.post('/api/login/check', (request, response) => {
     console.log(request.body);
     try {
@@ -554,7 +562,6 @@ app.post('/api/login/check', (request, response) => {
                             }
                         })
                     } else {
-                        console.log('In here?')
                         response.send({
                             success: false,
                             user: {
@@ -573,6 +580,80 @@ app.post('/api/login/check', (request, response) => {
         });
     } catch (err) {
         handleError(response, err.message);
+    }
+})
+
+app.post('/api/user/get/favorites', (request, response) => {
+    // Retrieves ALL Users information for '184' representing the id from the users table
+    // SELECT *
+    // FROM users, wholefoods
+    // INNER JOIN users_wf_favorites uwff
+    // ON uwff.wholefoods_id = wholefoods.id
+    // INNER JOIN users u
+    // ON u.id = uwff.users_id
+    // WHERE uwff.users_id = users.id
+    // AND users_id = 184
+
+    // Retrieve Users Information for '184' representing the id from the users table
+    // SELECT *
+    // FROM users, wholefoods
+    // INNER JOIN users_wf_favorites uwff
+    // ON uwff.wholefoods_id = wholefoods.id
+    // WHERE uwff.users_id = users.id
+    // AND users_id = 184
+
+    // Retreive Users Favorites for 'test@gmail.com'
+    // SELECT *
+    // FROM users, wholefoods
+    // INNER JOIN users_wf_favorites uwff
+    // ON uwff.wholefoods_id = wholefoods.id
+    // WHERE uwff.users_id = users.id
+    // AND users.email = 'test@gmail.com'
+
+    // Retrieve on the ID's from the wholefoods table of the users favorites set in the users_wf_favorites
+    // SELECT wholefoods.id, wholefoods.city
+    // FROM users, wholefoods
+    // INNER JOIN users_wf_favorites uwff
+    // ON uwff.wholefoods_id = wholefoods.id
+    // WHERE uwff.users_id = users.id
+    // AND users.email = 'testing@gmail.com'
+
+
+
+})
+
+app.post('/api/user/insert/favorites', async (req, res) => {
+    try {
+        const sql = 'INSERT INTO `users_wf_favorites` (`users_id`, `wholefoods_id`) VALUES (?, ?)';
+        const inserts = [req.body.user_id, req.body.location];
+
+        const query = mysql.format(sql, inserts);
+
+        const insertResults = await db.query(query);
+
+        res.send({
+            success: true,
+            insertId: insertResults.insertId
+        });
+    } catch(error){
+        res.status(500).send('Server Error');
+    }
+
+})
+
+app.post('/api/user/check/favorites', async(req, res) => {
+    try {
+        const sql = `SELECT wholefoods.id, wholefoods.city FROM users, wholefoods INNER JOIN users_wf_favorites uwff ON uwff.wholefoods_id = wholefoods.id WHERE uwff.users_id = users.id AND users.email = ? AND wholefoods.id = ?`;
+        let queryResults = await db.query(sql, [req.body.email, req.body.location]);
+
+
+        res.send({
+            success: true,
+            results: queryResults
+        });
+    } catch(error){
+        res.status(500).send('Server Error');
+        console.log(error);
     }
 })
 

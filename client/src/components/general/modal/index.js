@@ -6,7 +6,9 @@ class Modal extends Component {
 
     state = {
         isModalOpen: true,
-        previousUser: false
+        previousUser: false,
+        email: '',
+        user_id: 0
     }
 
     clickHandler(){
@@ -54,6 +56,22 @@ class Modal extends Component {
         this.clickHandler();
     }
 
+    handleEmailChange=(email)=>{
+        this.setState({
+            email: email
+        })
+
+        this.props.onEmailChange(email);
+    }
+
+    handleIdChange=(user_id)=>{
+        this.setState({
+            user_id: user_id
+        })
+
+        this.props.onIdChange(user_id);
+    }
+
     render(){
         return(
             <Fragment>
@@ -70,7 +88,7 @@ class Modal extends Component {
                     </figure>
                 </div>
 
-                <Login/>
+                <Login onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
             </Fragment>
 
         )

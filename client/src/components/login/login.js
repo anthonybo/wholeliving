@@ -13,7 +13,8 @@ class Login extends Component {
         confirmPassword: '',
         loginOpen: false,
         registrationClicked: false,
-        userLoggedIn: false
+        userLoggedIn: false,
+        users_id: 0
     }
 
     clickHandler(){
@@ -27,6 +28,9 @@ class Login extends Component {
     }
 
     toggleLogout=()=>{
+        this.props.onEmailChange('');
+        this.props.onIdChange(0);
+
         this.setState({
             userLoggedIn: false
         })
@@ -99,7 +103,13 @@ class Login extends Component {
                 lastLogin: dateStr
             });
 
+            // console.log(loginDataConfirm);
+
             if(loginDataConfirm.data.success){
+                this.setState({
+                    email: loginDataConfirm.data.user.email,
+                    users_id: loginDataConfirm.data.user.id
+                })
                 this.loginSuccess();
             } else {
                 errorOutput.innerHTML = "*Email or Password Incorrect!";
@@ -149,6 +159,9 @@ class Login extends Component {
     }
 
     loginSuccess=()=>{
+        this.props.onEmailChange(this.state.email);
+        this.props.onIdChange(this.state.users_id);
+
         let registrationForm = document.getElementById('registration-form');
         registrationForm.classList.add('closed-registration-form');
 
@@ -161,7 +174,6 @@ class Login extends Component {
         this.setState({
             registrationOpen: !this.state.registrationOpen,
             password: '',
-            email: '',
             userLoggedIn: true
         })
     }
@@ -244,8 +256,10 @@ class Login extends Component {
         return;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
+    componentDidUpdate =(prevProps, prevState, snapshot)=> {
+        // console.log(this.props);
+        // this.props.onEmailChange(this.state.email);
+        // this.props.onEmailChange = this.state.email;
 
     }
 
@@ -288,7 +302,7 @@ class Login extends Component {
                         {
                             this.state.userLoggedIn ?
                                 <Fragment>
-                                <li><a onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip="Logout"><i className="material-icons">account_box</i></a></li>
+                                <li><a onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip={'Logout: ' + '<br>' + this.state.email }><i className="material-icons">account_box</i></a></li>
                                     <li className='hide'><a></a></li>
                                 </Fragment>
                                 :
