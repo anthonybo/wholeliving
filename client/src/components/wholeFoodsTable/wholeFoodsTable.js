@@ -27,7 +27,9 @@ class WholeFoodsTable extends Component {
         loadingTextMedianHousing: true,
         allWholeFoodsTable: [],
         wholeFoodsCount: 5,
-        wholeFoodsIndex: 0
+        wholeFoodsIndex: 0,
+        email: '',
+        user_id: 0
     }
 
     async getAllWholeFoods(){
@@ -39,8 +41,6 @@ class WholeFoodsTable extends Component {
 
         this.getAllWholeFoodsCreateTable();
         this.fancyButtons();
-
-
     }
 
     fancyButtons(){
@@ -91,7 +91,7 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
@@ -103,8 +103,6 @@ class WholeFoodsTable extends Component {
         forward.addEventListener('click', ()=> {
             if(wholeFoodsIndex < 485){
                 wholeFoodsIndex += 5;
-
-                // console.log(this.state.wholeFoodsCount, ' ', wholeFoodsIndex);
                 items = [];
 
                 for(this.state.wholeFoodsCount; this.state.wholeFoodsCount < wholeFoodsIndex; this.state.wholeFoodsCount++){
@@ -112,7 +110,7 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
@@ -124,7 +122,7 @@ class WholeFoodsTable extends Component {
         for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
             // console.log(value.properties);
             if(index < this.state.wholeFoodsCount){
-                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 wholeFoodsIndex++;
             }
         }
@@ -132,6 +130,45 @@ class WholeFoodsTable extends Component {
         this.setState({
             allWholeFoodsTable: items,
         })
+    }
+
+    updateHomePageTable(){
+        let items = [];
+        let wholeFoodsCount = 10;
+        let wholeFoodsIndex = 0;
+
+        for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
+            if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                wholeFoodsIndex++;
+            }
+        }
+
+        this.setState({
+            allWholeFoodsTable: items,
+        })
+    }
+
+    async addUserFavorite(location) {
+        let checkFavorite = await axios.post('/api/user/check/favorites', {
+            email: this.state.email,
+            user_id: this.state.user_id,
+            location: location,
+        })
+
+        // console.log(checkFavorite);
+
+        if(!checkFavorite.data.results.length > 0){
+            let insertFavorite = await axios.post('/api/user/insert/favorites', {
+                location: location,
+                email: this.state.email,
+                user_id: this.state.user_id
+            })
+
+            // console.log(insertFavorite);
+        } else {
+            console.log('You have already added that location!');
+        }
     }
 
     async getWholeFoodsByState(){
@@ -268,6 +305,16 @@ class WholeFoodsTable extends Component {
 
     componentDidMount() {
         const path = this.props.history.location.pathname;
+
+        if(this.props.email !== '' && this.props.user_id !== 0){
+            console.log('Email: ',this.props.email);
+            console.log('User ID: ',this.props.user_id);
+
+            this.setState({
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+        }
 
         if(path === '/'){
             this.getAllWholeFoods();
@@ -560,7 +607,17 @@ class WholeFoodsTable extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const path = this.props.history.location.pathname;
 
+        if(this.props.email !== prevState.email && this.props.user_id !== prevState.user_id){
+            this.setState( {
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+            // this.getAllWholeFoodsCreateTable();
+            this.updateHomePageTable();
+        }
+
         if(prevProps.location.pathname !== this.props.location.pathname){
+            console.log('In here ?');
             if(path === '/'){
                 this.getAllWholeFoods();
                 this.setState({
@@ -1057,6 +1114,7 @@ class WholeFoodsTable extends Component {
                         <table className='responsive-table'>
                             <thead>
                             <tr className='white-text'>
+                                {this.state.email !== '' ? <th> </th> : null}
                                 <th>#</th>
                                 <th>State</th>
                                 <th>Address</th>
