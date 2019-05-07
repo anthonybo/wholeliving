@@ -29,7 +29,7 @@ class WholeFoodsTable extends Component {
         wholeFoodsCount: 5,
         wholeFoodsIndex: 0,
         email: '',
-        user_id: 0
+        user_id: 0,
     }
 
     async getAllWholeFoods(){
@@ -72,7 +72,7 @@ class WholeFoodsTable extends Component {
         }
     }
 
-    getAllWholeFoodsCreateTable(){
+    async getAllWholeFoodsCreateTable(){
         let items = [];
         let wholeFoodsCount = 10;
         let wholeFoodsIndex = 0;
@@ -80,7 +80,7 @@ class WholeFoodsTable extends Component {
         var behind = document.getElementById('behind');
         var forward = document.getElementById('forward');
 
-        behind.addEventListener('click', ()=> {
+        behind.addEventListener('click', async ()=> {
             if(wholeFoodsIndex >= 5 && this.state.wholeFoodsCount >= 10){
                 wholeFoodsIndex -= 5;
                 this.state.wholeFoodsCount -= 10;
@@ -91,16 +91,19 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    let star_type = await this.checkFavorites(value.id);
+
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
                     allWholeFoodsTable: items,
+                    wholeFoodsIndex: wholeFoodsIndex
                 })
             }
         })
 
-        forward.addEventListener('click', ()=> {
+        forward.addEventListener ('click', async ()=>{
             if(wholeFoodsIndex < 485){
                 wholeFoodsIndex += 5;
                 items = [];
@@ -110,11 +113,14 @@ class WholeFoodsTable extends Component {
                     // console.log(this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount].properties);
                     let value = this.state.allWholeFoods.geoJson.features[this.state.wholeFoodsCount];
 
-                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    let star_type = await this.checkFavorites(value.id);
+
+                    items.push(<tr className='white-text' key={this.state.wholeFoodsCount}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 }
 
                 this.setState({
                     allWholeFoodsTable: items,
+                    wholeFoodsIndex: wholeFoodsIndex
                 })
             }
         })
@@ -122,30 +128,52 @@ class WholeFoodsTable extends Component {
         for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
             // console.log(value.properties);
             if(index < this.state.wholeFoodsCount){
-                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                let star_type = await this.checkFavorites(value.id);
+
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 wholeFoodsIndex++;
             }
         }
 
         this.setState({
             allWholeFoodsTable: items,
+            wholeFoodsIndex: wholeFoodsIndex
         })
     }
 
-    updateHomePageTable(){
+    async checkFavorites(id){
+        let checkFavorite = await axios.post('/api/user/check/favorites', {
+            email: this.state.email,
+            user_id: this.state.user_id,
+            location: id
+        })
+
+        let star_type = 'star_border';
+
+        if(checkFavorite.data.results.length > 0){
+            star_type = 'star'
+        }
+
+        return star_type;
+    }
+
+    async updateHomePageTable(){
         let items = [];
         let wholeFoodsCount = 10;
         let wholeFoodsIndex = 0;
 
         for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
             if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
-                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons'>star_border</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                let star_type = await this.checkFavorites(value.id);
+
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
                 wholeFoodsIndex++;
             }
         }
 
         this.setState({
             allWholeFoodsTable: items,
+            wholeFoodsIndex: wholeFoodsIndex
         })
     }
 
@@ -165,10 +193,39 @@ class WholeFoodsTable extends Component {
                 user_id: this.state.user_id
             })
 
+            console.log('Location has been added to your favorites!: ', this.state.wholeFoodsIndex, ' ', this.state.wholeFoodsCount);
             // console.log(insertFavorite);
+            this.updateWFTableRecords()
         } else {
             console.log('You have already added that location!');
+            let removeFavorites = await axios.post('/api/user/remove/favorites', {
+                location: location,
+                user_id: this.state.user_id
+            })
+
+            console.log(removeFavorites);
+            this.updateWFTableRecords()
         }
+    }
+
+    async updateWFTableRecords(){
+        let items = [];
+        let wholeFoodsCount = 10;
+        let wholeFoodsIndex = 0;
+
+        for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
+            if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
+                let star_type = await this.checkFavorites(value.id);
+
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                wholeFoodsIndex++;
+            }
+        }
+
+        this.setState({
+            allWholeFoodsTable: items,
+            wholeFoodsIndex: wholeFoodsIndex
+        })
     }
 
     async getWholeFoodsByState(){

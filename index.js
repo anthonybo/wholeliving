@@ -657,6 +657,24 @@ app.post('/api/user/check/favorites', async(req, res) => {
     }
 })
 
+app.post('/api/user/remove/favorites', async(req, res) => {
+    console.log('Delete Record!: ', req.body);
+    // DELETE FROM users_wf_favorites WHERE users_id = 205 AND wholefoods_id = 83
+
+    try {
+        const sql = `DELETE FROM users_wf_favorites WHERE users_id = ? AND wholefoods_id = ?`;
+        let queryResults = await db.query(sql, [req.body.user_id, req.body.location]);
+
+        res.send({
+            success: true,
+            results: queryResults
+        });
+    } catch(error){
+        res.status(500).send('Server Error');
+        console.log(error);
+    }
+})
+
 function handleError( response, error ){
     response.status(500).send( {success: false, error: [error]} );
 }
