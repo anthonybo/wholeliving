@@ -107,9 +107,6 @@
   left: 0;
 }
 
-.success header {
-  background: #388E3C;
-}
 .success i:after {
   background: #253226;
   color: #7bcb7e;
@@ -120,4 +117,16 @@
 }
 .success h2:after {
   border-bottom: 0.1em solid #388E3C;
+}
+
+.error i:after {
+  background: #3d1d1d;
+  color: #ff5656;
+  content: "\f12a";
+}
+.error h2 span {
+  color: #D50000;
+}
+.error h2:after {
+  border-bottom: 0.1em solid #D50000;
 }
