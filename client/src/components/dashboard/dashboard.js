@@ -38,7 +38,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item'><i className='material-icons'>remove_circle</i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
         }
 
         this.setState({
@@ -56,11 +56,26 @@ class Dashboard extends Component {
         }
     }
 
+    async removeItem(location, city){
+        let removeFavorites = await axios.post('/api/user/remove/favorites', {
+            location: location,
+            user_id: this.state.user_id
+        })
+
+        M.toast({
+            html: `${city} has been removed!`,
+            displayLength: 2000,
+            classes: 'pulse, dashboard-toast'
+        })
+
+        this.getUserRecords();
+    }
+
     render(){
         if(this.state.email == ''){
             return (
                 <Fragment>
-                    <h5 className='white-text'>PLEASE REGISTER...</h5>
+                    <h5 className='white-text center-align'>PLEASE LOGIN!</h5>
                     <Modal onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
                 </Fragment>
             )
@@ -73,23 +88,30 @@ class Dashboard extends Component {
                     </div>
                     {/*<div className='white-text center-align'>This is our dashboard for [{this.state.email}]</div>*/}
 
-                    <table className='responsive-table'>
-                        <thead>
-                        <tr className='white-text'>
-                            <th>#</th>
-                            <th>State</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>Zip</th>
-                            <th>Phone</th>
-                            <th>Hours</th>
-                        </tr>
-                        </thead>
+                    {
+                        this.state.userFavorites.length > 0 ?
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th></th>
+                                <th>#</th>
+                                <th>State</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Zip</th>
+                                <th>Phone</th>
+                                <th>Hours</th>
+                            </tr>
+                            </thead>
 
-                        <tbody>
-                        {this.state.userFavorites}
-                        </tbody>
-                    </table>
+                            <tbody>
+                            {this.state.userFavorites}
+                            </tbody>
+                        </table>
+                            : null
+                    }
+
+
 
                     <Modal onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
                 </Fragment>
