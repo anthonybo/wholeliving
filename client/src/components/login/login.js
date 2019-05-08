@@ -15,7 +15,8 @@ class Login extends Component {
         registrationClicked: false,
         userLoggedIn: false,
         users_id: 0,
-        tokenConfirmed: false
+        tokenConfirmed: false,
+        gettingLoginData: false
     }
 
     clickHandler(){
@@ -31,6 +32,12 @@ class Login extends Component {
     toggleLogout=()=>{
         this.props.onEmailChange('');
         this.props.onIdChange(0);
+
+        let popupMessage = document.getElementById('logoutPopupMessage');
+        popupMessage.classList.remove('hide-popup');
+        let logoutMessage = document.getElementById('logoutMessage');
+        logoutMessage.innerHTML = "You have Logged Out!";
+        this.fade('logout');
 
         this.setState({
             userLoggedIn: false
@@ -160,9 +167,13 @@ class Login extends Component {
                 registrationOpen: !this.state.registrationOpen,
                 password: '',
                 email: '',
-                confirmPassword: ''
+                confirmPassword: '',
+                gettingLoginData: false
             })
         }
+        this.setState({
+            gettingLoginData: false
+        })
     }
 
     loginSuccess=()=>{
@@ -176,12 +187,13 @@ class Login extends Component {
         popupMessage.classList.remove('hide-popup');
         let successMessage = document.getElementById('successMessage');
         successMessage.innerHTML = "You have Logged In!";
-        this.fade();
+        this.fade('login');
 
         this.setState({
             registrationOpen: !this.state.registrationOpen,
             password: '',
-            userLoggedIn: true
+            userLoggedIn: true,
+            gettingLoginData: false
         })
     }
 
@@ -220,6 +232,9 @@ class Login extends Component {
         event.preventDefault();
 
         this.sendLoginDetails();
+        this.setState({
+            gettingLoginData: true
+        })
     }
 
     handleChange = (event) => {
@@ -228,8 +243,13 @@ class Login extends Component {
         });
     }
 
-    fade() {
-        let well = document.getElementById('popupMessage');
+    fade(loginOrLogout) {
+        let well = null;
+        if(loginOrLogout == 'login'){
+            well = document.getElementById('popupMessage');
+        } else if (loginOrLogout == 'logout'){
+            well = document.getElementById('logoutPopupMessage');
+        }
         well.style.opacity = 1;
 
         var opacity;
@@ -288,7 +308,6 @@ class Login extends Component {
     }
 
     componentDidUpdate =(prevProps, prevState, snapshot)=> {
-
         if(this.state.email == '' && this.state.users_id == 0 && localStorage.getItem('email') !== null){
             this.confirmToken();
             if(this.state.tokenConfirmed){
@@ -305,16 +324,20 @@ class Login extends Component {
                 this.props.onEmailChange(email);
                 this.props.onIdChange(user_id);
             }
-
         }
     }
 
     render(){
         return(
             <Fragment>
-            {/*<span className='tutorial'>*/}
-            {/*        <a><i id='tutorial-modal-icon' className='material-icons tutorial-icon'>help</i></a>*/}
-            {/*</span>*/}
+                {
+                    this.state.gettingLoginData ?
+                        <div className="progress">
+                            <div className="indeterminate"></div>
+                        </div>
+                        :
+                        null
+                }
 
                 <form id='registration-form' className='closed-registration-form registration-form' onSubmit={this.handleSubmit}>
                     <a id='close-registration' className="close-registration-button"><i className="material-icons ion-close">close</i></a>
@@ -349,14 +372,14 @@ class Login extends Component {
                             this.state.userLoggedIn ?
                                 <Fragment>
                                     <li><Link to='/dashboard' id='dashboard-icon' className="btn-floating pink tooltipped" data-position="top" data-delay="50" data-tooltip='Dashboard'><i className="material-icons">dashboard</i></Link></li>
-                                    <li><Link to='/' onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip={'Logout: ' + '<br>' + this.state.email }><i className="material-icons">account_box</i></Link></li>
+                                    <li><Link to={this.props.match.url == '/dashboard' ? '/' : this.props.match.url} onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip={'Logout: ' + '<br>' + this.state.email }><i className="material-icons">account_box</i></Link></li>
                                     <li className='hide'><Link to=''></Link></li>
 
                                 </Fragment>
                                 :
                                 <Fragment>
-                                <li><Link to='' onClick={this.toggleRegistrationClicked} id='registration-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></Link></li>
-                                <li><Link to='' onClick={this.toggleLogin} id='login-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></Link></li>
+                                <li><Link to={this.props.match.url} onClick={this.toggleRegistrationClicked} id='registration-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></Link></li>
+                                <li><Link to={this.props.match.url} onClick={this.toggleLogin} id='login-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></Link></li>
                                 </Fragment>
 
                         }
@@ -368,6 +391,14 @@ class Login extends Component {
                     <h2>
                         <span>Success</span>
                         <div id='successMessage'></div>
+                    </h2>
+                </section>
+
+                <section id='logoutPopupMessage' className="message error hide-popup">
+                    <i></i>
+                    <h2>
+                        <span>Logout</span>
+                        <div id='logoutMessage'></div>
                     </h2>
                 </section>
             </Fragment>
