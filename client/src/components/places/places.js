@@ -110,19 +110,22 @@ class Places extends Component {
         var count = 0;
         var selectedText = '';
         var text = '';
-        (function type() {
-            var delta = 200 - Math.random() * 100;
-            if (count == phrases.length) {
-                count = 0;
+        (function type () {
+            if(window.location.pathname !== '/dashboard'){
+                var delta = 200 - Math.random() * 100;
+                if (count == phrases.length) {
+                    count = 0;
+                }
+                selectedText = phrases[count];
+                text = selectedText.slice(0, ++i);
+                document.getElementsByName('keyword')[0].placeholder=text;
+                if (text.length === selectedText.length) {
+                    count++;
+                    i = 0;
+                }
+                setTimeout(type, delta);
             }
-            selectedText = phrases[count];
-            text = selectedText.slice(0, ++i);
-            document.getElementsByName('keyword')[0].placeholder=text;
-            if (text.length === selectedText.length) {
-                count++;
-                i = 0;
-            }
-            setTimeout(type, delta);
+
         }());
     }
 
