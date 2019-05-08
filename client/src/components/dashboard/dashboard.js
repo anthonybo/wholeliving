@@ -110,9 +110,6 @@ class Dashboard extends Component {
                         </table>
                             : null
                     }
-
-
-
                     <Modal onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
                 </Fragment>
             )
