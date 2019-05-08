@@ -30,6 +30,7 @@ class WholeFoodsTable extends Component {
         wholeFoodsIndex: 0,
         email: '',
         user_id: 0,
+        byStateTable: []
     }
 
     async getAllWholeFoods(){
@@ -208,19 +209,32 @@ class WholeFoodsTable extends Component {
         let wholeFoodsCount = 10;
         let wholeFoodsIndex = 0;
 
-        for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
-            if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
-                let star_type = await this.checkFavorites(value.id);
+        if(this.state.allWholeFoods !== null){
+            for(const [index, value] of this.state.allWholeFoods.geoJson.features.entries()){
+                if(index < this.state.wholeFoodsCount && this.state.wholeFoodsCount - index <= 5){
+                    let star_type = await this.checkFavorites(value.id);
 
-                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
-                wholeFoodsIndex++;
+                    items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
+                    wholeFoodsIndex++;
+                }
             }
-        }
 
-        this.setState({
-            allWholeFoodsTable: items,
-            wholeFoodsIndex: wholeFoodsIndex
-        })
+            this.setState({
+                allWholeFoodsTable: items,
+                wholeFoodsIndex: wholeFoodsIndex
+            })
+        } else if(this.state.byState !== null){
+            for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
+                let star_type = await this.checkFavorites(value.id);
+                // console.log(value.properties);
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+            }
+
+            this.setState({
+                byStateTable: items
+            })
+
+        }
     }
 
     async getWholeFoodsByState(){
@@ -234,6 +248,8 @@ class WholeFoodsTable extends Component {
         this.setState({
             byState: wholefoods
         })
+
+        this.createTableForStates();
     }
 
     async getLocationById(){
@@ -375,7 +391,8 @@ class WholeFoodsTable extends Component {
                 allWholeFoods: null,
                 byState: null,
                 byId: null,
-                generalMap: true
+                generalMap: true,
+                byStateTable: []
             })
         } else if (path.match('/byState/') ){
             this.getWholeFoodsByState();
@@ -666,10 +683,10 @@ class WholeFoodsTable extends Component {
             })
             // this.getAllWholeFoodsCreateTable();
             this.updateHomePageTable();
+            this.createTableForStates();
         }
 
         if(prevProps.location.pathname !== this.props.location.pathname){
-            console.log('In here ?');
             if(path === '/'){
                 this.getAllWholeFoods();
                 this.setState({
@@ -686,7 +703,8 @@ class WholeFoodsTable extends Component {
                     byBusId: null,
                     allWholeFoodsTable: [],
                     wholeFoodsCount: 5,
-                    wholeFoodsIndex: 0
+                    wholeFoodsIndex: 0,
+                    byStateTable: []
                 })
             } else if (path === '/generalMap'){
                 this.setState({
@@ -703,7 +721,8 @@ class WholeFoodsTable extends Component {
                     byBusId: null,
                     allWholeFoodsTable: [],
                     wholeFoodsCount: 5,
-                    wholeFoodsIndex: 0
+                    wholeFoodsIndex: 0,
+                    byStateTable: []
                 })
 
             } else if (path.match('/byState/') ){
@@ -721,7 +740,8 @@ class WholeFoodsTable extends Component {
                     byBusId: null,
                     allWholeFoodsTable: [],
                     wholeFoodsCount: 5,
-                    wholeFoodsIndex: 0
+                    wholeFoodsIndex: 0,
+                    byStatTable: []
                 })
                 this.getLocationById();
             } else if (path.match('/crossReference/')){
@@ -739,7 +759,8 @@ class WholeFoodsTable extends Component {
                     byBusId: null,
                     allWholeFoodsTable: [],
                     wholeFoodsCount: 5,
-                    wholeFoodsIndex: 0
+                    wholeFoodsIndex: 0,
+                    byStateTable: []
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -755,7 +776,8 @@ class WholeFoodsTable extends Component {
                     byBusId: null,
                     allWholeFoodsTable: [],
                     wholeFoodsCount: 5,
-                    wholeFoodsIndex: 0
+                    wholeFoodsIndex: 0,
+                    byStateTable: []
                 })
                 this.getLocationByBusId();
             }
@@ -822,6 +844,22 @@ class WholeFoodsTable extends Component {
         }
     }
 
+    async createTableForStates(){
+        const items = [];
+
+        if(this.state.byState !== null){
+            for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
+                let star_type = await this.checkFavorites(value.id);
+                // console.log(value.properties);
+                items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+            }
+
+            this.setState({
+                byStateTable: items
+            })
+        }
+    }
+
     render(){
         const items = [];
         const userInput = [];
@@ -834,10 +872,10 @@ class WholeFoodsTable extends Component {
 
             } else if(this.state.byState){
             // console.log(this.state.byState.data.geoJson.features);
-                for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
-                // console.log(value.properties);
-                items.push(<tr className='white-text' key={index}><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
-                }
+            //     for(const [index, value] of this.state.byState.data.geoJson.features.entries()){
+            //     // console.log(value.properties);
+            //     items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>star</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td>{value.properties.Hours}</td></tr>)
+            //     }
             } else if(this.state.byId){
             // console.log(this.state.byState.data.geoJson.features);
                 for(const [index, value] of this.state.byId.data.geoJson.features.entries()){
@@ -1179,13 +1217,13 @@ class WholeFoodsTable extends Component {
 
                             <tbody>
                                 {
-                                    items.length > 0 ? items : this.state.allWholeFoodsTable
+                                    this.state.byStateTable.length > 0 ? this.state.byStateTable : this.state.allWholeFoodsTable
                                 }
                             </tbody>
                         </table>
 
                             {
-                                items.length > 0 ? <span></span> :
+                                this.state.byStateTable.length > 0 ? <span></span> :
                                  <Fragment>
                                  <br/><br/>
                                  <div className="pagination-wrapper">

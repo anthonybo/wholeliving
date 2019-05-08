@@ -1,0 +1,28 @@
+.dashboard-title {
+  border-bottom: 1px solid white;
+}
+
+.dashboard-main-title {
+  font-size: 2rem;
+  /* line-height: 0; */
+  margin: 2.8rem 0 1.68rem 0;
+  border-bottom: 1px solid white;
+}
+
+.dashboard-list {
+  list-style-type: none;
+}
+
+@media only screen and (min-width: 993px) {
+  .dashboard-header {
+    //display: inline-flex;
+    //background-color: #363b41;
+    //box-shadow: 0 .25em .25em -.125em rgba(0, 0, 0, .25), 0 .5em 1.25em rgba(0, 0, 0, .5);
+    //position: fixed;
+    //top: 0;
+    //height: 5rem;
+    //justify-content: space-between;
+    //width: 100vw;
+    //z-index: 1000;
+  }
+}

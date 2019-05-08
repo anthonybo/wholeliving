@@ -2,7 +2,7 @@ import React, {Component, Fragment} from 'react';
 import './login.scss';
 import axios from 'axios';
 import ReactDOM from "react-dom";
-import {withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 
 class Login extends Component {
 
@@ -186,6 +186,8 @@ class Login extends Component {
     }
 
     componentDidMount() {
+        this.mounted = true;
+
         const node = ReactDOM.findDOMNode(this);
         let elem = null;
         let tooltipElem = null;
@@ -274,11 +276,15 @@ class Login extends Component {
             token: token
         })
 
-        if(tokenData.data.success){
+        if(tokenData.data.success && this.mounted){
             this.setState({
                 tokenConfirmed: true
             })
         }
+    }
+
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
     componentDidUpdate =(prevProps, prevState, snapshot)=> {
@@ -342,13 +348,15 @@ class Login extends Component {
                         {
                             this.state.userLoggedIn ?
                                 <Fragment>
-                                <li><a onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip={'Logout: ' + '<br>' + this.state.email }><i className="material-icons">account_box</i></a></li>
-                                    <li className='hide'><a></a></li>
+                                    <li><Link to='/dashboard' id='dashboard-icon' className="btn-floating pink tooltipped" data-position="top" data-delay="50" data-tooltip='Dashboard'><i className="material-icons">dashboard</i></Link></li>
+                                    <li><Link to='/' onClick={this.toggleLogout} id='logout-icon' className="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip={'Logout: ' + '<br>' + this.state.email }><i className="material-icons">account_box</i></Link></li>
+                                    <li className='hide'><Link to=''></Link></li>
+
                                 </Fragment>
                                 :
                                 <Fragment>
-                                <li><a onClick={this.toggleRegistrationClicked} id='registration-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></a></li>
-                                <li><a onClick={this.toggleLogin} id='login-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></a></li>
+                                <li><Link to='' onClick={this.toggleRegistrationClicked} id='registration-icon' className="btn-floating deep-orange lighten-1 tooltipped" data-position="top" data-delay="50" data-tooltip="Registration"><i className="material-icons">account_box</i></Link></li>
+                                <li><Link to='' onClick={this.toggleLogin} id='login-icon' className="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="Login"><i className="material-icons">account_box</i></Link></li>
                                 </Fragment>
 
                         }
