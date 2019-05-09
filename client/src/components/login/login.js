@@ -200,6 +200,10 @@ class Login extends Component {
     componentDidMount() {
         this.mounted = true;
 
+        const removeElements = (elms) => elms.forEach(el => el.remove());
+
+        removeElements( document.querySelectorAll(".material-tooltip") );
+
         const node = ReactDOM.findDOMNode(this);
         let elem = null;
         let tooltipElem = null;
@@ -245,10 +249,10 @@ class Login extends Component {
 
     fade(loginOrLogout) {
         let well = null;
-        if(loginOrLogout == 'login'){
-            well = document.getElementById('popupMessage');
-        } else if (loginOrLogout == 'logout'){
+        if(loginOrLogout == 'logout'){
             well = document.getElementById('logoutPopupMessage');
+        } else {
+            well = document.getElementById('popupMessage');
         }
         well.style.opacity = 1;
 

@@ -38,7 +38,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item'><i className='material-icons'>remove_circle</i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item tooltipped' data-tooltip='Dashboard'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
         }
 
         this.setState({
