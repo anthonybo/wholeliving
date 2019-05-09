@@ -563,8 +563,6 @@ app.post('/api/login', (request, response) => {
 })
 
 app.post('/api/login/token', (request, response) => {
-    console.log('Token Check: ', request.body);
-
     try {
         const email = request.body.email;
         if (email === undefined) {
@@ -608,7 +606,6 @@ app.post('/api/login/token', (request, response) => {
 })
 
 app.post('/api/login/check', (request, response) => {
-    console.log(request.body);
     try {
         const email = request.body.email;
         if (email === undefined) {
@@ -658,9 +655,6 @@ app.post('/api/user/get/favorites', async (req, res) => {
     // ON uwff.wholefoods_id = wholefoods.id
     // WHERE uwff.users_id = users.id
     // AND users.email = 'testman@gmail.com'
-
-    console.log('User Records: ',req.body);
-
     try {
         const sql = `SELECT wholefoods.id, wholefoods.city, wholefoods.address, wholefoods.state, wholefoods.zip, wholefoods.phone, wholefoods.hours FROM users, wholefoods INNER JOIN users_wf_favorites uwff ON uwff.wholefoods_id = wholefoods.id WHERE uwff.users_id = users.id AND users.email = ?`;
         let queryResults = await db.query(sql, [req.body.email, req.body.location]);
@@ -712,7 +706,6 @@ app.post('/api/user/check/favorites', async(req, res) => {
 })
 
 app.post('/api/user/remove/favorites', async(req, res) => {
-    console.log('Delete Record!: ', req.body);
     // DELETE FROM users_wf_favorites WHERE users_id = 205 AND wholefoods_id = 83
 
     try {
