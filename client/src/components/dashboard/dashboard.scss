@@ -42,3 +42,34 @@
   border: 1px solid #ff1533;
 }
 
+.dashboard-admin-modal {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  background: #691616;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  border: 2px solid white;
+  padding: 8px;
+  border-radius: 8px;
+  overflow-y: scroll;
+  height: 50%;
+}
+
+.close-admin-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 2rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  cursor: pointer;
+}
+
+.closed-admin-modal {
+  display: none;
+}

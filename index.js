@@ -694,7 +694,6 @@ app.post('/api/user/check/favorites', async(req, res) => {
         const sql = `SELECT wholefoods.id, wholefoods.city FROM users, wholefoods INNER JOIN users_wf_favorites uwff ON uwff.wholefoods_id = wholefoods.id WHERE uwff.users_id = users.id AND users.email = ? AND wholefoods.id = ?`;
         let queryResults = await db.query(sql, [req.body.email, req.body.location]);
 
-
         res.send({
             success: true,
             results: queryResults
@@ -702,6 +701,45 @@ app.post('/api/user/check/favorites', async(req, res) => {
     } catch(error){
         res.status(500).send('Server Error');
         console.log(error);
+    }
+})
+
+app.post('/api/admin/get/users', async (req, res) => {
+    // SELECT id,email,lastLogin,ipv4 FROM `users`
+    if(req.body.email === 'admin@admin.com' && req.body.user_id == 214){
+        console.log('Admin Requesting Data!: ',req.body);
+        try {
+            const sql = `SELECT id,email,lastLogin,ipv4 FROM users WHERE email != 'admin@admin.com'`;
+            let queryResults = await db.query(sql);
+
+            res.send({
+                success: true,
+                results: queryResults
+            });
+        } catch(error){
+            res.status(500).send('Server Error');
+            console.log(error);
+        }
+    }
+})
+
+app.post('/api/admin/remove/user', async (req, res) => {
+    // DELETE FROM users WHERE id = 215
+    if(req.body.email === 'admin@admin.com' && req.body.admin_id == 214){
+        console.log('Admin Requesting To Remove User!: ',req.body);
+        try {
+            const sql = `DELETE FROM users WHERE id = ?`;
+            let queryResults = await db.query(sql, [req.body.user_id]);
+
+            res.send({
+                success: true,
+                results: queryResults
+            });
+        } catch(error){
+            res.status(500).send('Server Error');
+            console.log(error);
+        }
+
     }
 })
 
