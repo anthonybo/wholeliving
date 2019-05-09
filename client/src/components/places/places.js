@@ -110,19 +110,22 @@ class Places extends Component {
         var count = 0;
         var selectedText = '';
         var text = '';
-        (function type() {
-            var delta = 200 - Math.random() * 100;
-            if (count == phrases.length) {
-                count = 0;
+        (function type () {
+            if(window.location.pathname !== '/dashboard'){
+                var delta = 200 - Math.random() * 100;
+                if (count == phrases.length) {
+                    count = 0;
+                }
+                selectedText = phrases[count];
+                text = selectedText.slice(0, ++i);
+                document.getElementsByName('keyword')[0].placeholder=text;
+                if (text.length === selectedText.length) {
+                    count++;
+                    i = 0;
+                }
+                setTimeout(type, delta);
             }
-            selectedText = phrases[count];
-            text = selectedText.slice(0, ++i);
-            document.getElementsByName('keyword')[0].placeholder=text;
-            if (text.length === selectedText.length) {
-                count++;
-                i = 0;
-            }
-            setTimeout(type, delta);
+
         }());
     }
 
@@ -138,7 +141,7 @@ class Places extends Component {
                         <input id="autocomplete-input" className='white-text autocomplete' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
                     </div>
                     <div className="col s2">
-                        <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='miles'/>
+                        <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='10m'/>
                     </div>
                     <div className="col s2">
                         <input onClick={this.handleSubmit} className='btn waves-effect waves-light hideThis' type="submit" value='submit'/>

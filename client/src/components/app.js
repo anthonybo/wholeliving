@@ -6,6 +6,7 @@ import {Route, Switch, withRouter, Link} from 'react-router-dom';
 import MapContainer from './map/mapContainer';
 import WholeFoodsTable from './wholeFoodsTable/wholeFoodsTable';
 import Homepage from './homepage';
+import Dashboard from './dashboard/dashboard';
 import './app.scss';
 import logo from '../../dist/logo_transparent2.png';
 import Error404 from './general/error404';
@@ -34,6 +35,7 @@ const App = () => (
                 <Route path='/location/:id' component={Homepage}/>
                 <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
                 <Route path='/busLookup/:id' component={Homepage}/>
+                <Route path='/dashboard' component={Dashboard}/>
 
                 <Route component={Error404}/>
             </Switch>

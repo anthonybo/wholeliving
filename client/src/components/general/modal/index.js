@@ -1,11 +1,14 @@
 import React, {Component, Fragment} from 'react';
 import './modal.scss';
+import Login from '../../login/login';
 
 class Modal extends Component {
 
     state = {
         isModalOpen: true,
-        previousUser: false
+        previousUser: false,
+        email: '',
+        user_id: 0
     }
 
     clickHandler(){
@@ -50,10 +53,23 @@ class Modal extends Component {
             tutorialModal.classList.remove('closed-no-animations');
             // tutorialModal.classList.add('closed');
         }
-
         this.clickHandler();
+    }
 
+    handleEmailChange=(email)=>{
+        this.setState({
+            email: email
+        })
 
+        this.props.onEmailChange(email);
+    }
+
+    handleIdChange=(user_id)=>{
+        this.setState({
+            user_id: user_id
+        })
+
+        this.props.onIdChange(user_id);
     }
 
     render(){
@@ -70,12 +86,9 @@ class Modal extends Component {
                                 in America.</p>
                         </figcaption>
                     </figure>
-
                 </div>
 
-                <span className='tutorial'>
-                    <a><i id='tutorial-modal-icon' className='material-icons tutorial-icon'>help</i></a>
-                </span>
+                <Login onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
             </Fragment>
 
         )
