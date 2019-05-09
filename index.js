@@ -11,11 +11,13 @@ const request = require('request');
 const fetch = require('node-fetch');
 const sha1 = require('sha1');
 const http = require('http');
+const path = require('path');
 
 const app = express();
 
 app.use( cors() );
 app.use( express.json() );
+app.use(express.static(path.join('client', 'dist')));
 
 // const parser = parse({
 //     delimiter:','
@@ -734,6 +736,11 @@ app.post('/api/user/remove/favorites', async(req, res) => {
         res.status(500).send('Server Error');
     }
 })
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join('client', 'dist', 'index.html'));
+});
+
 
 function handleError( response, error ){
     response.status(500).send( {success: false, error: [error]} );
