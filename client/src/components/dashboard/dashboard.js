@@ -41,7 +41,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item tooltipped' data-tooltip='Dashboard'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
         }
 
         this.setState({
@@ -96,7 +96,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userData.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item tooltipped' data-tooltip='Dashboard'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td>{value.id}</td><td onClick={()=> this.adminGetUsersSaves(value.email, value.id)}>{value.email}</td><td>{value.lastLogin}</td><td>{value.ipv4}</td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td>{value.id}</td><td className='dashboard-admin-display-user-email' onClick={()=> this.adminGetUsersSaves(value.email, value.id)}>{value.email}</td><td>{value.lastLogin}</td><td>{value.ipv4}</td></tr>)
         }
 
         this.setState({
@@ -113,7 +113,7 @@ class Dashboard extends Component {
         })
 
         for(let [index, value] of userRecords.data.results.entries()){
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.adminRemoveItem(value.id, value.city)} className='dashboard-remove-item tooltipped' data-tooltip='Dashboard'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.adminRemoveItem(value.id, value.city)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
         }
 
         if(items.length < 1){
@@ -221,7 +221,7 @@ class Dashboard extends Component {
                                         <div id= 'dashboard-admin-modal' className='dashboard-admin-modal closed-admin-modal'>
                                             <a onClick={this.closeAdminModal} id='close-admin-modal' className="close-admin-button"><i className="material-icons ion-close">close</i></a>
                                             <h6 className='pink-text'>Current User: <span className='light-green-text'>{this.state.adminUserFavoritesCurrentUser}</span></h6>
-                                            <table className='table'>
+                                            <table className='responsive-table'>
                                                 <thead>
                                                 <tr className='white-text'>
                                                     <th></th>

@@ -460,20 +460,14 @@ app.post('/api/new/user', async (req,res) => {
                 })
             } catch (error){
                 res.status(500).send('Server Error');
-                console.log(error);
             }
-
-
         });
     }).on('error', function(e) {
         console.log("error: " + e.message);
     });
-
-
 });
 
 app.post('/api/login', (request, response) => {
-    console.log(request.body);
     try {
         const email = request.body.email;
         if (email === undefined || request.body.password === undefined) {
@@ -486,17 +480,7 @@ app.post('/api/login', (request, response) => {
         db.query(query, [email,password], (error,data)=>{
             try {
                 if (!error) {
-                    console.log(data);
                     if (data.length === 1) {
-                        // response.send({
-                        //     success: true,
-                        //     user: {
-                        //         id: data[0].id,
-                        //         email: data[0].email,
-                        //         message: 'User exists'
-                        //     }
-                        // });
-
                         var options = {
                             host: 'ipv4bot.whatismyipaddress.com',
                             port: 80,
@@ -573,7 +557,6 @@ app.post('/api/login/token', (request, response) => {
         db.query(query, [request.body.token], (error,data) =>{
             try {
                 if (!error) {
-                    console.log(data);
                     if (data.length === 1) {
                         response.send({
                             success: true,
@@ -616,7 +599,6 @@ app.post('/api/login/check', (request, response) => {
         db.query(query, [email], (error,data) =>{
             try {
                 if (!error) {
-                    console.log(data);
                     if (data.length === 1) {
                         response.send({
                             success: true,
@@ -665,7 +647,6 @@ app.post('/api/user/get/favorites', async (req, res) => {
         });
     } catch(error){
         res.status(500).send('Server Error');
-        console.log(error);
     }
 
 })
@@ -700,14 +681,12 @@ app.post('/api/user/check/favorites', async(req, res) => {
         });
     } catch(error){
         res.status(500).send('Server Error');
-        console.log(error);
     }
 })
 
 app.post('/api/admin/get/users', async (req, res) => {
     // SELECT id,email,lastLogin,ipv4 FROM `users`
     if(req.body.email === 'admin@admin.com' && req.body.user_id == 214){
-        console.log('Admin Requesting Data!: ',req.body);
         try {
             const sql = `SELECT id,email,lastLogin,ipv4 FROM users WHERE email != 'admin@admin.com'`;
             let queryResults = await db.query(sql);
@@ -718,7 +697,6 @@ app.post('/api/admin/get/users', async (req, res) => {
             });
         } catch(error){
             res.status(500).send('Server Error');
-            console.log(error);
         }
     }
 })
@@ -726,7 +704,6 @@ app.post('/api/admin/get/users', async (req, res) => {
 app.post('/api/admin/remove/user', async (req, res) => {
     // DELETE FROM users WHERE id = 215
     if(req.body.email === 'admin@admin.com' && req.body.admin_id == 214){
-        console.log('Admin Requesting To Remove User!: ',req.body);
         try {
             const sql = `DELETE FROM users WHERE id = ?`;
             let queryResults = await db.query(sql, [req.body.user_id]);
@@ -739,7 +716,6 @@ app.post('/api/admin/remove/user', async (req, res) => {
             res.status(500).send('Server Error');
             console.log(error);
         }
-
     }
 })
 
@@ -756,7 +732,6 @@ app.post('/api/user/remove/favorites', async(req, res) => {
         });
     } catch(error){
         res.status(500).send('Server Error');
-        console.log(error);
     }
 })
 
