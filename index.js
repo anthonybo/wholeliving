@@ -17,7 +17,7 @@ const app = express();
 
 app.use( cors() );
 app.use( express.json() );
-app.use(express.static(path.join('client', 'dist')));
+app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
 // const parser = parse({
 //     delimiter:','
@@ -738,7 +738,7 @@ app.post('/api/user/remove/favorites', async(req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join('client', 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
 
 
