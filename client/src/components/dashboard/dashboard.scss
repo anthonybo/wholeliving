@@ -46,7 +46,7 @@
   position: fixed;
   z-index: 10000;
   top: 0;
-  background: #691616;
+  background: #212121;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
@@ -55,6 +55,14 @@
   border-radius: 8px;
   overflow-y: scroll;
   height: 50%;
+  margin: 50px auto 100px;
+  max-width: 600px;
+}
+
+@media only screen and (max-width: 600px) {
+  .dashboard-admin-modal {
+    width: 365px;
+  }
 }
 
 .close-admin-button {
@@ -70,6 +78,17 @@
   cursor: pointer;
 }
 
+.close-admin-button:hover {
+  background-color: rgba(0, 0, 0, 1);
+  border: 1px solid #039be5;
+}
+
 .closed-admin-modal {
   display: none;
 }
+
+.dashboard-admin-display-user-email:hover {
+  color: lightgreen;
+  cursor: pointer;
+}
+
