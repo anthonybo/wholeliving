@@ -3,11 +3,7 @@ const cors = require('cors');
 const mysql = require('mysql');
 const db = require('./db');
 const PORT = process.env.PORT || 9000;
-// const ENV = process.env.NODE_ENV || 'development';
-const ENV = JSON.stringify(process.env.NODE_ENV || 'development');
-// new webpack.DefinePlugin({
-//     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-// })
+const ENV = process.env.NODE_ENV || 'development';
 const fs = require('fs');
 const stream = require ('stream');
 const parse= require('csv-parse');

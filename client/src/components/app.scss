@@ -172,6 +172,12 @@ footer {
 }
 
 /* =========== Media Queries =========== */
+@media (min-width: 601px) {
+  main {
+    overflow: auto;
+  }
+}
+
 @media (max-width: 1030px) {
   main {
     //margin-left: 15%;
