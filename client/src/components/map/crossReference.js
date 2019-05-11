@@ -13,7 +13,8 @@ class CrossReference extends Component {
         keyword: null,
         keywordLength: 0,
         center: [-97.2263, 37.7091],
-        loading: false
+        loading: false,
+        noResults: false
     }
 
     async getData() {
@@ -69,6 +70,11 @@ class CrossReference extends Component {
 
         if(wholefoodsLimited !== null){
             this.createMap();
+        } else {
+            this.setState({
+                loading: false,
+                noResults: true
+            })
         }
     }
 
@@ -330,7 +336,10 @@ class CrossReference extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname) {
             if(this.map !== undefined){
                 this.map.remove();
-                document.getElementById('currentStateContainer').remove();
+                let currentStateContainer = document.getElementById('currentStateContainer');
+                if(currentStateContainer !== null){
+                    currentStateContainer.remove();
+                }
             }
             this.getData();
         }
@@ -353,7 +362,7 @@ class CrossReference extends Component {
                 </Fragment>
 
             )
-        } else if(wholefoods && keyword ){
+        } else if(wholefoods && keyword || this.state.noResults){
             // let search_term = this.props.match.params.keyword;
             return(
                 <Fragment>
