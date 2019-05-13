@@ -12,6 +12,7 @@ const fetch = require('node-fetch');
 const sha1 = require('sha1');
 const http = require('http');
 const path = require('path');
+const keys = require('./keys');
 
 const app = express();
 
@@ -192,14 +193,9 @@ app.post('/api/location', async (req, res, next) => {
             features: wholeFoodsByLocation
         }
     });
-
-
 })
 
 app.post('/api/places', async (req,res,next) => {
-    // let api_key = 'AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc';     // Parapxl API Key
-    let api_key = 'AIzaSyAhep7VKUQYV5vLRbLHxe5ODoqDyl77pnc';        // Personal API Key
-    // console.log('Request: ', req.body);
     let keyword = '';
     let location = '33.6526719,-117.74766229999999';
 
@@ -212,7 +208,7 @@ app.post('/api/places', async (req,res,next) => {
 
     try {
         // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
-        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=${api_key}`)
+        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=${keys.googlePlaces}`)
             .then(res => res.json())
             .then(data=> {
                 data = data.results.map(item => {
@@ -257,7 +253,7 @@ app.post('/api/housing/median', async (req,res,next) => {
     //MLPAH -Median home data code
     //Documentation: https://www.quandl.com/data/ZILLOW-Zillow-Real-Estate-Research
 
-    fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=bJuDKBZZsyeazf4kySm3`)
+    fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=${keys.quandl}`)
         .then(res => res.json())
         .then(data=> {
             // console.log(data);
@@ -275,7 +271,7 @@ app.post('/api/walkscore', async (req,res,next)=>{
     let lat = req.body.lat;
     let lng = req.body.lng;
 
-    fetch(`http://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lng}&transit=1&bike=1&wsapikey=f02b1d13f4bfd1098b20d5cee723ca0d`)
+    fetch(`http://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lng}&transit=1&bike=1&wsapikey=${keys.walkscore}`)
         .then(res => res.json())
         .then(data=> {
             // console.log(data);
@@ -300,7 +296,7 @@ app.post('/api/wiki', async (req,res,next)=>{
 
 app.post('/api/places/details', async (req,res,next) => {
     try{
-        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=${keys.googlePlaces}`)
             .then(res => res.json())
             .then(data=> {
                 // console.log(data);
@@ -378,37 +374,37 @@ app.post('/api/geoSpacial', async(req,res,next) => {
 })
 
 
-app.get('/api/test', async (req, res, next) => {
-    const sql = 'SELECT * FROM `test`';
+// app.get('/api/test', async (req, res, next) => {
+//     const sql = 'SELECT * FROM `test`';
+//
+//     const wholefoods = await db.query(sql);
+//
+//     res.send({
+//        success: true,
+//        wholefoods: wholefoods
+//     });
+// });
 
-    const wholefoods = await db.query(sql);
-
-    res.send({
-       success: true,
-       wholefoods: wholefoods
-    });
-});
-
-app.post('/api/test', async (req, res) => {
-    const { lat, lng, state } = req.body;
-
-    try {
-        const sql = 'INSERT INTO `test` (`lat`, `lng`, `state`) VALUES (?, ?, ?)';
-        const inserts = [lat, lng, state];
-
-        const query = mysql.format(sql, inserts);
-
-        const insertResults = await db.query(query);
-
-        res.send({
-            success: true,
-            insertId: insertResults.insertId
-        });
-    } catch(error){
-        res.status(500).send('Server Error');
-    }
-
-});
+// app.post('/api/test', async (req, res) => {
+//     const { lat, lng, state } = req.body;
+//
+//     try {
+//         const sql = 'INSERT INTO `test` (`lat`, `lng`, `state`) VALUES (?, ?, ?)';
+//         const inserts = [lat, lng, state];
+//
+//         const query = mysql.format(sql, inserts);
+//
+//         const insertResults = await db.query(query);
+//
+//         res.send({
+//             success: true,
+//             insertId: insertResults.insertId
+//         });
+//     } catch(error){
+//         res.status(500).send('Server Error');
+//     }
+//
+// });
 
 app.post('/api/new/user', async (req,res) => {
     let {email, password, lastLogin} = req.body;
