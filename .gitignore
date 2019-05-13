@@ -3,6 +3,7 @@ node_modules
 .idea
 .vscode
 .DS_Store
+keys/index.js
 
 config/*.js
 !config/index.js
