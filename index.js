@@ -197,6 +197,8 @@ app.post('/api/location', async (req, res, next) => {
 })
 
 app.post('/api/places', async (req,res,next) => {
+    // let api_key = 'AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc';     // Parapxl API Key
+    let api_key = 'AIzaSyAhep7VKUQYV5vLRbLHxe5ODoqDyl77pnc';        // Personal API Key
     // console.log('Request: ', req.body);
     let keyword = '';
     let location = '33.6526719,-117.74766229999999';
@@ -210,7 +212,7 @@ app.post('/api/places', async (req,res,next) => {
 
     try {
         // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
-        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc`)
+        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=${api_key}`)
             .then(res => res.json())
             .then(data=> {
                 data = data.results.map(item => {
