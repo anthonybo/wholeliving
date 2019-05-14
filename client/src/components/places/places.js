@@ -138,7 +138,7 @@ class Places extends Component {
                     </div>
                     <div className="col s4 input-field">
                         <i className="material-icons prefix">textsms</i>
-                        <input id="autocomplete-input" className='white-text autocomplete' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='location'/>
+                        <input id="autocomplete-input" className='white-text autocomplete' type="text" location="location" name='location' ref='location' onChange={this.handleChange} autoComplete='off' placeholder='Enter location'/>
                     </div>
                     <div className="col s2">
                         <input className='white-text' type="number" min="5" range="range" name='range' ref='range' onChange={this.handleChange} autoComplete='off' placeholder='10m'/>
