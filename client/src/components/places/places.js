@@ -27,7 +27,7 @@ class Places extends Component {
             M.toast({
                 html: 'Please complete both fields!',
                 displayLength: 2000,
-                classes: 'pulse'
+                classes: 'pulse red darken-2'
             })
         }
     }
