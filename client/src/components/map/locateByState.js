@@ -3,6 +3,7 @@ const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
 import axios from "axios";
 import {withRouter} from 'react-router-dom';
+import stateData from './us_states';
 
 class LocateByState extends Component {
 
@@ -55,22 +56,52 @@ class LocateByState extends Component {
 
         statePre.id = 'currentStateContainer';
         stateSpan.innerText = 'Current State: ' + this.state.state;
-        wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length
+        wfCount.innerText = 'WF Count: ' + this.state.wholefoods.features.length;
         // console.log(this.state.wholefoods.features.length);
         mapDiv.append(statePre);
         statePre.append(wfCount, stateSpan);
     }
 
     createMap(){
+        // console.log(this.state.state);
+        // console.log(stateData);
+
+
         this.map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
-            center: this.state.center,
+            // center: this.state.center,
             zoom: this.state.zoom,
             pitch: 45,
             // minZoom: 7,
             // maxZoom: 20
         });
+
+        let coords = [];
+        let stateOutline = null;
+
+        stateData.features.map (item => {
+            if(item.properties.STATE_ABB == this.state.state){
+                stateOutline = item;
+                if(this.state.state == 'CA'){
+                    coords = item.geometry.coordinates[5][0];
+                } else if (this.state.state == 'FL' || this.state.state == 'RI'){
+                    coords = item.geometry.coordinates[1][0];
+                } else {
+                    coords = item.geometry.coordinates[0];
+                }
+
+                var bounds = new mapboxgl.LngLatBounds();
+
+                coords.forEach(function(feature) {
+                    bounds.extend(feature);
+                });
+
+                this.map.fitBounds(bounds);
+                // this.map.setMaxBounds(bounds);
+
+            }
+        })
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
@@ -93,6 +124,28 @@ class LocateByState extends Component {
                     break;
                 }
             }
+
+            this.map.addSource("warnings", {
+                "type": "geojson",
+                "data": stateOutline
+            });
+
+            this.map.addLayer({
+                "id": "warnings",
+                "type": "line",
+                "source": "warnings",
+                "paint": {
+                    "line-color": "rgb(50,188,210)",
+                    "line-opacity": .6,
+                    "line-gap-width": 1,
+                    "line-blur": 2,
+                    "line-dasharray": [10, 3, 2, 3]
+        },
+                "layout": {
+                    "line-join": "round",
+                    "line-cap": "round"
+                },
+            });
 
             this.map.addLayer({
                 'id': '3d-buildings',
@@ -130,64 +183,14 @@ class LocateByState extends Component {
             });
 
             // add heatmap layer here
-            this.map.addLayer({
-                id: 'wholefoods-heat',
-                type: 'heatmap',
-                source: 'wholefoods',
-                maxzoom: 15,
-                paint: {
-                    // increase weight as diameter breast height increases
-                    'heatmap-weight': {
-                        property: 'dbh',
-                        type: 'exponential',
-                        stops: [
-                            [1, 0],
-                            [62, 1]
-                        ]
-                    },
-                    // increase intensity as zoom level increases
-                    'heatmap-intensity': {
-                        stops: [
-                            [11, 1],
-                            [15, 3]
-                        ]
-                    },
-                    // assign color values be applied to points depending on their density
-                    // R: 93 G: 188 B: 210
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0, 'rgba(93,188,210,0)',
-                        0.2, 'rgb(80,188,210)',
-                        0.4, 'rgb(70,188,210)',
-                        0.6, 'rgb(60,188,210)',
-                        0.8, 'rgb(50,188,210)'
-                    ],
-                    // increase radius as zoom increases
-                    'heatmap-radius': {
-                        stops: [
-                            [11, 15],
-                            [15, 20]
-                        ]
-                    },
-                    // decrease opacity to transition into the circle layer
-                    'heatmap-opacity': {
-                        default: 1,
-                        stops: [
-                            [14, 1],
-                            [15, 0]
-                        ]
-                    },
-                }
-            }, 'waterway-label');
+
 
             // add circle layer here
             this.map.addLayer({
                 id: 'wholefoods-point',
                 type: 'circle',
                 source: 'wholefoods',
-                minzoom: 14,
+                minzoom: 1,
                 paint: {
                     // increase the radius of the circle as the zoom level and dbh value increases
                     'circle-radius': {
@@ -200,24 +203,12 @@ class LocateByState extends Component {
                             [{ zoom: 22, value: 62 }, 50],
                         ]
                     },
-                    'circle-color': {
-                        property: 'dbh',
-                        type: 'exponential',
-                        stops: [
-                            [0, 'rgba(236,222,239,0)'],
-                            [10, 'rgb(236,222,239)'],
-                            [20, 'rgb(208,209,230)'],
-                            [30, 'rgb(166,189,219)'],
-                            [40, 'rgb(103,169,207)'],
-                            [50, 'rgb(28,144,153)'],
-                            [60, 'rgb(1,108,89)']
-                        ]
-                    },
-                    'circle-stroke-color': 'green',
-                    'circle-stroke-width': 1,
+                    'circle-color': 'rgb(48,108,9)',
+                    'circle-stroke-color': 'rgb(116,255,10)',
+                    'circle-stroke-width': 3,
                     'circle-opacity': {
                         stops: [
-                            [14, 0],
+                            [14, 1],
                             [15, 1]
                         ]
                     }
