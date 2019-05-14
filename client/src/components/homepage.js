@@ -6,11 +6,14 @@ import Modal from './general/modal';
 import {Link} from "react-router-dom";
 import logo from "../../dist/logo_transparent2.png";
 import Login from "./login/login";
+import Walkscore from './wholeFoodsTable/walkscore';
+import {withRouter} from 'react-router-dom';
 
 class Homepage extends Component {
     state = {
         email: '',
-        user_id: 0
+        user_id: 0,
+        nearByLocations: []
     }
 
     handleEmailChange=(email)=>{
@@ -25,16 +28,53 @@ class Homepage extends Component {
         })
     }
 
+    nearbyCity=(cities)=>{
+        this.setState({
+            nearByLocations: cities
+        })
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevProps.location.pathname !== this.props.location.pathname){
+            this.setState({
+                nearByLocations: []
+            })
+        }
+    }
+
     render(){
+        let path = this.props.location.pathname;
+        let walkscoreDisplay = null;
+
+        if (path.match('/crossReference/') || path.match('/busLookup/') || path.match('/location/')) {
+            walkscoreDisplay = <Walkscore/>;
+        }
         return(
             <Fragment>
                 <Places/>
                 <MapContainer/>
-                <WholeFoodsTable email={this.state.email} user_id={this.state.user_id}/>
+                {
+                    this.state.nearByLocations.length > 0 ?
+                        <ul className="city-hList">
+                            <li>
+                                <span className="city-menu">
+                                    <h2 className="city-menu-title">Nearby Cities</h2>
+                                    <ul className="city-menu-dropdown">
+                                        {this.state.nearByLocations}
+                                    </ul>
+                                </span>
+                            </li>
+                        </ul>
+                        : null
+                }
+                {
+                    walkscoreDisplay !== null ? walkscoreDisplay : null
+                }
+                <WholeFoodsTable email={this.state.email} user_id={this.state.user_id} onNearbyCity={this.nearbyCity}/>
                 <Modal onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
             </Fragment>
         )
     }
 }
 
-export default Homepage;
+export default withRouter(Homepage);
