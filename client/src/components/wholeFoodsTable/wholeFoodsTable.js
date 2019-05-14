@@ -5,6 +5,7 @@ import AllWholeFoodsLocations from "../map/mapContainer";
 import './wholeFoodsTable.scss';
 import ReactDOM from "react-dom";
 var zipcodes = require('zipcodes');
+import Walkscore from './walkscore';
 
 class WholeFoodsTable extends Component {
 
@@ -684,6 +685,8 @@ class WholeFoodsTable extends Component {
         this.setState({
             nearByLocations: nearByLocations
         })
+
+        this.props.onNearbyCity(nearByLocations);
     }
 
     updateLocation(city){
@@ -952,9 +955,12 @@ class WholeFoodsTable extends Component {
         if(this.state.noResults){
             items.push(<tr className='white-text' key='1342'><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td><td>unavailable</td></tr>)
             return(
-                <ul className="collapsible popout">
-                    <li></li>
-                </ul>
+                <Fragment>
+                    <ul className="collapsible popout">
+                        <li></li>
+                    </ul>
+                </Fragment>
+
             )
         } else if(this.state.allWholeFoods){
         // console.log(this.state.resp.data.wholefoods);
@@ -1024,30 +1030,6 @@ class WholeFoodsTable extends Component {
                         </div>
                     </li>
                 </ul>
-
-                <div className='scores-container'>
-                    <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
-                        <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-
-                    <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
-                        <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-                </div>
             </Fragment>
         )
     } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
@@ -1136,47 +1118,15 @@ class WholeFoodsTable extends Component {
                         </div>
                     </li>
                 </ul>
-                <ul className="city-hList">
-                    <li>
-                        <span className="city-menu">
-                            <h2 className="city-menu-title">Nearby Cities</h2>
-                            <ul className="city-menu-dropdown">
-                                {this.state.nearByLocations}
-                            </ul>
-                        </span>
-                    </li>
-                </ul>
-
-                <div className='scores-container'>
-                    <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
-                        <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-
-                    <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
-                        <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-                </div>
             </Fragment>
         )
     } else if (this.state.generalMap) {
         return (
-            <ul className="collapsible popout">
-                <li></li>
-            </ul>
+            <Fragment>
+                <ul className="collapsible popout">
+                    <li></li>
+                </ul>
+            </Fragment>
         )
     } else if (this.state.byBusId){
         return(
@@ -1239,90 +1189,68 @@ class WholeFoodsTable extends Component {
                         </div>
                     </li>
                 </ul>
-
-                <div className='scores-container'>
-                    <svg className="score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">WalkScore</text>
-                        <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-
-                    <svg className="bike-score" width="200" height="200" viewBox="-25 -25 400 400">
-                        <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
-                                fill="none"></circle>
-                        <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
-                                r="175" strokeDasharray="1100" strokeWidth="25" strokeDashoffset="1100"
-                                fill="none"></circle>
-                        <text className="js-bike-text score-text" x="50%" y="40%" dx="-25" textAnchor="middle"></text>
-                        <text className="score-text-name" x="50%" y="50%" dx="-25" textAnchor="middle">BikeScore</text>
-                        <text className="score-bike-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
-                    </svg>
-                </div>
             </Fragment>
         )
     }
 
     return(
-        <ul className="collapsible popout">
-            <li>
-                <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
-                <div className="collapsible-body">
-                    <table className='responsive-table'>
-                        <thead>
-                        <tr className='white-text'>
-                            {this.state.email !== '' ? <th> </th> : null}
-                            <th>#</th>
-                            <th>State</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>Zip</th>
-                            <th>Phone</th>
-                            <th>Hours</th>
-                        </tr>
-                        </thead>
+        <Fragment>
+            <ul className="collapsible popout">
+                <li>
+                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
+                    <div className="collapsible-body">
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                {this.state.email !== '' ? <th> </th> : null}
+                                <th>#</th>
+                                <th>State</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>Zip</th>
+                                <th>Phone</th>
+                                <th>Hours</th>
+                            </tr>
+                            </thead>
 
-                        <tbody>
+                            <tbody>
+                                {
+                                    this.state.byStateTable.length > 0 ? this.state.byStateTable : this.state.allWholeFoodsTable
+                                }
+                            </tbody>
+                        </table>
+
                             {
-                                this.state.byStateTable.length > 0 ? this.state.byStateTable : this.state.allWholeFoodsTable
-                            }
-                        </tbody>
-                    </table>
+                                this.state.byStateTable.length > 0 ? <span></span> :
+                                 <Fragment>
+                                 <br/><br/>
+                                 <div className="pagination-wrapper">
+                                    <svg className="btn-pagination btn--prev" id='behind' height="96" viewBox="0 0 24 24" width="96" xmlns="">
+                                    <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
+                                    <path d="M0-.5h24v24H0z" fill="none"/>
+                                    </svg>
 
-                        {
-                            this.state.byStateTable.length > 0 ? <span></span> :
-                             <Fragment>
-                             <br/><br/>
-                             <div className="pagination-wrapper">
-                                <svg className="btn-pagination btn--prev" id='behind' height="96" viewBox="0 0 24 24" width="96" xmlns="">
-                                <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
-                                <path d="M0-.5h24v24H0z" fill="none"/>
-                                </svg>
+                                    <div className="pagination-container">
+                                        <div className="little-dot  little-dot--first"></div>
+                                        <div className="little-dot">
+                                            <div className="big-dot-container">
+                                            <div className="big-dot"></div>
+                                        </div>
+                                        </div>
+                                        <div className="little-dot  little-dot--last"></div>
+                                    </div>
 
-                                <div className="pagination-container">
-                                    <div className="little-dot  little-dot--first"></div>
-                                    <div className="little-dot">
-                                        <div className="big-dot-container">
-                                        <div className="big-dot"></div>
-                                    </div>
-                                    </div>
-                                    <div className="little-dot  little-dot--last"></div>
+                                    <svg className="btn-pagination btn--next" id='forward' height="96" viewBox="0 0 24 24" width="96" xmlns="">
+                                    <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
+                                    <path d="M0-.25h24v24H0z" fill="none"/>
+                                    </svg>
                                 </div>
-
-                                <svg className="btn-pagination btn--next" id='forward' height="96" viewBox="0 0 24 24" width="96" xmlns="">
-                                <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
-                                <path d="M0-.25h24v24H0z" fill="none"/>
-                                </svg>
-                            </div>
-                             </Fragment>
-                        }
-                </div>
-            </li>
-        </ul>
+                                 </Fragment>
+                            }
+                    </div>
+                </li>
+            </ul>
+        </Fragment>
         )
     }
 }
