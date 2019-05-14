@@ -741,7 +741,7 @@ class WholeFoodsTable extends Component {
             cityInfo = 'Sorry, data currently unavailable.';
         }
 
-        cityDesc.push(<tr className='white-text' key='123890'><td>{cityInfo}</td></tr>)
+        cityDesc.push(<tr className='white-text' key='123890'><td dangerouslySetInnerHTML={{__html: cityInfo}} /></tr>);
         this.setState({
             cityDesc: cityDesc,
             loadingTextDesc: false
