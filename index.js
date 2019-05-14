@@ -284,7 +284,7 @@ app.post('/api/walkscore', async (req,res,next)=>{
 })
 
 app.post('/api/wiki', async (req,res,next)=>{
-    fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=${req.body.city},_${req.body.state}`)
+    fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&format=json&redirects&titles=${req.body.city},_${req.body.state}`)
         .then(res => res.json())
         .then(data=> {
             res.send({

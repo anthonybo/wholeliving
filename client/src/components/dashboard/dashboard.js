@@ -96,7 +96,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userData.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td>{value.id}</td><td className='' onClick={()=> this.adminGetUsersSaves(value.email, value.id)}><span className='dashboard-admin-display-user-email'>{value.email}</span></td><td>{value.lastLogin}</td><td>{value.ipv4}</td></tr>)
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item'><i className='fas fa-skull' aria-hidden="true"></i></td><td>{value.id}</td><td className='' onClick={()=> this.adminGetUsersSaves(value.email, value.id)}><span className='dashboard-admin-display-user-email'>{value.email}</span></td><td>{value.lastLogin}</td><td>{value.ipv4}</td></tr>)
         }
 
         this.setState({
