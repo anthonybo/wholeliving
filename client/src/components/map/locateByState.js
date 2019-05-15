@@ -66,10 +66,10 @@ class LocateByState extends Component {
         // console.log(this.state.state);
         // console.log(stateData);
 
-
         this.map = new mapboxgl.Map({
             container: 'map',
-            style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
+            // style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
+            style: 'mapbox://styles/anthonybo/cjvoh2yx00d4c1cnv3gmbgnol',
             // center: this.state.center,
             zoom: this.state.zoom,
             pitch: 45,
@@ -80,8 +80,9 @@ class LocateByState extends Component {
         let coords = [];
         let stateOutline = null;
 
-        stateData.features.map (item => {
+        stateData.features.map ((item, index) => {
             if(item.properties.STATE_ABB == this.state.state){
+                // stateData.features.splice(index, 1);
                 stateOutline = item;
                 if(this.state.state == 'CA'){
                     coords = item.geometry.coordinates[5][0];
@@ -99,9 +100,8 @@ class LocateByState extends Component {
 
                 this.map.fitBounds(bounds);
                 // this.map.setMaxBounds(bounds);
-
             }
-        })
+        });
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
@@ -125,15 +125,15 @@ class LocateByState extends Component {
                 }
             }
 
-            this.map.addSource("warnings", {
+            this.map.addSource("stateOutline", {
                 "type": "geojson",
                 "data": stateOutline
             });
 
             this.map.addLayer({
-                "id": "warnings",
+                "id": "stateOutline",
                 "type": "line",
-                "source": "warnings",
+                "source": "stateOutline",
                 "paint": {
                     "line-color": "rgb(50,188,210)",
                     "line-opacity": .6,
@@ -146,6 +146,21 @@ class LocateByState extends Component {
                     "line-cap": "round"
                 },
             });
+
+            // this.map.addSource("warnings", {
+            //     "type": "geojson",
+            //     "data": stateData
+            // });
+            //
+            // this.map.addLayer({
+            //     "id": "warnings",
+            //     "type": "fill",
+            //     "source": "warnings",
+            //     "paint": {
+            //         "fill-outline-color": "#fa0000",
+            //         "fill-opacity": 0.5,
+            //     }
+            // });
 
             this.map.addLayer({
                 'id': '3d-buildings',
@@ -227,7 +242,7 @@ class LocateByState extends Component {
             });
         });
 
-        this.displayCurrentState();
+        // this.displayCurrentState();
     }
 
     componentDidMount() {
