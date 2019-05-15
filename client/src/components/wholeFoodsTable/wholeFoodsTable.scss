@@ -5,3 +5,77 @@
 .noResultsToast {
   border: 1px solid lawngreen;
 }
+
+.score-circle {
+  stroke: #52c7e9;
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+.score-empty {
+  //stroke: #a1a1a1;
+}
+
+.score-text {
+  fill: #ffffff;
+  font: bold 4rem "Poppins", Helvetica, Arial, sans-serif;
+}
+
+.score-text-name {
+  fill: #ffffff;
+  font: bold 2rem "Poppins", Helvetica, Arial, sans-serif;
+}
+
+.score-desc-text, .score-bike-desc-text {
+  fill: #cacaca7d;;
+  font: bold 2rem "Poppins", Helvetica, Arial, sans-serif;
+}
+
+.scores-container {
+  display: flex;
+  //flex-flow: column nowrap;
+  //width: 100vw;
+  //height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.svg-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow-svg {
+  transform: rotate(-90deg);
+  width: 22vmin;
+  height: 28vmin;
+}
+
+polygon {
+  fill: #4ce915;
+}
+
+line {
+  stroke: #4ce915;
+}
+
+.median-text {
+  fill: #ffffff;
+  font: bold 3rem "Poppins", Helvetica, Arial, sans-serif;
+}
+
+.median-text-btm {
+  font: bold 3rem "Poppins", Helvetica, Arial, sans-serif;
+  fill: #636363;
+  transform: rotate(90deg);
+}
+
+.median-text-negative {
+  font: bold 3rem "Poppins", Helvetica, Arial, sans-serif;
+  fill: #636363;
+  transform: rotate(270deg) translate(-78%,31%);
+}
+
+.arrow-container {
+  display: none;
+}
