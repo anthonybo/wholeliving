@@ -555,19 +555,14 @@ class WholeFoodsTable extends Component {
 
 
             let medianPrice = medianHousingPrices.data.median_prices.dataset.data;
-            console.log(medianHousingPrices.data.median_prices.dataset.data);
-            console.log(medianPrice[0][1] - medianPrice[1][1]);
-            console.log(medianPrice[0][1]);
             median_text.textContent = `$${medianPrice[0][1].toLocaleString()}`;
             arrow_container.style.display = 'block';
             if(medianPrice[0][1] - medianPrice[1][1] < 0){
-                console.log('We have a NEAGTIVE!');
                 arrow_svg.style.transform = "rotate(90deg)";
                 arrow_bottom_txt.style.transform = 'rotate(270deg) translate(-78%,31%)';
                 line.style.stroke = 'red';
                 polygon.style.fill = 'red';
             } else {
-                console.log('WE HAVE A POSITIVE!');
                 arrow_svg.style.transform = "rotate(-90deg)";
                 arrow_bottom_txt.style.transform = 'rotate(90deg)';
                 line.style.stroke = 'green';
