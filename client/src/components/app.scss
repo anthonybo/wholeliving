@@ -274,39 +274,6 @@ i.material-icons.prefix {
   display: none;
 }
 
-.score-circle {
-  stroke: #52c7e9;
-  transition: stroke-dashoffset 1s ease-out;
-}
-
-.score-empty {
-  //stroke: #a1a1a1;
-}
-
-.score-text {
-  fill: #ffffff;
-  font: bold 4rem "Poppins", Helvetica, Arial, sans-serif;
-}
-
-.score-text-name {
-  fill: #ffffff;
-  font: bold 2rem "Poppins", Helvetica, Arial, sans-serif;
-}
-
-.score-desc-text, .score-bike-desc-text {
-  fill: #cacaca7d;;
-  font: bold 2rem "Poppins", Helvetica, Arial, sans-serif;
-}
-
-.scores-container {
-  display: flex;
-  //flex-flow: column nowrap;
-  //width: 100vw;
-  //height: 100vh;
-  justify-content: center;
-  align-items: center;
-}
-
 
 // Cities Menu
 //a {
