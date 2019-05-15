@@ -21,7 +21,7 @@ const Walkscore =()=>{
                     </svg>
                 </div>
                 <div className='scores-container'>
-                    <svg className="score" width="30vmin" height="30vmin" viewBox="-25 -25 400 400">
+                    <svg className="score" viewBox="-25 -25 400 400">
                         <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
                                 fill="none"></circle>
                         <circle className="js-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
@@ -32,7 +32,7 @@ const Walkscore =()=>{
                         <text className="score-desc-text" x="50%" y="60%" dx="-25" textAnchor="middle"></text>
                     </svg>
 
-                    <svg className="bike-score" width="30vmin" height="30vmin" viewBox="-25 -25 400 400">
+                    <svg className="bike-score" viewBox="-25 -25 400 400">
                         <circle className="score-empty" cx="175" cy="175" r="175" strokeWidth="25"
                                 fill="none"></circle>
                         <circle className="js-bike-circle score-circle" transform="rotate(-90 175 175)" cx="175" cy="175"
