@@ -84,10 +84,13 @@ class LocateByState extends Component {
             if(item.properties.STATE_ABB == this.state.state){
                 // stateData.features.splice(index, 1);
                 stateOutline = item;
+                let tmp = item.geometry.coordinates;
                 if(this.state.state == 'CA'){
-                    coords = item.geometry.coordinates[5][0];
+                    coords = [ ...tmp[0][0], ...tmp[1][0], ...tmp[2][0], ...tmp[3][0], ...tmp[4][0], ...tmp[5][0] ]
                 } else if (this.state.state == 'FL' || this.state.state == 'RI'){
-                    coords = item.geometry.coordinates[1][0];
+                    coords = [ ...tmp[0][0], ...tmp[1][0] ];
+                } else if (this.state.state == 'HI') {
+                    coords = [ ...tmp[4][0], ...tmp[5][0], ...tmp[6][0], ...tmp[7][0], ...tmp[8][0], ...tmp[9][0], ...tmp[10][0] ];
                 } else {
                     coords = item.geometry.coordinates[0];
                 }

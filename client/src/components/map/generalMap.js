@@ -16,12 +16,16 @@ class GeneralMap extends Component {
         this.map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
-            center: [-97.2263, 37.7091],
+            // center: [-97.2263, 37.7091],
             zoom: 2.6,
             pitch: 45,
             // minZoom: 7,
             // maxZoom: 20
+            // maxBounds: [-171.791110603, 18.91619, -66.96466, 71.3577635769]
         });
+
+        this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
+        // this.map.fitBounds([-171.791110603, 18.91619, -66.96466, 71.3577635769]);
 
         var hoveredStateId =  null;
 
