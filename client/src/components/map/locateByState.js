@@ -240,6 +240,19 @@ class LocateByState extends Component {
                     .addTo(this.map);
                 // var features = e.features[0];
             });
+
+            this.map.on('zoomend', (e)=>{
+                var zoom = this.map.getZoom();
+                // console.log(zoom);
+                if(zoom > 8){
+                    // this.map.setPitch(0);
+                    // this.map.easeTo(latlng, zoom, bearing, 0, options);
+                    this.map.easeTo({bearing:60, duration:3000, pitch:0});
+                } else {
+                    // this.map.setPitch(45);
+                    this.map.easeTo({bearing:0, duration:3000, pitch:45});
+                }
+            })
         });
 
         // this.displayCurrentState();
