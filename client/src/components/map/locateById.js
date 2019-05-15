@@ -134,7 +134,19 @@ class LocateByState extends Component {
             })
         }
     }
-
+    // rotator=()=>{
+    //     console.log('Rotator');
+    //     this.map.easeTo({bearing:60, duration:5000, pitch:55, zoom:14});
+    //     window.setTimeout(()=>{
+    //         this.map.easeTo({bearing:180, duration:8000, pitch:0, zoom:10});
+    //         window.setTimeout(()=>{
+    //             this.map.easeTo({bearing:220, duration:7000, pitch:70, zoom:13});
+    //             window.setTimeout(()=>{
+    //                 this.rotator();
+    //             }, 5000)
+    //         }, 8000)
+    //     }, 7000)
+    // }
     createMap(){
         this.map = new mapboxgl.Map({
             container: 'map',
@@ -145,8 +157,9 @@ class LocateByState extends Component {
             // minZoom: 7,
             // maxZoom: 20
         });
-
+        
         this.map.on('style.load', () => {
+            // this.rotator();
             // this.rotateCamera(0);
             this.map.addControl(new mapboxgl.FullscreenControl());
 
