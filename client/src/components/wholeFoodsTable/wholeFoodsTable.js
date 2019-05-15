@@ -1197,7 +1197,11 @@ class WholeFoodsTable extends Component {
         <Fragment>
             <ul className="collapsible popout">
                 <li>
-                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods</div>
+                    <div className="collapsible-header"><i className="material-icons">filter_drama</i>Whole Foods
+                        {
+                            this.state.byStateTable.length > 0 ? ' ['+this.state.byStateTable.length+']' : null
+                        }
+                    </div>
                     <div className="collapsible-body">
                         <table className='responsive-table'>
                             <thead>
