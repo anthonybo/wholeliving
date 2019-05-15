@@ -544,8 +544,36 @@ class WholeFoodsTable extends Component {
                 }
             }
         }
+        const arrow_container = document.querySelector('.arrow-container');
 
         if(medianHousingPrices.data.median_prices.hasOwnProperty('dataset')){
+            const arrow_svg = document.querySelector('.arrow-svg');
+            const arrow_bottom_txt = document.querySelector('.median-text-btm');
+            const line = document.querySelector('line');
+            const polygon = document.querySelector('polygon');
+            const median_text = document.querySelector('.js-median-text');
+
+
+            let medianPrice = medianHousingPrices.data.median_prices.dataset.data;
+            console.log(medianHousingPrices.data.median_prices.dataset.data);
+            console.log(medianPrice[0][1] - medianPrice[1][1]);
+            console.log(medianPrice[0][1]);
+            median_text.textContent = `$${medianPrice[0][1].toLocaleString()}`;
+            arrow_container.style.display = 'block';
+            if(medianPrice[0][1] - medianPrice[1][1] < 0){
+                console.log('We have a NEAGTIVE!');
+                arrow_svg.style.transform = "rotate(90deg)";
+                arrow_bottom_txt.style.transform = 'rotate(270deg) translate(-78%,31%)';
+                line.style.stroke = 'red';
+                polygon.style.fill = 'red';
+            } else {
+                console.log('WE HAVE A POSITIVE!');
+                arrow_svg.style.transform = "rotate(-90deg)";
+                arrow_bottom_txt.style.transform = 'rotate(90deg)';
+                line.style.stroke = 'green';
+                polygon.style.fill = 'green';
+            }
+
             for(const [index, value] of medianHousingPrices.data.median_prices.dataset.data.entries()) {
                 // console.log(value);
                 medianHousingPricesList.push(<tr className='white-text' key={index}>
@@ -554,6 +582,7 @@ class WholeFoodsTable extends Component {
                 </tr>)
             }
         } else {
+            arrow_container.style.display = 'none';
             medianHousingPricesList.push(<tr className='white-text' key='0912389123'>
                 <td>No Data Available</td>
                 <td>No Data Available</td>
@@ -643,7 +672,6 @@ class WholeFoodsTable extends Component {
     }
 
     nearByLocations(noLocations){
-
         // Zip Code Resource: https://www.npmjs.com/package/zipcodes
         let zip = 0;
         let city = '';
