@@ -125,6 +125,13 @@ line {
     padding: 0;
     margin: 0;
   }
+
+  .card .card-content .card-title i {
+    line-height: 32px;
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+  }
 }
 
 @media (min-width: 601px) {
@@ -155,6 +162,13 @@ line {
 
   .card-website-directions {
     font-size: 1.2vw;
+  }
+
+  .card .card-content .card-title i {
+    line-height: 32px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
 }
 
@@ -188,13 +202,13 @@ line {
   .card-website-directions {
     font-size: 1.2vw;
   }
-}
 
-.card .card-content .card-title i {
-  line-height: 32px;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  .card .card-content .card-title i {
+    line-height: 32px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
 }
 
 .card .card-title {
@@ -206,7 +220,7 @@ line {
   position: fixed;
   top: 0;
   right: 0;
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 .close-card:hover {
