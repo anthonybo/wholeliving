@@ -6,6 +6,7 @@ import './wholeFoodsTable.scss';
 import ReactDOM from "react-dom";
 var zipcodes = require('zipcodes');
 import Walkscore from './walkscore';
+const keys = require('../../../../keys');
 
 class WholeFoodsTable extends Component {
 
@@ -33,7 +34,8 @@ class WholeFoodsTable extends Component {
         user_id: 0,
         byStateTable: [],
         crossReferenceWFItems: [],
-        locationByIdItems: []
+        locationByIdItems: [],
+        userInputCards: []
     }
 
     async getAllWholeFoods(){
@@ -923,6 +925,7 @@ class WholeFoodsTable extends Component {
 
     createTableEntriesForUserSelection(){
         const userInput = [];
+        const userInputCards = [];
         let placeId = '';
 
         for(const [index, original_value] of this.state.crossReferenceUserInput.features.entries()){
@@ -947,12 +950,60 @@ class WholeFoodsTable extends Component {
                     phone = userInputData.formatted_phone_number
                 }
                 placeId = original_value.properties.PlaceId;
-
+                // console.log(userInputData.photos[0].photo_reference);
                 userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+
+                let photoLink = '';
+                if('photos' in userInputData){
+                    let photoLength = userInputData.photos.length;
+                    photoLength = Math.floor(Math.random() * photoLength);
+                    photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${keys.googlePlaces}`;
+                } else {
+                    photoLink = `https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png`;
+                }
+                let reviews = [];
+                if('reviews' in userInputData){
+                    let reviewLength = userInputData.reviews.length;
+                    reviewLength = Math.floor(Math.random() * reviewLength);
+                    reviews.push(userInputData.reviews[reviewLength]);
+                }
+
+                userInputCards.push(<div key={index} className="card">
+                    <div className="card-image waves-effect waves-block waves-light">
+                        {
+                            photoLink !== '' ? <img className="activator" src={photoLink}/> : null
+                        }
+                    </div>
+                    <div className="card-content">
+                        <span className="card-title activator grey-text text-darken-4">{userInputData.name}<i
+                            className="material-icons right">more_vert</i></span>
+                        <div className="card-action">
+                            <p className='card-website-directions'><a href={value.data.data.result.website} target='_blank'>website</a></p>
+                            <p className='card-website-directions'><Link to={'/busLookup/'+ placeId}>Directions</Link></p>
+                        </div>
+                    </div>
+                    <div className="card-reveal">
+                        <span className="card-title grey-text text-darken-4">{userInputData.name}<i
+                            className="material-icons right close-card">close</i></span>
+                        <hr/>
+                        <p>{'rating' in userInputData ? 'Rating: '+userInputData.rating : null}</p>
+                        <p>{phone}</p>
+                        <p>{hours !== 'unavailable' ? hours : null}</p>
+                        {reviews.length > 0 ? <hr/> : null}
+                        <p>{reviews.length > 0 ? 'Random Review:' : null}</p>
+                        <p>{reviews.length > 0 ? reviews[0].text : null}</p>
+                    </div>
+                </div>
+                )
+
+                this.props.onCrossReference(userInputCards);
+
                 this.setState({
-                    userInput: userInput
+                    userInput: userInput,
+                    userInputCards: userInputCards
                 })
             })
+
         }
     }
 
@@ -994,29 +1045,29 @@ class WholeFoodsTable extends Component {
         return(
             <Fragment>
                 <ul className="collapsible popout">
-                    <li>
-                        <div className="collapsible-header"><i className="material-icons">place</i>Whole Foods</div>
-                        <div className="collapsible-body">
-                            <table className='responsive-table'>
-                                <thead>
-                                <tr className='white-text'>
-                                    {this.state.email !== '' ? <th> </th> : null}
-                                    <th>#</th>
-                                    <th>State</th>
-                                    <th>Address</th>
-                                    <th>City</th>
-                                    <th>Zip</th>
-                                    <th>Phone</th>
-                                    <th>Hours</th>
-                                </tr>
-                                </thead>
+                    {/*<li>*/}
+                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>Whole Foods</div>*/}
+                    {/*    <div className="collapsible-body">*/}
+                    {/*        <table className='responsive-table'>*/}
+                    {/*            <thead>*/}
+                    {/*            <tr className='white-text'>*/}
+                    {/*                {this.state.email !== '' ? <th> </th> : null}*/}
+                    {/*                <th>#</th>*/}
+                    {/*                <th>State</th>*/}
+                    {/*                <th>Address</th>*/}
+                    {/*                <th>City</th>*/}
+                    {/*                <th>Zip</th>*/}
+                    {/*                <th>Phone</th>*/}
+                    {/*                <th>Hours</th>*/}
+                    {/*            </tr>*/}
+                    {/*            </thead>*/}
 
-                                <tbody>
-                                {this.state.locationByIdItems}
-                                </tbody>
-                            </table>
-                        </div>
-                    </li>
+                    {/*            <tbody>*/}
+                    {/*            {this.state.locationByIdItems}*/}
+                    {/*            </tbody>*/}
+                    {/*        </table>*/}
+                    {/*    </div>*/}
+                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {
@@ -1083,27 +1134,27 @@ class WholeFoodsTable extends Component {
                             </table>
                         </div>
                     </li>
-                    <li>
-                        <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>
-                        <div className="collapsible-body">
-                            <table className='responsive-table'>
-                                <thead>
-                                <tr className='white-text'>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Address</th>
-                                    <th>Phone</th>
-                                    <th>Hours</th>
-                                    <th>Website</th>
-                                </tr>
-                                </thead>
+                    {/*<li>*/}
+                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>*/}
+                    {/*    <div className="collapsible-body">*/}
+                    {/*        <table className='responsive-table'>*/}
+                    {/*            <thead>*/}
+                    {/*            <tr className='white-text'>*/}
+                    {/*                <th>#</th>*/}
+                    {/*                <th>Name</th>*/}
+                    {/*                <th>Address</th>*/}
+                    {/*                <th>Phone</th>*/}
+                    {/*                <th>Hours</th>*/}
+                    {/*                <th>Website</th>*/}
+                    {/*            </tr>*/}
+                    {/*            </thead>*/}
 
-                                <tbody>
-                                {this.state.userInput}
-                                </tbody>
-                            </table>
-                        </div>
-                    </li>
+                    {/*            <tbody>*/}
+                    {/*            {this.state.userInput}*/}
+                    {/*            </tbody>*/}
+                    {/*        </table>*/}
+                    {/*    </div>*/}
+                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {
@@ -1125,7 +1176,6 @@ class WholeFoodsTable extends Component {
                             </table>
                         </div>
                     </li>
-
                     <li>
                         <div className="collapsible-header"><i className="material-icons">description</i>
                             {
@@ -1155,27 +1205,27 @@ class WholeFoodsTable extends Component {
         return(
             <Fragment>
                 <ul className="collapsible popout">
-                    <li>
-                        <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>
-                        <div className="collapsible-body">
-                            <table className='responsive-table'>
-                                <thead>
-                                <tr className='white-text'>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Address</th>
-                                    <th>Phone</th>
-                                    <th>Hours</th>
-                                    <th>Website</th>
-                                </tr>
-                                </thead>
+                    {/*<li>*/}
+                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>*/}
+                    {/*    <div className="collapsible-body">*/}
+                    {/*        <table className='responsive-table'>*/}
+                    {/*            <thead>*/}
+                    {/*            <tr className='white-text'>*/}
+                    {/*                <th>#</th>*/}
+                    {/*                <th>Name</th>*/}
+                    {/*                <th>Address</th>*/}
+                    {/*                <th>Phone</th>*/}
+                    {/*                <th>Hours</th>*/}
+                    {/*                <th>Website</th>*/}
+                    {/*            </tr>*/}
+                    {/*            </thead>*/}
 
-                                <tbody>
-                                {this.state.userInput}
-                                </tbody>
-                            </table>
-                        </div>
-                    </li>
+                    {/*            <tbody>*/}
+                    {/*            {this.state.userInput}*/}
+                    {/*            </tbody>*/}
+                    {/*        </table>*/}
+                    {/*    </div>*/}
+                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {

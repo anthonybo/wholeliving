@@ -13,7 +13,8 @@ class Homepage extends Component {
     state = {
         email: '',
         user_id: 0,
-        nearByLocations: []
+        nearByLocations: [],
+        cards: []
     }
 
     handleEmailChange=(email)=>{
@@ -34,10 +35,17 @@ class Homepage extends Component {
         })
     }
 
+    crossReference=(cards)=>{
+        this.setState({
+            cards: cards
+        })
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         if(prevProps.location.pathname !== this.props.location.pathname){
             this.setState({
-                nearByLocations: []
+                nearByLocations: [],
+                cards: []
             })
         }
     }
@@ -70,7 +78,14 @@ class Homepage extends Component {
                 {
                     walkscoreDisplay !== null ? walkscoreDisplay : null
                 }
-                <WholeFoodsTable email={this.state.email} user_id={this.state.user_id} onNearbyCity={this.nearbyCity}/>
+                {
+                    this.state.cards.length > 0 ?
+                    <div className='userInputCardsContainer'>
+                        {this.state.cards}
+                    </div>
+                        :null
+                }
+                <WholeFoodsTable email={this.state.email} user_id={this.state.user_id} onNearbyCity={this.nearbyCity} onCrossReference={this.crossReference}/>
                 <Modal onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
             </Fragment>
         )
