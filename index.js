@@ -296,7 +296,7 @@ app.post('/api/wiki', async (req,res,next)=>{
 
 app.post('/api/places/details', async (req,res,next) => {
     try{
-        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry&key=${keys.googlePlaces}`)
+        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry,photo,review,icon,price_level&key=${keys.googlePlaces}`)
             .then(res => res.json())
             .then(data=> {
                 // console.log(data);

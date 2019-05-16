@@ -89,3 +89,131 @@ line {
 .arrow-container {
   display: none;
 }
+
+//svg text {
+//  font-family: FontAwesome;
+//}
+
+
+
+.userInputCardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .card {
+    height: auto;
+    text-align: center;
+    margin: auto;
+    max-width: 400px;
+    min-width: 400px;
+  }
+
+  .card img {
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    max-width: 400px;
+  }
+
+  .card .card-action {
+    border-radius: 0 0 2px 2px;
+    flex-direction: row;
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+@media (min-width: 601px) {
+  .card {
+    width: 33%;
+    max-width: 400px;
+    object-fit: cover;
+    object-position: bottom;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .card img {
+    height: 100px;
+    max-width: 400px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .card .card-action {
+    border-radius: 0 0 2px 2px;
+    flex-direction: row;
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+  }
+
+  .card-website-directions {
+    font-size: 1.2vw;
+  }
+}
+
+
+@media (min-width: 901px) {
+  .card {
+    width: 25%;
+    max-width: 400px;
+    object-fit: cover;
+    object-position: bottom;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .card img {
+    height: 100px;
+    max-width: 400px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .card .card-action {
+    border-radius: 0 0 2px 2px;
+    flex-direction: row;
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+  }
+
+  .card-website-directions {
+    font-size: 1.2vw;
+  }
+}
+
+.card .card-content .card-title i {
+  line-height: 32px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.card .card-title {
+  font-size: calc(0.75em + 1vmin);
+  font-weight: 300;
+}
+
+.close-card {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin-right: 5px;
+}
+
+.close-card:hover {
+  color: red;
+}
+
+.card .card-image img {
+  border: 1px solid white;
+  padding: 5px;
+}
