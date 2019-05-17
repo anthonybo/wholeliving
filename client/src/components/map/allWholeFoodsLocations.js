@@ -46,6 +46,45 @@ class AllWholeFoodsLocations extends Component {
             // this.rotateCamera(0);
             this.map.addControl(new mapboxgl.FullscreenControl());
 
+            class MapboxGLButtonControl {
+                constructor({
+                                className = "",
+                                title = "",
+                                eventHandler = evtHndlr
+                            }) {
+                    this._className = className;
+                    this._title = title;
+                    this._eventHandler = eventHandler;
+                }
+
+                onAdd(map) {
+                    this._btn = document.createElement("button");
+                    this._btn.className = "mapboxgl-ctrl-icon" + " " + this._className;
+                    this._btn.type = "button";
+                    this._btn.title = this._title;
+                    this._btn.onclick = this._eventHandler;
+
+                    this._container = document.createElement("div");
+                    this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+                    this._container.appendChild(this._btn);
+
+                    return this._container;
+                }
+
+                onRemove() {
+                    this._container.parentNode.removeChild(this._container);
+                    this._map = undefined;
+                }
+            }
+
+            const ctrlCenter = new MapboxGLButtonControl({
+                className: "mapbox-gl-center",
+                title: "Center camera",
+                eventHandler: ()=>{this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);}
+            });
+
+            this.map.addControl(ctrlCenter, "top-right");
+
             // if(!document.getElementById("menu")) {
             //     this.createMenu();
             // }
