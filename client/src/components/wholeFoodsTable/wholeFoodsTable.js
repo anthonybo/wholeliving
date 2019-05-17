@@ -547,13 +547,13 @@ class WholeFoodsTable extends Component {
             }
         }
         const arrow_container = document.querySelector('.arrow-container');
+        const median_text = document.querySelector('.js-median-text');
 
-        if(medianHousingPrices.data.median_prices.hasOwnProperty('dataset')){
+        if(medianHousingPrices.data.median_prices.hasOwnProperty('dataset') && median_text !== null){
             const arrow_svg = document.querySelector('.arrow-svg');
             const arrow_bottom_txt = document.querySelector('.median-text-btm');
             const line = document.querySelector('line');
             const polygon = document.querySelector('polygon');
-            const median_text = document.querySelector('.js-median-text');
 
 
             let medianPrice = medianHousingPrices.data.median_prices.dataset.data;
@@ -947,7 +947,10 @@ class WholeFoodsTable extends Component {
                     website = <a target="_blank" href={value.data.data.result.website}>Link</a>;
                 }
                 if(value.data.data.result.formatted_phone_number){
-                    phone = userInputData.formatted_phone_number
+                    let unformatted_phone = '';
+                    phone = userInputData.formatted_phone_number;
+                    unformatted_phone = phone.replace(/\D+/g, "");
+                    phone = <a href={'tel:'+unformatted_phone}>{phone}</a>
                 }
                 placeId = original_value.properties.PlaceId;
                 // console.log(userInputData.photos[0].photo_reference);
@@ -979,7 +982,7 @@ class WholeFoodsTable extends Component {
                             className="material-icons right">more_vert</i></span>
                         <div className="card-action">
                             <p className='card-website-directions'><a href={value.data.data.result.website} target='_blank'>website</a></p>
-                            <p className='card-website-directions'><Link to={'/busLookup/'+ placeId}>Directions</Link></p>
+                            <p className='card-website-directions'><a href={'/busLookup/'+ placeId}>Directions</a></p>
                         </div>
                     </div>
                     <div className="card-reveal">
