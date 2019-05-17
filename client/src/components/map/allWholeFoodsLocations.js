@@ -33,6 +33,8 @@ class AllWholeFoodsLocations extends Component {
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
             center: [-97.2263, 37.7091],
             zoom: 2.6,
+            minZoom: 2,
+            maxZoom: 18,
             pitch: 45,
             // minZoom: 7,
             // maxZoom: 20
@@ -100,7 +102,7 @@ class AllWholeFoodsLocations extends Component {
                 id: 'wholefoods-heat',
                 type: 'heatmap',
                 source: 'wholefoods',
-                maxzoom: 15,
+                maxzoom: 6,
                 paint: {
                     // increase weight as diameter breast height increases
                     'heatmap-weight': {
@@ -153,7 +155,7 @@ class AllWholeFoodsLocations extends Component {
                 id: 'wholefoods-point',
                 type: 'circle',
                 source: 'wholefoods',
-                minzoom: 14,
+                minzoom: 5,
                 paint: {
                     // increase the radius of the circle as the zoom level and dbh value increases
                     'circle-radius': {
@@ -166,24 +168,12 @@ class AllWholeFoodsLocations extends Component {
                             [{ zoom: 22, value: 62 }, 50],
                         ]
                     },
-                    'circle-color': {
-                        property: 'dbh',
-                        type: 'exponential',
-                        stops: [
-                            [0, 'rgba(236,222,239,0)'],
-                            [10, 'rgb(236,222,239)'],
-                            [20, 'rgb(208,209,230)'],
-                            [30, 'rgb(166,189,219)'],
-                            [40, 'rgb(103,169,207)'],
-                            [50, 'rgb(28,144,153)'],
-                            [60, 'rgb(1,108,89)']
-                        ]
-                    },
-                    'circle-stroke-color': 'green',
-                    'circle-stroke-width': 1,
+                    'circle-color': 'rgb(48,108,9)',
+                    'circle-stroke-color': 'rgb(116,255,10)',
+                    'circle-stroke-width': 3,
                     'circle-opacity': {
                         stops: [
-                            [14, 0],
+                            [14, 1],
                             [15, 1]
                         ]
                     }
@@ -200,6 +190,35 @@ class AllWholeFoodsLocations extends Component {
                     .addTo(this.map);
                 // var features = e.features[0];
             });
+
+            this.map.on('click', (e)=> {
+                const cluster = this.map.queryRenderedFeatures(e.point, { layers: ["wholefoods-heat"] });
+                const coordinates = e.lngLat;
+                const currentZoom = this.map.getZoom();
+
+                var zoom = this.map.getZoom();
+                if(zoom < 17){
+                    this.flyIntoCluster(this.map, coordinates, currentZoom);
+                }
+            })
+        });
+    }
+
+    flyIntoCluster(map, coordinates, currentZoom){
+        var zoom = map.getZoom();
+        const maxZoom = 16;
+
+        map.flyTo({
+            center: coordinates,
+            zoom: zoom < 17 ? zoom+2 : zoom,
+            bearing: 0,
+            maxZoom: 18,
+            speed: 1, // make the flying slow
+            curve: 1, // change the speed at which it zooms out
+
+            easing: function (t) {
+                return t;
+            }
         });
     }
 
