@@ -31,7 +31,7 @@ class AllWholeFoodsLocations extends Component {
         this.map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
-            center: [-97.2263, 37.7091],
+            // center: [-97.2263, 37.7091],
             zoom: 2.6,
             minZoom: 2,
             maxZoom: 18,
@@ -39,6 +39,8 @@ class AllWholeFoodsLocations extends Component {
             // minZoom: 7,
             // maxZoom: 20
         });
+
+        this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
 
         this.map.on('style.load', () => {
             // this.rotateCamera(0);
