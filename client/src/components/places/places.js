@@ -41,9 +41,9 @@ class Places extends Component {
     handleSubmit = (event) => {
         var newLoc = this.refs.location.value;
 
-        this.refs.keyword.value = '';
-        this.refs.location.value = '';
-        this.refs.range.value = '';
+        // this.refs.keyword.value = '';
+        // this.refs.location.value = '';
+        // this.refs.range.value = '';
 
         event.preventDefault();
         this.getData();
@@ -64,12 +64,34 @@ class Places extends Component {
         instances.open();
 
         this.animatePlaceholder();
+
+        let params = this.props.match.params;
+        if('location' in params && params.keyword !== '' && params.location !== ''){
+            this.setState({
+                keyword: params.keyword,
+                location: params.location
+            });
+            
+            this.refs.keyword.value = params.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            this.refs.location.value = params.location.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        let path = this.props.location.pathname;
+        if(prevProps.location.pathname !== this.props.location.pathname) {
+            if(!path.match('/crossReference/')){
+                this.refs.keyword.value = '';
+                this.refs.location.value = '';
+                this.refs.range.value = '';
+            }
+        }
     }
 
     autoComplete = (value) => {
-        this.refs.keyword.value = '';
-        this.refs.location.value = '';
-        this.refs.range.value = '';
+        // this.refs.keyword.value = '';
+        // this.refs.location.value = '';
+        // this.refs.range.value = '';
 
         this.setState({
             location: value
