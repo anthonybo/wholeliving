@@ -18,9 +18,11 @@ class AllWholeFoodsLocations extends Component {
 
         wholefoods = wholefoods.data.geoJson;
 
-        this.setState({
-            wholefoods: wholefoods
-        })
+        if(this.mounted){
+            this.setState({
+                wholefoods: wholefoods
+            })
+        }
 
         if(wholefoods !== null){
             this.createMap();
@@ -84,10 +86,6 @@ class AllWholeFoodsLocations extends Component {
             });
 
             this.map.addControl(ctrlCenter, "top-right");
-
-            // if(!document.getElementById("menu")) {
-            //     this.createMenu();
-            // }
 
             /**
              * Allow the ability to create 3D Buildings
@@ -265,7 +263,12 @@ class AllWholeFoodsLocations extends Component {
 
     componentDidMount() {
         // this.createMap();
+        this.mounted = true;
         this.getData();
+    }
+
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
