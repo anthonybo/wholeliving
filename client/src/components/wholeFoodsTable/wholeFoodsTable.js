@@ -41,12 +41,13 @@ class WholeFoodsTable extends Component {
     async getAllWholeFoods(){
         const resp = await axios('/api/wholefoods');
 
-        this.setState({
-            allWholeFoods: resp.data
-        })
-
-        this.getAllWholeFoodsCreateTable();
-        this.fancyButtons();
+        if(this.mounted) {
+            this.setState({
+                allWholeFoods: resp.data
+            })
+            this.getAllWholeFoodsCreateTable();
+            this.fancyButtons();
+        }
     }
 
     fancyButtons(){
@@ -291,14 +292,17 @@ class WholeFoodsTable extends Component {
             id: id
         });
 
-        this.setState({
-            byId: wholefoods
-        })
+        if(this.mounted){
+            this.setState({
+                byId: wholefoods
+            })
 
-        this.locationByIdTable();
-        this.housingMedian();
-        this.walkScore();
-        this.wikiData();
+            this.locationByIdTable();
+            this.housingMedian();
+            this.walkScore();
+            this.wikiData();
+        }
+
     }
 
     async locationByIdTable(){
@@ -579,12 +583,14 @@ class WholeFoodsTable extends Component {
                 </tr>)
             }
         } else {
-            arrow_container.style.display = 'none';
-            medianHousingPricesList.push(<tr className='white-text' key='0912389123'>
-                <td>No Data Available</td>
-                <td>No Data Available</td>
-            </tr>);
-            location = 'unavailable'
+            if(arrow_container !== null){
+                arrow_container.style.display = 'none';
+                medianHousingPricesList.push(<tr className='white-text' key='0912389123'>
+                    <td>No Data Available</td>
+                    <td>No Data Available</td>
+                </tr>);
+                location = 'unavailable'
+            }
         }
 
 
@@ -650,22 +656,25 @@ class WholeFoodsTable extends Component {
             walkingDesc = walkScore.data.walkscore.description;
         }
 
-        const radius = circle.getAttribute('r');
-        const diameter = Math.round(Math.PI * radius * 2);
-        const getOffset = (val = 0) => Math.round((100 - val) / 100 * diameter);
+        if(circle !== null){
+            const radius = circle.getAttribute('r');
+            const diameter = Math.round(Math.PI * radius * 2);
+            const getOffset = (val = 0) => Math.round((100 - val) / 100 * diameter);
 
-        const bikeradius = circleBike.getAttribute('r');
-        const bikediameter = Math.round(Math.PI * bikeradius * 2);
-        const bikegetOffset = (val = 0) => Math.round((100 - val) / 100 * bikediameter);
+            const bikeradius = circleBike.getAttribute('r');
+            const bikediameter = Math.round(Math.PI * bikeradius * 2);
+            const bikegetOffset = (val = 0) => Math.round((100 - val) / 100 * bikediameter);
 
-        circle.style.strokeDashoffset = getOffset(walkscoreNum);
-        circleBike.style.strokeDashoffset = bikegetOffset(bikescoreNum);
+            circle.style.strokeDashoffset = getOffset(walkscoreNum);
+            circleBike.style.strokeDashoffset = bikegetOffset(bikescoreNum);
 
-        scoreText.textContent = `${walkscoreNum}%`;
-        scoreDescText.textContent = `${walkingDesc}`;
+            scoreText.textContent = `${walkscoreNum}%`;
+            scoreDescText.textContent = `${walkingDesc}`;
 
-        scoreBikeText.textContent = `${bikescoreNum}%`;
-        scoreBikeDescText.textContent = `${bikeDesc}`;
+            scoreBikeText.textContent = `${bikescoreNum}%`;
+            scoreBikeDescText.textContent = `${bikeDesc}`;
+        }
+
     }
 
     nearByLocations(noLocations){
@@ -707,11 +716,15 @@ class WholeFoodsTable extends Component {
             //     <td>{value}</td>
             // </tr>)
         }
-        this.setState({
-            nearByLocations: nearByLocations
-        })
+        let path = this.props.location.pathname;
 
-        this.props.onNearbyCity(nearByLocations);
+        if(this.mounted && path.match('/crossReference/')) {
+            this.setState({
+                nearByLocations: nearByLocations
+            })
+
+            this.props.onNearbyCity(nearByLocations);
+        }
     }
 
     updateLocation(city){
@@ -999,12 +1012,16 @@ class WholeFoodsTable extends Component {
                 </div>
                 )
 
-                this.props.onCrossReference(userInputCards);
+                let path = this.props.location.pathname;
 
-                this.setState({
-                    userInput: userInput,
-                    userInputCards: userInputCards
-                })
+                if(this.mounted && path.match('/crossReference/')) {
+                    this.props.onCrossReference(userInputCards);
+
+                    this.setState({
+                        userInput: userInput,
+                        userInputCards: userInputCards
+                    })
+                }
             })
 
         }
@@ -1020,9 +1037,11 @@ class WholeFoodsTable extends Component {
                 items.push(<tr className='white-text' key={index}>{this.state.email !== '' ? <td onClick={() => this.addUserFavorite(value.id)}><i className='material-icons star-hover '>{star_type}</i></td> : null}<td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.properties.State}</td><td>{value.properties.Address}</td><td>{value.properties.City}</td><td>{value.properties.Zip}</td><td>{value.properties.Phone}</td><td className='tooltip'>{value.properties.Hours.substr(0,12)}<span className="tooltiptext">{value.properties.Hours}</span></td></tr>)
             }
 
-            this.setState({
-                byStateTable: items
-            })
+            if(this.mounted) {
+                this.setState({
+                    byStateTable: items
+                })
+            }
         }
     }
 

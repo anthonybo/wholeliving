@@ -60,21 +60,23 @@ class CrossReference extends Component {
             wholefoodsLimitedLength = wholefoodsLimited.features.length;
         }
 
-        this.setState({
-            wholefoods: wholefoodsLimited,
-            wholefoodsLength: wholefoodsLimitedLength,
-            keyword: userInput,
-            keywordLength: userInput.features.length,
-            center: center
-        })
-
-        if(wholefoodsLimited !== null){
-            this.createMap();
-        } else {
+        if(this.mounted){
             this.setState({
-                loading: false,
-                noResults: true
+                wholefoods: wholefoodsLimited,
+                wholefoodsLength: wholefoodsLimitedLength,
+                keyword: userInput,
+                keywordLength: userInput.features.length,
+                center: center
             })
+
+            if(wholefoodsLimited !== null){
+                this.createMap();
+            } else {
+                this.setState({
+                    loading: false,
+                    noResults: true
+                })
+            }
         }
     }
 
@@ -305,7 +307,12 @@ class CrossReference extends Component {
 
     componentDidMount() {
         // this.createMap();
+        this.mounted = true;
         this.getData();
+    }
+
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
