@@ -758,7 +758,6 @@ input:focus::-webkit-input-placeholder {
 }
 
 @media (max-width: 601px) {
-
   .input-field .prefix ~ input, .input-field .prefix ~ textarea, .input-field .prefix ~ label, .input-field .prefix ~ .validate ~ label, .input-field .prefix ~ .helper-text, .input-field .prefix ~ .autocomplete-content {
     margin-left: 0;
     width: 100%;
