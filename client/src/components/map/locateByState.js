@@ -250,10 +250,10 @@ class LocateByState extends Component {
                 if(zoom > 8){
                     // this.map.setPitch(0);
                     // this.map.easeTo(latlng, zoom, bearing, 0, options);
-                    this.map.easeTo({bearing:60, duration:3000, pitch:0});
+                    this.map.easeTo({bearing:60, duration:1200, pitch:0});
                 } else {
                     // this.map.setPitch(45);
-                    this.map.easeTo({bearing:0, duration:3000, pitch:45});
+                    this.map.easeTo({bearing:0, duration:1200, pitch:45});
                 }
             })
         });
