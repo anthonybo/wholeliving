@@ -328,7 +328,7 @@ class LocateByState extends Component {
                 .addTo(this.map);
         });
 
-        this.displayCurrentState();
+        // this.displayCurrentState();
     }
 
     componentDidMount() {
