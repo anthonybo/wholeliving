@@ -79,6 +79,7 @@ class LocateByState extends Component {
 
         let coords = [];
         let stateOutline = null;
+        let bounds;
 
         stateData.features.map ((item, index) => {
             if(item.properties.STATE_ABB == this.state.state){
@@ -95,12 +96,12 @@ class LocateByState extends Component {
                     coords = item.geometry.coordinates[0];
                 }
 
-                var bounds = new mapboxgl.LngLatBounds();
+                bounds = new mapboxgl.LngLatBounds();
 
                 coords.forEach(function(feature) {
                     bounds.extend(feature);
                 });
-
+                
                 this.map.fitBounds(bounds);
                 // this.map.setMaxBounds(bounds);
             }
@@ -110,9 +111,44 @@ class LocateByState extends Component {
             // this.rotateCamera(0);
             this.map.addControl(new mapboxgl.FullscreenControl());
 
-            // if(!document.getElementById("menu")) {
-            //     this.createMenu();
-            // }
+            class MapboxGLButtonControl {
+                constructor({
+                                className = "",
+                                title = "",
+                                eventHandler = evtHndlr
+                            }) {
+                    this._className = className;
+                    this._title = title;
+                    this._eventHandler = eventHandler;
+                }
+
+                onAdd(map) {
+                    this._btn = document.createElement("button");
+                    this._btn.className = "mapboxgl-ctrl-icon" + " " + this._className;
+                    this._btn.type = "button";
+                    this._btn.title = this._title;
+                    this._btn.onclick = this._eventHandler;
+
+                    this._container = document.createElement("div");
+                    this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+                    this._container.appendChild(this._btn);
+
+                    return this._container;
+                }
+
+                onRemove() {
+                    this._container.parentNode.removeChild(this._container);
+                    this._map = undefined;
+                }
+            }
+
+            const ctrlCenter = new MapboxGLButtonControl({
+                className: "mapbox-gl-center",
+                title: "Center camera",
+                eventHandler: ()=>{this.map.fitBounds(bounds);}
+            });
+
+            this.map.addControl(ctrlCenter, "top-right");
 
             /**
              * Allow the ability to create 3D Buildings
