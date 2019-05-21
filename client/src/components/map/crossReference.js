@@ -301,7 +301,7 @@ class CrossReference extends Component {
                 loading: false
             })
 
-            this.displayCurrentState();
+            // this.displayCurrentState();
         });
     }
 
