@@ -154,7 +154,7 @@ class Places extends Component {
     render(){
         return(
             <div className='places-container '>
-                <form className='row' onSubmit={this.handleSubmit}>
+                <form className='row' onSubmit={this.handleSubmit} autoComplete="off">
                     <div className="col s4">
                             <input id='search-keyword' className='white-text' type="search" keyword="keyword" name='keyword' ref='keyword' onChange={this.handleChange} autoComplete='off' placeholder='search keyword'/>
                     </div>
