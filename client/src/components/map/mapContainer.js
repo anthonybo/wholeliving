@@ -20,7 +20,7 @@ class MapContainer extends Component {
         let mapType = null;
 
         if(path === '/'){
-            mapType = <AllWholeFoodsLocations/>;
+            mapType = <AllWholeFoodsLocations email={this.props.email} user_id={this.props.user_id}/>;
         } else if (path === '/generalMap'){
             mapType = <GeneralMap/>
         } else if (path.match('/byState/') ){

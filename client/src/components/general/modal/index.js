@@ -90,7 +90,6 @@ class Modal extends Component {
 
                 <Login onEmailChange={this.handleEmailChange} onIdChange={this.handleIdChange}/>
             </Fragment>
-
         )
     }
 }

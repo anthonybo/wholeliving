@@ -60,7 +60,7 @@ class Homepage extends Component {
         return(
             <Fragment>
                 <Places/>
-                <MapContainer/>
+                <MapContainer email={this.state.email} user_id={this.state.user_id}/>
                 {
                     this.state.nearByLocations.length > 0 ?
                         <ul className="city-hList">
