@@ -8,7 +8,11 @@ import {withRouter} from 'react-router-dom';
 class AllWholeFoodsLocations extends Component {
 
     state = {
-        wholefoods: null
+        wholefoods: null,
+        email: '',
+        user_id: 0,
+        popup: null,
+        coords: []
     }
 
     async getData() {
@@ -29,7 +33,7 @@ class AllWholeFoodsLocations extends Component {
         }
     }
 
-    createMap(){
+     createMap =()=> {
         this.map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/anthonybo/cjsyvu6032n4u1fo9vso1qzd4',
@@ -221,16 +225,51 @@ class AllWholeFoodsLocations extends Component {
 
             this.map.on('click', 'wholefoods-point', (e) => {
                 // console.log(e.features[0].properties);
+                var favoriteElem = null;
+                var self = this;
+                if(this.state.email !== '' && this.state.user_id !== 0){
+                    var popupValues = e;
+                    let star_type = this.checkFavorites(e.features[0].id);
+                    star_type.then(doWork.bind(null, popupValues.features));
+                } else {
+                    favoriteElem = '';
+                    var popupValues = e;
+                    doWork(popupValues.features,'');
+                }
 
-                // this.createFeatureButtonLink();
-                new mapboxgl.Popup()
-                    .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>'+ '<a href="/location/'+ e.features[0].id +'">' +'Whole Foods' + '</a>' +'</b>' + '<br><b>State:</b> ' + e.features[0].properties.State + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>City:</b> ' + e.features[0].properties.City + '<br><b>Zip:</b> ' + e.features[0].properties.Zip + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
-                    .addTo(this.map);
-                // var features = e.features[0];
+                 function doWork (popValue, data) {
+                    if(data !== ''){
+                        favoriteElem = '<span id="favoriteLocation">' + data + '</span>';
+                    } else {
+                        favoriteElem = '';
+                    }
+
+                    var popup = new mapboxgl.Popup()
+                        .setLngLat(popValue[0].geometry.coordinates)
+                        .setHTML('<b>'+ '<a href="/location/'+ popValue[0].id +'">' +'Whole Foods' + '</a>' +'</b>' + '<br><b>State:</b> ' + popValue[0].properties.State + '<br><b>Address:</b> ' + popValue[0].properties.Address + '<br><b>City:</b> ' + popValue[0].properties.City + '<br><b>Zip:</b> ' + popValue[0].properties.Zip + '<br><b>Phone:</b> ' + popValue[0].properties.Phone + '<br><b>Hours:</b> ' + popValue[0].properties.Hours + '<br/>' + favoriteElem)
+                        .addTo(self.map);
+
+                    self.setState({
+                        popup: popup,
+                        coords: popValue[0].geometry.coordinates
+                    })
+                    // var features = e.features[0];
+                    if(self.state.email !== '' && self.state.user_id !== 0){
+                        var target = popValue[0].id;
+                        var elem = document.getElementById("favoriteLocation");
+                        elem.addEventListener('click', ()=>self.favoriteLocation(target));
+                    }
+
+                    if(self.state.email == ''){
+                        var elem = document.getElementById('favoriteLocation');
+                        if(elem !== null){
+                             elem.parentNode.removeChild(elem);
+                        }
+                    }
+                }
             });
 
-            this.map.on('click', (e)=> {
+            this.map.on('click', (e) => {
                 const cluster = this.map.queryRenderedFeatures(e.point, { layers: ["wholefoods-heat"] });
                 const coordinates = e.lngLat;
                 const currentZoom = this.map.getZoom();
@@ -241,6 +280,54 @@ class AllWholeFoodsLocations extends Component {
                 }
             })
         });
+    }
+
+    async checkFavorites (target) {
+        let checkFavorite = await axios.post('/api/user/check/favorites', {
+            email: this.state.email,
+            user_id: this.state.user_id,
+            location: target,
+        })
+
+        let star_type = '<i class="far fa-star"></i>';
+
+        if(checkFavorite.data.results.length > 0){
+            star_type = '<i class="fas fa-star"></i>'
+        }
+
+        return star_type;
+    }
+
+    async favoriteLocation (target) {
+        if(this.state.email !== ''){
+            let checkFavorite = await axios.post('/api/user/check/favorites', {
+                email: this.state.email,
+                user_id: this.state.user_id,
+                location: target,
+            })
+
+            if(!checkFavorite.data.results.length > 0){
+                let insertFavorite = await axios.post('/api/user/insert/favorites', {
+                    location: target,
+                    email: this.state.email,
+                    user_id: this.state.user_id
+                })
+
+            } else {
+                let removeFavorites = await axios.post('/api/user/remove/favorites', {
+                    location: target,
+                    user_id: this.state.user_id
+                })
+
+            }
+            if(this.state.popup.isOpen()){
+                this.state.popup.remove();
+                this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+                // this.flyIntoCluster(this.map, this.state.coords,this.map.getZoom() );
+            }
+        } else {
+            console.log('You must be logged in!')
+        }
     }
 
     flyIntoCluster(map, coordinates, currentZoom){
@@ -262,6 +349,13 @@ class AllWholeFoodsLocations extends Component {
     }
 
     componentDidMount() {
+        if(this.props.email !== '' && this.props.user_id !== 0){
+            this.setState({
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+        }
+
         // this.createMap();
         this.mounted = true;
         this.getData();
@@ -275,6 +369,21 @@ class AllWholeFoodsLocations extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname) {
             if(this.map !== undefined){
                 this.map.remove();
+            }
+        }
+
+        if(this.props.email !== prevState.email && this.props.user_id !== prevState.user_id){
+            this.setState( {
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+
+            if(this.map !== undefined && this.state.popup !== null){
+                if(this.state.popup.isOpen()){
+                    this.state.popup.remove();
+                    this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+                    // this.flyIntoCluster(this.map, this.state.coords,this.map.getZoom() );
+                }
             }
         }
     }
