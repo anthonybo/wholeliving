@@ -385,6 +385,19 @@ class WholeFoodsTable extends Component {
 
         userInput = userInput.data.geoJson;
 
+        for(const [index, original_value] of userInput.features.entries()){
+            let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+                user_id: this.state.user_id,
+                business_id: original_value.reference
+            })
+
+            if(checkBusinessFavorite.data.success){
+                original_value.inDB = true;
+            } else {
+                original_value.inDB = false;
+            }
+        }
+
         if(userInput.features.length > 0){
             lat = userInput.features[0].geometry.coordinates[1];
             lng = userInput.features[0].geometry.coordinates[0];
@@ -944,6 +957,7 @@ class WholeFoodsTable extends Component {
         for(const [index, original_value] of this.state.crossReferenceUserInput.features.entries()){
             // console.log(value.properties.PlaceId);
             let getMoreData = this.getDetailedData(original_value.properties.PlaceId);
+            // console.log(original_value.properties.PlaceId);
             getMoreData.then((value)=> {
                 let userInputData = value.data.data.result;
                 let hours = 'unavailable';
