@@ -738,7 +738,6 @@ app.post('/api/user/remove/favorites', async(req, res) => {
 
 app.post('/api/user/get/business/favorites', async(req, res) =>{
     try {
-        // const sql = `-- SELECT business_id FROM users_business_favorites WHERE users_id = 221 AND business_id = 'ChIJT3nDW1Dv3IARuOmZax7UU0o'`;
         const sql = `SELECT business_id FROM users_business_favorites WHERE users_id = ? AND business_id = ?`;
         let queryResults = await db.query(sql, [req.body.user_id, req.body.business_id]);
 
@@ -757,18 +756,48 @@ app.post('/api/user/get/business/favorites', async(req, res) =>{
     } catch (error) {
         res.status(500).send('Server Error');
     }
-})
+});
 
 app.post('/api/user/insert/business/favorites', async (req, res) => {
     try {
-        const sql = 'INSERT INTO `users_business_favorites` (`users_id`, `business_id`) VALUES (?, ?)';
-        let queryResults = await db.query(sql, [req.body.users_id], req.body.business_id);
+        const sql = 'INSERT INTO `users_business_favorites` (`users_id`, `business_id`, `business_name`, `business_addr`) VALUES (?, ?, ?, ?)';
+        let queryResults = await db.query(sql, [req.body.user_id, req.body.business_id, req.body.business_name, req.body.business_addr]);
+
+        res.send({
+            success: true,
+        })
 
     } catch (error) {
         res.status(500).send('Server Error');
     }
-})
+});
 
+app.post('/api/user/delete/business/favorites', async (req, res) => {
+    try {
+        const sql = `DELETE FROM users_business_favorites WHERE users_id = ? AND business_id = ?`;
+        let queryResults = await db.query(sql, [req.body.user_id, req.body.business_id]);
+
+        res.send({
+            success: true,
+        })
+    } catch(error) {
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/api/user/get/all/business/favorites', async(req, res) =>{
+    try {
+        const sql = `SELECT * FROM users_business_favorites WHERE users_id = ?`;
+        let queryResults = await db.query(sql, [req.body.user_id]);
+
+        res.send({
+            success: true,
+            queryResults
+        })
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+});
 
 
 app.get('*', (req, res) => {
