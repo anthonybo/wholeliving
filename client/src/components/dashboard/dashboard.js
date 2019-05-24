@@ -12,7 +12,8 @@ class Dashboard extends Component {
         userFavorites: [],
         usersList: [],
         adminUserFavorites: [],
-        adminUserFavoritesCurrentUser: ''
+        adminUserFavoritesCurrentUser: '',
+        userBusinessFavorites: []
     }
 
     handleEmailChange=(email)=>{
@@ -29,6 +30,39 @@ class Dashboard extends Component {
         })
 
         // this.props.onIdChange(user_id);
+    }
+
+    async getUserBusinessFavorites() {
+        let items = [];
+
+        let userFavorites = await axios.post('/api/user/get/all/business/favorites', {
+            user_id: this.state.user_id
+        });
+
+        for(let [index, value] of userFavorites.data.queryResults.entries()){
+            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeBusiness(value.business_id, value.business_name)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/busLookup/' + value.business_id}>{value.business_name}</Link></td><td>{value.business_addr}</td></tr>)
+
+        }
+
+        this.setState({
+            userBusinessFavorites: items
+        })
+    }
+
+    async removeBusiness(id, name){
+        let deleteBusiness = await axios.post('/api/user/delete/business/favorites', {
+            user_id: this.state.user_id,
+            business_id: id
+        })
+
+        M.toast({
+            html: `${name} has been removed!`,
+            displayLength: 2000,
+            classes: 'pulse, dashboard-toast'
+        })
+
+        this.getUserBusinessFavorites();
+
     }
 
     async getUserRecords(){
@@ -51,6 +85,7 @@ class Dashboard extends Component {
 
     componentDidMount() {
         this.getUserRecords();
+        this.getUserBusinessFavorites();
 
         if(this.state.email == 'admin@admin.com'){
             this.getUsers();
@@ -60,6 +95,7 @@ class Dashboard extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if(prevState.email !== this.state.email){
             this.getUserRecords();
+            this.getUserBusinessFavorites();
             if(this.state.email == 'admin@admin.com'){
                 this.getUsers();
             }
@@ -195,6 +231,26 @@ class Dashboard extends Component {
                             {this.state.userFavorites}
                             </tbody>
                         </table>
+                            : null
+                    }
+                    {
+                        this.state.userBusinessFavorites.length > 0 ?
+                         <Fragment>
+                             <hr/>
+                        <table className='responsive-table'>
+                            <thead>
+                            <tr className='white-text'>
+                                <th></th>
+                                <th>Business Name</th>
+                                <th>Location</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {this.state.userBusinessFavorites}
+                            </tbody>
+                        </table>
+                         </Fragment>
                             : null
                     }
                     {

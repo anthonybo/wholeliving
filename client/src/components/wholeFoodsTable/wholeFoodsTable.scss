@@ -233,3 +233,12 @@ line {
   border: 1px solid white;
   padding: 5px;
 }
+
+span.userBusinessFavorite {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  left: 0;
+  color: #52c7e9;
+  cursor: pointer;
+}

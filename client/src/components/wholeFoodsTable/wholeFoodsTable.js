@@ -35,7 +35,8 @@ class WholeFoodsTable extends Component {
         byStateTable: [],
         crossReferenceWFItems: [],
         locationByIdItems: [],
-        userInputCards: []
+        userInputCards: [],
+        loading: false
     }
 
     async getAllWholeFoods(){
@@ -836,7 +837,8 @@ class WholeFoodsTable extends Component {
                     wholeFoodsIndex: 0,
                     byStateTable: [],
                     crossReferenceWFItems: [],
-                    locationByIdItems: []
+                    locationByIdItems: [],
+                    loading: false
                 })
             } else if (path === '/generalMap'){
                 this.setState({
@@ -856,7 +858,8 @@ class WholeFoodsTable extends Component {
                     wholeFoodsIndex: 0,
                     byStateTable: [],
                     crossReferenceWFItems: [],
-                    locationByIdItems: []
+                    locationByIdItems: [],
+                    loading: false
                 })
 
             } else if (path.match('/byState/') ){
@@ -877,7 +880,8 @@ class WholeFoodsTable extends Component {
                     wholeFoodsIndex: 0,
                     byStatTable: [],
                     crossReferenceWFItems: [],
-                    locationByIdItems: []
+                    locationByIdItems: [],
+                    loading: false
                 })
                 this.getLocationById();
             } else if (path.match('/crossReference/')){
@@ -898,7 +902,8 @@ class WholeFoodsTable extends Component {
                     wholeFoodsIndex: 0,
                     byStateTable: [],
                     crossReferenceWFItems: [],
-                    locationByIdItems: []
+                    locationByIdItems: [],
+                    loading: false
                 })
                 this.crossReference();
             } else if (path.match('/busLookup/')){
@@ -917,7 +922,8 @@ class WholeFoodsTable extends Component {
                     wholeFoodsIndex: 0,
                     byStateTable: [],
                     crossReferenceWFItems: [],
-                    locationByIdItems: []
+                    locationByIdItems: [],
+                    loading: false
                 })
                 this.getLocationByBusId();
             }
@@ -949,96 +955,135 @@ class WholeFoodsTable extends Component {
         return detailedData;
     }
 
-    createTableEntriesForUserSelection(){
+    async createTableEntriesForUserSelection(){
         const userInput = [];
         const userInputCards = [];
         let placeId = '';
 
+        this.setState({
+            loading: true
+        })
+
         for(const [index, original_value] of this.state.crossReferenceUserInput.features.entries()){
-            // console.log(value.properties.PlaceId);
-            let getMoreData = this.getDetailedData(original_value.properties.PlaceId);
-            // console.log(original_value.properties.PlaceId);
-            getMoreData.then((value)=> {
-                let userInputData = value.data.data.result;
-                let hours = 'unavailable';
-                let website = 'unavailable';
-                let phone = 'unavailable';
-                // console.log(value.data.data.result);
-                if(value.data.data.result.opening_hours){
-                    var d = new Date();
-                    // console.log(d.getDay()-1 );
-                    hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
-                }
-                if(value.data.data.result.website) {
-                    // console.log('We have a website');
-                    website = <a target="_blank" href={value.data.data.result.website}>Link</a>;
-                }
-                if(value.data.data.result.formatted_phone_number){
-                    let unformatted_phone = '';
-                    phone = userInputData.formatted_phone_number;
-                    unformatted_phone = phone.replace(/\D+/g, "");
-                    phone = <a href={'tel:'+unformatted_phone}>{phone}</a>
-                }
-                placeId = original_value.properties.PlaceId;
-                // console.log(userInputData.photos[0].photo_reference);
-                userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+            let getMoreData = await this.getDetailedData(original_value.properties.PlaceId);
+            let value = getMoreData;
+            let userInputData = value.data.data.result;
+            let hours = 'unavailable';
+            let website = 'unavailable';
+            let phone = 'unavailable';
+            if(value.data.data.result.opening_hours){
+                var d = new Date();
+                hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
+            }
+            if(value.data.data.result.website) {
+                website = <a target="_blank" href={value.data.data.result.website}>Link</a>;
+            }
+            if(value.data.data.result.formatted_phone_number){
+                let unformatted_phone = '';
+                phone = userInputData.formatted_phone_number;
+                unformatted_phone = phone.replace(/\D+/g, "");
+                phone = <a href={'tel:'+unformatted_phone}>{phone}</a>
+            }
+            placeId = original_value.properties.PlaceId;
+            // console.log(userInputData.photos[0].photo_reference);
+            userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
 
-                let photoLink = '';
-                if('photos' in userInputData){
-                    let photoLength = userInputData.photos.length;
-                    photoLength = Math.floor(Math.random() * photoLength);
-                    photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${keys.googlePlaces}`;
-                } else {
-                    photoLink = `https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png`;
-                }
-                let reviews = [];
-                if('reviews' in userInputData){
-                    let reviewLength = userInputData.reviews.length;
-                    reviewLength = Math.floor(Math.random() * reviewLength);
-                    reviews.push(userInputData.reviews[reviewLength]);
-                }
+            let photoLink = '';
+            if('photos' in userInputData){
+                let photoLength = userInputData.photos.length;
+                photoLength = Math.floor(Math.random() * photoLength);
+                photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${keys.googlePlaces}`;
+            } else {
+                photoLink = `https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png`;
+            }
+            let reviews = [];
+            if('reviews' in userInputData){
+                let reviewLength = userInputData.reviews.length;
+                reviewLength = Math.floor(Math.random() * reviewLength);
+                reviews.push(userInputData.reviews[reviewLength]);
+            }
 
-                userInputCards.push(<div key={index} className="card">
-                    <div className="card-image waves-effect waves-block waves-light">
-                        {
-                            photoLink !== '' ? <img className="activator" src={photoLink}/> : null
-                        }
-                    </div>
-                    <div className="card-content">
-                        <span className="card-title activator grey-text text-darken-4">{userInputData.name}<i
-                            className="material-icons right">more_vert</i></span>
-                        <div className="card-action">
-                            <p className='card-website-directions'><a href={value.data.data.result.website} target='_blank'>website</a></p>
-                            <p className='card-website-directions'><a href={'/busLookup/'+ placeId}>Directions</a></p>
-                        </div>
-                    </div>
-                    <div className="card-reveal">
-                        <span className="card-title grey-text text-darken-4">{userInputData.name}<i
-                            className="material-icons right close-card">close</i></span>
-                        <hr/>
-                        <p>{'rating' in userInputData ? 'Rating: '+userInputData.rating : null}</p>
-                        <p>{phone}</p>
-                        <p>{hours !== 'unavailable' ? hours : null}</p>
-                        {reviews.length > 0 ? <hr/> : null}
-                        <p>{reviews.length > 0 ? 'Random Review:' : null}</p>
-                        <p>{reviews.length > 0 ? reviews[0].text : null}</p>
+            userInputCards.push(<div key={index} className="card">
+                <div className="card-image waves-effect waves-block waves-light">
+                    {
+                        photoLink !== '' ? <img className="activator" src={photoLink}/> : null
+                    }
+                </div>
+                <div className="card-content">
+                    {
+                        original_value.inDB ? <span onClick={() =>this.removeBusinessFavorite(original_value.properties.PlaceId)} className='userBusinessFavorite'><i className='material-icons'>star</i></span> :
+                            <span onClick={() =>this.addBusinessFavorite(original_value.properties.PlaceId,userInputData.name,original_value.properties.Address)} className='userBusinessFavorite'><i className='material-icons'>star_border</i></span>
+                    }
+                    {/*<span onClick={() =>this.addBusinessFavorite(original_value.properties.PlaceId)} className='userBusinessFavorite'><i className='material-icons'>{original_value.inDB ? 'star' : 'star_border'}</i></span>*/}
+                    <span className="card-title activator grey-text text-darken-4">{userInputData.name}<i
+                        className="material-icons right">more_vert</i></span>
+                    <div className="card-action">
+                        <p className='card-website-directions'><a href={value.data.data.result.website} target='_blank'>website</a></p>
+                        <p className='card-website-directions'><a href={'/busLookup/'+ placeId}>Directions</a></p>
                     </div>
                 </div>
-                )
+                <div className="card-reveal">
+                    <span className="card-title grey-text text-darken-4">{userInputData.name}<i
+                        className="material-icons right close-card">close</i></span>
+                    <hr/>
+                    <p>{'rating' in userInputData ? 'Rating: '+userInputData.rating : null}</p>
+                    <p>{phone}</p>
+                    <p>{hours !== 'unavailable' ? hours : null}</p>
+                    {reviews.length > 0 ? <hr/> : null}
+                    <p>{reviews.length > 0 ? 'Random Review:' : null}</p>
+                    <p>{reviews.length > 0 ? reviews[0].text : null}</p>
+                </div>
+            </div>
+            )
+        }
+        let path = this.props.location.pathname;
 
-                let path = this.props.location.pathname;
+        if(this.mounted && path.match('/crossReference/')) {
+            this.props.onCrossReference(userInputCards);
 
-                if(this.mounted && path.match('/crossReference/')) {
-                    this.props.onCrossReference(userInputCards);
+            this.setState({
+                userInput: userInput,
+                userInputCards: userInputCards,
+                loading: false
+            })
+        }
+    }
 
-                    this.setState({
-                        userInput: userInput,
-                        userInputCards: userInputCards
-                    })
-                }
+    async addBusinessFavorite(id, name, addr){
+        let insertFavorite = await axios.post('/api/user/insert/business/favorites', {
+            user_id: this.state.user_id,
+            business_id: id,
+            business_name: name,
+            business_addr: addr
+        })
+
+        this.updateBusinessFavorites();
+    }
+
+    async removeBusinessFavorite(id){
+        let removeFavorite = await axios.post('/api/user/delete/business/favorites', {
+            user_id: this.state.user_id,
+            business_id: id
+        })
+
+        this.updateBusinessFavorites();
+    }
+
+    async updateBusinessFavorites() {
+        for(const [index, original_value] of this.state.crossReferenceUserInput.features.entries()){
+            let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+                user_id: this.state.user_id,
+                business_id: original_value.reference
             })
 
+            if(checkBusinessFavorite.data.success){
+                original_value.inDB = true;
+            } else {
+                original_value.inDB = false;
+            }
         }
+
+        this.createTableEntriesForUserSelection();
     }
 
     async createTableForStates(){
@@ -1227,6 +1272,13 @@ class WholeFoodsTable extends Component {
                         </div>
                     </li>
                 </ul>
+                {
+                    this.state.loading ?
+                        <div className="progress">
+                            <div className="indeterminate"></div>
+                        </div>
+                        :null
+                }
             </Fragment>
         )
     } else if (this.state.generalMap) {
