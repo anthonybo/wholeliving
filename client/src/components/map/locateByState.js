@@ -11,7 +11,10 @@ class LocateByState extends Component {
         wholefoods: null,
         center: [-97.2263, 37.7091],
         zoom: 4,
-        state: ''
+        state: '',
+        email: '',
+        user_id: 0,
+        popup: null
     }
 
     async getData() {
@@ -62,7 +65,7 @@ class LocateByState extends Component {
         statePre.append(wfCount, stateSpan);
     }
 
-    createMap(){
+    createMap =()=> {
         // console.log(this.state.state);
         // console.log(stateData);
 
@@ -186,21 +189,6 @@ class LocateByState extends Component {
                 },
             });
 
-            // this.map.addSource("warnings", {
-            //     "type": "geojson",
-            //     "data": stateData
-            // });
-            //
-            // this.map.addLayer({
-            //     "id": "warnings",
-            //     "type": "fill",
-            //     "source": "warnings",
-            //     "paint": {
-            //         "fill-outline-color": "#fa0000",
-            //         "fill-opacity": 0.5,
-            //     }
-            // });
-
             this.map.addLayer({
                 'id': '3d-buildings',
                 'source': 'composite',
@@ -270,14 +258,48 @@ class LocateByState extends Component {
             }, 'waterway-label');
 
             this.map.on('click', 'wholefoods-point', (e) => {
-                // console.log(e.features[0].properties);
+                var favoriteElem = null;
+                var self = this;
+                if(this.state.email !== '' && this.state.user_id !== 0){
+                    var popupValues = e;
+                    let star_type = this.checkFavorites(e.features[0].id);
+                    star_type.then(doWork.bind(null, popupValues.features));
+                } else {
+                    favoriteElem = '';
+                    var popupValues = e;
+                    doWork(popupValues.features,'');
+                }
 
-                // this.createFeatureButtonLink();
-                new mapboxgl.Popup()
-                    .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>' + '<a href="/location/'+ e.features[0].id +'">' +'Whole Foods' + '</a>' + '</b>' + '<br><b>State:</b> ' + e.features[0].properties.State + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>City:</b> ' + e.features[0].properties.City + '<br><b>Zip:</b> ' + e.features[0].properties.Zip + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
-                    .addTo(this.map);
-                // var features = e.features[0];
+                function doWork (popValue, data) {
+                    if(data !== ''){
+                        favoriteElem = '<span id="favoriteLocation">' + data + '</span>';
+                    } else {
+                        favoriteElem = '';
+                    }
+
+                    var popup = new mapboxgl.Popup()
+                        .setLngLat(popValue[0].geometry.coordinates)
+                        .setHTML('<b>'+ '<a href="/location/'+ popValue[0].id +'">' +'Whole Foods' + '</a>' +'</b>' + '<br><b>State:</b> ' + popValue[0].properties.State + '<br><b>Address:</b> ' + popValue[0].properties.Address + '<br><b>City:</b> ' + popValue[0].properties.City + '<br><b>Zip:</b> ' + popValue[0].properties.Zip + '<br><b>Phone:</b> ' + popValue[0].properties.Phone + '<br><b>Hours:</b> ' + popValue[0].properties.Hours + '<br/>' + favoriteElem)
+                        .addTo(self.map);
+
+                    self.setState({
+                        popup: popup,
+                        coords: popValue[0].geometry.coordinates
+                    })
+                    // var features = e.features[0];
+                    if(self.state.email !== '' && self.state.user_id !== 0){
+                        var target = popValue[0].id;
+                        var elem = document.getElementById("favoriteLocation");
+                        elem.addEventListener('click', ()=>self.favoriteLocation(target));
+                    }
+
+                    if(self.state.email == ''){
+                        var elem = document.getElementById('favoriteLocation');
+                        if(elem !== null){
+                            elem.parentNode.removeChild(elem);
+                        }
+                    }
+                }
             });
 
             this.map.on('zoomend', (e)=>{
@@ -297,7 +319,62 @@ class LocateByState extends Component {
         // this.displayCurrentState();
     }
 
+    async checkFavorites (target) {
+        let checkFavorite = await axios.post('/api/user/check/favorites', {
+            email: this.state.email,
+            user_id: this.state.user_id,
+            location: target,
+        })
+
+        let star_type = '<i class="far fa-star"></i>';
+
+        if(checkFavorite.data.results.length > 0){
+            star_type = '<i class="fas fa-star"></i>'
+        }
+
+        return star_type;
+    }
+
+    async favoriteLocation (target) {
+        if(this.state.email !== ''){
+            let checkFavorite = await axios.post('/api/user/check/favorites', {
+                email: this.state.email,
+                user_id: this.state.user_id,
+                location: target,
+            })
+
+            if(!checkFavorite.data.results.length > 0){
+                let insertFavorite = await axios.post('/api/user/insert/favorites', {
+                    location: target,
+                    email: this.state.email,
+                    user_id: this.state.user_id
+                })
+
+            } else {
+                let removeFavorites = await axios.post('/api/user/remove/favorites', {
+                    location: target,
+                    user_id: this.state.user_id
+                })
+
+            }
+            if(this.state.popup.isOpen()){
+                this.state.popup.remove();
+                this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+                // this.flyIntoCluster(this.map, this.state.coords,this.map.getZoom() );
+            }
+        } else {
+            console.log('You must be logged in!')
+        }
+    }
+
     componentDidMount() {
+        if(this.props.email !== '' && this.props.user_id !== 0){
+            this.setState({
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+        }
+
         this.getData();
     }
 
@@ -305,6 +382,21 @@ class LocateByState extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname) {
             if(this.map !== undefined){
                 this.map.remove();
+            }
+        }
+
+        if(this.props.email !== prevState.email && this.props.user_id !== prevState.user_id){
+            this.setState( {
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+
+            if(this.map !== undefined && this.state.popup !== null){
+                if(this.state.popup.isOpen()){
+                    this.state.popup.remove();
+                    this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+                    // this.flyIntoCluster(this.map, this.state.coords,this.map.getZoom() );
+                }
             }
         }
     }
