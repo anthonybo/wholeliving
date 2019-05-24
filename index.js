@@ -736,6 +736,41 @@ app.post('/api/user/remove/favorites', async(req, res) => {
     }
 })
 
+app.post('/api/user/get/business/favorites', async(req, res) =>{
+    try {
+        // const sql = `-- SELECT business_id FROM users_business_favorites WHERE users_id = 221 AND business_id = 'ChIJT3nDW1Dv3IARuOmZax7UU0o'`;
+        const sql = `SELECT business_id FROM users_business_favorites WHERE users_id = ? AND business_id = ?`;
+        let queryResults = await db.query(sql, [req.body.user_id, req.body.business_id]);
+
+        if(queryResults.length < 1){
+            res.send({
+                success: false,
+                message: 'That business is not in the database for the current user.'
+            })
+        } else {
+            res.send({
+                success: true,
+                message: 'That business is in the database for current user.'
+            })
+        }
+
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+})
+
+app.post('/api/user/insert/business/favorites', async (req, res) => {
+    try {
+        const sql = 'INSERT INTO `users_business_favorites` (`users_id`, `business_id`) VALUES (?, ?)';
+        let queryResults = await db.query(sql, [req.body.users_id], req.body.business_id);
+
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+})
+
+
+
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
