@@ -24,7 +24,7 @@ class MapContainer extends Component {
         } else if (path === '/generalMap'){
             mapType = <GeneralMap/>
         } else if (path.match('/byState/') ){
-            mapType = <LocationByState/>;
+            mapType = <LocationByState email={this.props.email} user_id={this.props.user_id}/>;
         } else if (path.match('/location/') ){
             mapType = <LocatonById/>;
         } else if (path.match('/crossReference/')) {
