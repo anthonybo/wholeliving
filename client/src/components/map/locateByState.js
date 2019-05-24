@@ -14,7 +14,8 @@ class LocateByState extends Component {
         state: '',
         email: '',
         user_id: 0,
-        popup: null
+        popup: null,
+        coords: []
     }
 
     async getData() {
