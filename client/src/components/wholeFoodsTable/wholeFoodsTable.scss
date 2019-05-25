@@ -132,6 +132,10 @@ line {
     bottom: 0;
     right: 10px;
   }
+
+  span.userBusinessFavorite {
+    left: 10px;
+  }
 }
 
 @media (min-width: 601px) {
@@ -170,6 +174,9 @@ line {
     position: absolute;
     bottom: 0;
     right: 0;
+  }
+  span.userBusinessFavorite {
+    left: 0px;
   }
 }
 
@@ -211,6 +218,9 @@ line {
     bottom: 0;
     right: 0;
   }
+  span.userBusinessFavorite {
+    left: 0px;
+  }
 }
 
 .card .card-title {
@@ -238,7 +248,6 @@ span.userBusinessFavorite {
   position: absolute;
   bottom: 0;
   z-index: 1;
-  left: 0;
   color: #52c7e9;
   cursor: pointer;
 }
