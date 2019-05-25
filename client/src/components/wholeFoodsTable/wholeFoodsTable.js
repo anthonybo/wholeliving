@@ -815,6 +815,7 @@ class WholeFoodsTable extends Component {
             this.updateHomePageTable();
             this.createTableForStates();
             this.locationByIdTable();
+            this.crossReference();
         }
 
         if(prevProps.location.pathname !== this.props.location.pathname){
@@ -1011,9 +1012,10 @@ class WholeFoodsTable extends Component {
                 </div>
                 <div className="card-content">
                     {
-                        original_value.inDB ? <span onClick={() =>this.removeBusinessFavorite(original_value.properties.PlaceId)} className='userBusinessFavorite'><i className='material-icons'>star</i></span> :
-                            <span onClick={() =>this.addBusinessFavorite(original_value.properties.PlaceId,userInputData.name,original_value.properties.Address)} className='userBusinessFavorite'><i className='material-icons'>star_border</i></span>
+                        this.state.email !== '' ? original_value.inDB ? <span onClick={() =>this.removeBusinessFavorite(original_value.properties.PlaceId)} className='userBusinessFavorite'><i className='material-icons'>star</i></span> :
+                        <span onClick={() =>this.addBusinessFavorite(original_value.properties.PlaceId,userInputData.name,original_value.properties.Address)} className='userBusinessFavorite'><i className='material-icons'>star_border</i></span> : null
                     }
+
                     {/*<span onClick={() =>this.addBusinessFavorite(original_value.properties.PlaceId)} className='userBusinessFavorite'><i className='material-icons'>{original_value.inDB ? 'star' : 'star_border'}</i></span>*/}
                     <span className="card-title activator grey-text text-darken-4">{userInputData.name}<i
                         className="material-icons right">more_vert</i></span>
@@ -1044,6 +1046,10 @@ class WholeFoodsTable extends Component {
             this.setState({
                 userInput: userInput,
                 userInputCards: userInputCards,
+                loading: false
+            })
+        } else if(path.match('/busLookup/')) {
+            this.setState({
                 loading: false
             })
         }
@@ -1188,7 +1194,7 @@ class WholeFoodsTable extends Component {
             </Fragment>
         )
     } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
-        this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        // this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         return(
             <Fragment>
                 <ul className="collapsible popout">
