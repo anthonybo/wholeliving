@@ -13,6 +13,7 @@ const sha1 = require('sha1');
 const http = require('http');
 const path = require('path');
 const keys = require('./keys');
+// var io = require('socket.io').listen(http);
 
 const app = express();
 
