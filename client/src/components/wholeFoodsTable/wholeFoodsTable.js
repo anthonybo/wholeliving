@@ -1111,6 +1111,7 @@ class WholeFoodsTable extends Component {
     }
 
     render(){
+        let path = this.props.location.pathname;
         const items = [];
         const userInput = [];
         if(this.state.noResults){
@@ -1132,29 +1133,6 @@ class WholeFoodsTable extends Component {
         return(
             <Fragment>
                 <ul className="collapsible popout">
-                    {/*<li>*/}
-                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>Whole Foods</div>*/}
-                    {/*    <div className="collapsible-body">*/}
-                    {/*        <table className='responsive-table'>*/}
-                    {/*            <thead>*/}
-                    {/*            <tr className='white-text'>*/}
-                    {/*                {this.state.email !== '' ? <th> </th> : null}*/}
-                    {/*                <th>#</th>*/}
-                    {/*                <th>State</th>*/}
-                    {/*                <th>Address</th>*/}
-                    {/*                <th>City</th>*/}
-                    {/*                <th>Zip</th>*/}
-                    {/*                <th>Phone</th>*/}
-                    {/*                <th>Hours</th>*/}
-                    {/*            </tr>*/}
-                    {/*            </thead>*/}
-
-                    {/*            <tbody>*/}
-                    {/*            {this.state.locationByIdItems}*/}
-                    {/*            </tbody>*/}
-                    {/*        </table>*/}
-                    {/*    </div>*/}
-                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {
@@ -1193,7 +1171,7 @@ class WholeFoodsTable extends Component {
                 </ul>
             </Fragment>
         )
-    } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods){
+    } else if(this.state.crossReferenceUserInput && this.state.crossReferenceWholeFoods && path.match('/crossReference/')){
         // this.state.keyword = this.state.keyword.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         return(
             <Fragment>
@@ -1221,27 +1199,6 @@ class WholeFoodsTable extends Component {
                             </table>
                         </div>
                     </li>
-                    {/*<li>*/}
-                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.keyword} [{this.state.userInput.length}]</div>*/}
-                    {/*    <div className="collapsible-body">*/}
-                    {/*        <table className='responsive-table'>*/}
-                    {/*            <thead>*/}
-                    {/*            <tr className='white-text'>*/}
-                    {/*                <th>#</th>*/}
-                    {/*                <th>Name</th>*/}
-                    {/*                <th>Address</th>*/}
-                    {/*                <th>Phone</th>*/}
-                    {/*                <th>Hours</th>*/}
-                    {/*                <th>Website</th>*/}
-                    {/*            </tr>*/}
-                    {/*            </thead>*/}
-
-                    {/*            <tbody>*/}
-                    {/*            {this.state.userInput}*/}
-                    {/*            </tbody>*/}
-                    {/*        </table>*/}
-                    {/*    </div>*/}
-                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {
@@ -1299,27 +1256,6 @@ class WholeFoodsTable extends Component {
         return(
             <Fragment>
                 <ul className="collapsible popout">
-                    {/*<li>*/}
-                    {/*    <div className="collapsible-header"><i className="material-icons">place</i>{this.state.byBusId.data.data.result.name}</div>*/}
-                    {/*    <div className="collapsible-body">*/}
-                    {/*        <table className='responsive-table'>*/}
-                    {/*            <thead>*/}
-                    {/*            <tr className='white-text'>*/}
-                    {/*                <th>#</th>*/}
-                    {/*                <th>Name</th>*/}
-                    {/*                <th>Address</th>*/}
-                    {/*                <th>Phone</th>*/}
-                    {/*                <th>Hours</th>*/}
-                    {/*                <th>Website</th>*/}
-                    {/*            </tr>*/}
-                    {/*            </thead>*/}
-
-                    {/*            <tbody>*/}
-                    {/*            {this.state.userInput}*/}
-                    {/*            </tbody>*/}
-                    {/*        </table>*/}
-                    {/*    </div>*/}
-                    {/*</li>*/}
                     <li>
                         <div className="collapsible-header"><i className="material-icons">local_atm</i>
                             {
