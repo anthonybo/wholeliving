@@ -12,8 +12,12 @@ const fetch = require('node-fetch');
 const sha1 = require('sha1');
 const http = require('http');
 const path = require('path');
-const keys = require('./keys');
+require('dotenv').config();
 // var io = require('socket.io').listen(http);
+
+const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
+const quandl = process.env.REACT_APP_QUANDL_API_KEY;
+const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
 
 const app = express();
 
@@ -209,7 +213,7 @@ app.post('/api/places', async (req,res,next) => {
 
     try {
         // fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=16093.4&key=AIzaSyD-NNZfs0n53D0caUB0M_ERLC2n9psGZfc&keyword=${keyword}&fields=geometry,photos,formatted_address,name,opening_hours,rating`)
-        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=${keys.googlePlaces}`)
+        fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${keyword}+${location}&sensor=false&key=${googlePlaces}`)
             .then(res => res.json())
             .then(data=> {
                 data = data.results.map(item => {
@@ -254,7 +258,7 @@ app.post('/api/housing/median', async (req,res,next) => {
     //MLPAH -Median home data code
     //Documentation: https://www.quandl.com/data/ZILLOW-Zillow-Real-Estate-Research
 
-    fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=${keys.quandl}`)
+    fetch(`https://www.quandl.com/api/v3/datasets/ZILLOW/Z${req.body.zip}_MLPAH?api_key=${quandl}`)
         .then(res => res.json())
         .then(data=> {
             // console.log(data);
@@ -272,7 +276,7 @@ app.post('/api/walkscore', async (req,res,next)=>{
     let lat = req.body.lat;
     let lng = req.body.lng;
 
-    fetch(`http://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lng}&transit=1&bike=1&wsapikey=${keys.walkscore}`)
+    fetch(`http://api.walkscore.com/score?format=json&address=${address}&lat=${lat}&lon=${lng}&transit=1&bike=1&wsapikey=${walkscore}`)
         .then(res => res.json())
         .then(data=> {
             // console.log(data);
@@ -297,7 +301,7 @@ app.post('/api/wiki', async (req,res,next)=>{
 
 app.post('/api/places/details', async (req,res,next) => {
     try{
-        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry,photo,review,icon,price_level&key=${keys.googlePlaces}`)
+        fetch(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${req.body.places_id}&fields=name,rating,formatted_phone_number,opening_hours/weekday_text,website,formatted_address,geometry,photo,review,icon,price_level&key=${googlePlaces}`)
             .then(res => res.json())
             .then(data=> {
                 // console.log(data);
