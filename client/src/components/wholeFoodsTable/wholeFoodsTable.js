@@ -988,9 +988,6 @@ class WholeFoodsTable extends Component {
             placeId = original_value.properties.PlaceId;
             // console.log(userInputData.photos[0].photo_reference);
             // userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
-            const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
-            console.log(googlePlaces);
-            console.log(process.env);
 
             let photoLink = '';
             if('photos' in userInputData){
