@@ -993,7 +993,14 @@ class WholeFoodsTable extends Component {
             if('photos' in userInputData){
                 let photoLength = userInputData.photos.length;
                 photoLength = Math.floor(Math.random() * photoLength);
-                photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${keys.googlePlaces}`;
+
+                let photoSrc = await axios.post('/api/places/getImage', {
+                    photoreference: userInputData.photos[photoLength].photo_reference
+                })
+
+                photoLink = photoSrc.data.url;
+
+                // photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${googlePlaces}`;
             } else {
                 photoLink = `https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png`;
             }
