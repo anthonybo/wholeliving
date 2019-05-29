@@ -1014,7 +1014,11 @@ class WholeFoodsTable extends Component {
             userInputCards.push(<div key={index} className="card">
                 <div className="card-image waves-effect waves-block waves-light">
                     {
-                        photoLink !== '' ? <img className="activator" src={photoLink}/> : null
+                        photoLink !== '' ? <img className="activator" src={photoLink} onError={async (e)=>{ if (e.target.src !== "https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png"){
+                            e.target.onerror = null;
+                            e.target.src="https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png";}
+                        }
+                        }/> : null
                     }
                 </div>
                 <div className="card-content">
