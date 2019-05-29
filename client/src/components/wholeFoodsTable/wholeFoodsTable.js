@@ -987,7 +987,7 @@ class WholeFoodsTable extends Component {
             }
             placeId = original_value.properties.PlaceId;
             // console.log(userInputData.photos[0].photo_reference);
-            userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+            // userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
 
             let photoLink = '';
             if('photos' in userInputData){
@@ -1031,6 +1031,7 @@ class WholeFoodsTable extends Component {
                     <p>{'rating' in userInputData ? 'Rating: '+userInputData.rating : null}</p>
                     <p>{phone}</p>
                     <p>{hours !== 'unavailable' ? hours : null}</p>
+                    <p>{userInputData.formatted_address}</p>
                     {reviews.length > 0 ? <hr/> : null}
                     <p>{reviews.length > 0 ? 'Random Review:' : null}</p>
                     <p>{reviews.length > 0 ? reviews[0].text : null}</p>
