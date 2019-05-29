@@ -4,6 +4,7 @@ node_modules
 .vscode
 .DS_Store
 keys/index.js
+.env
 
 config/*.js
 !config/index.js
