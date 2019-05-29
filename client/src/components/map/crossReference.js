@@ -297,36 +297,68 @@ class CrossReference extends Component {
             });
 
             this.map.on('click', 'keyword-point', (e) => {
-                this.setState({
-                    loading: true
-                })
-                // console.log(e.features[0]);
-                let keyword = e.features[0];
-                let detailedData = this.getDetailedData(e.features[0].properties.PlaceId);
+                var favoriteElem = null;
+                var self = this;
+                if(this.state.email !== '' && this.state.user_id !== 0){
+                    let star_type = this.businessCheckFavorites(e.features[0].properties.PlaceId);
+                    star_type.then(doWork.bind(null, e.features));
+                } else {
+                    favoriteElem = '';
+                    var popupValues = e;
+                    doWork(popupValues.features,'');
+                }
 
-                detailedData.then((value)=>{
-                    let hours = 'unavailable';
-                    let website = 'unavailable';
-                    // console.log(value.data.data.result);
-                    if(value.data.data.result.opening_hours){
-                        var d = new Date();
-                        // console.log(d.getDay()-1 );
-                        hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
-                    }
-                    if(value.data.data.result.website) {
-                        // console.log('We have a website');
-                        website = '<a target="_blank" href="' + value.data.data.result.website + '">' + 'Link' + '</a>';
+                function doWork (popValue, data) {
+                    if(data !== ''){
+                        favoriteElem = '<span id="favoriteLocation">' + data + '</span>';
+                    } else {
+                        favoriteElem = '';
                     }
 
-                    new mapboxgl.Popup()
-                        .setLngLat(keyword.geometry.coordinates)
-                        .setHTML('<b>' + '<a href="/busLookup/'+ keyword.properties.PlaceId +'">' + keyword.properties.Name + '</a>' +'</b>' + '<br><b>Rating:</b> ' + keyword.properties.Rating + '<br><b>Address:</b> ' + keyword.properties.Address + '<br><b>Phone:</b> ' + value.data.data.result.formatted_phone_number + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours)
-                        .addTo(this.map);
-
-                    this.setState({
-                        loading: false
+                    self.setState({
+                        loading: true
                     })
-                })
+                    // console.log(e.features[0]);
+                    let keyword = popValue[0];
+                    let detailedData = self.getDetailedData(keyword.properties.PlaceId);
+
+                    detailedData.then((value)=>{
+                        let hours = 'unavailable';
+                        let website = 'unavailable';
+                        // console.log(value.data.data.result);
+                        if(value.data.data.result.opening_hours){
+                            var d = new Date();
+                            // console.log(d.getDay()-1 );
+                            hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
+                        }
+                        if(value.data.data.result.website) {
+                            // console.log('We have a website');
+                            website = '<a target="_blank" href="' + value.data.data.result.website + '">' + 'Link' + '</a>';
+                        }
+
+                        var popup = new mapboxgl.Popup()
+                            .setLngLat(keyword.geometry.coordinates)
+                            .setHTML('<b>' + '<a href="/busLookup/'+ keyword.properties.PlaceId +'">' + keyword.properties.Name + '</a>' +'</b>' + '<br><b>Rating:</b> ' + keyword.properties.Rating + '<br><b>Address:</b> ' + keyword.properties.Address + '<br><b>Phone:</b> ' + value.data.data.result.formatted_phone_number + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours + '<br/>' + favoriteElem)
+                            .addTo(self.map);
+
+                        self.setState({
+                            loading: false,
+                            popup: popup,
+                            coords: keyword.geometry.coordinates
+                        })
+
+                        if(self.state.email !== '' && self.state.user_id !== 0){
+                            var target = keyword.properties.PlaceId;
+                            var name = keyword.properties.Name;
+                            var address = keyword.properties.Address;
+                            var elem = document.getElementById("favoriteLocation");
+                            if(elem !== null){
+                                elem.addEventListener('click', ()=>self.businessFavoriteLocation(target,name,address));
+
+                            }
+                        }
+                    })
+                }
             });
             this.setState({
                 loading: false
@@ -334,6 +366,51 @@ class CrossReference extends Component {
 
             // this.displayCurrentState();
         });
+    }
+
+    async businessFavoriteLocation (target,name,addr) {
+        if(this.state.email !== ''){
+            let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+                user_id: this.state.user_id,
+                business_id: target
+            })
+
+            if(!checkBusinessFavorite.data.success){
+                let insertFavorite = await axios.post('/api/user/insert/business/favorites', {
+                    user_id: this.state.user_id,
+                    business_id: target,
+                    business_name: name,
+                    business_addr: addr
+                })
+            } else {
+                let removeFavorite = await axios.post('/api/user/delete/business/favorites', {
+                    user_id: this.state.user_id,
+                    business_id: target
+                })
+            }
+
+            if(this.state.popup.isOpen()){
+                this.state.popup.remove();
+                this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+            }
+        } else {
+            console.log('You must be logged in!')
+        }
+    }
+
+    async businessCheckFavorites (target) {
+        let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+            user_id: this.state.user_id,
+            business_id: target
+        })
+
+        let star_type = '<i class="far fa-star"></i>';
+
+        if(checkBusinessFavorite.data.success){
+            star_type = '<i class="fas fa-star"></i>'
+        }
+
+        return star_type;
     }
 
     async checkFavorites (target) {
@@ -366,7 +443,6 @@ class CrossReference extends Component {
                     email: this.state.email,
                     user_id: this.state.user_id
                 })
-
             } else {
                 let removeFavorites = await axios.post('/api/user/remove/favorites', {
                     location: target,
@@ -374,6 +450,7 @@ class CrossReference extends Component {
                 })
 
             }
+
             if(this.state.popup.isOpen()){
                 this.state.popup.remove();
                 this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
