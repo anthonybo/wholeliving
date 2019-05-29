@@ -77,7 +77,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='black-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item' data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="#"><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td data-label="State">{value.state}</td><td data-label="City">{value.city}</td><td data-label="Phone">{value.phone}</td><td data-label="Hours" className='tooltipdashboard'>{value.hours.substr(0,12)}<span className="tooltiptextdashboard">{value.hours}</span></td></tr>)
+            items.push(<tr className='black-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item' data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="ID"><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td data-label="State">{value.state}</td><td data-label="City">{value.city}</td><td data-label="Phone">{value.phone}</td><td data-label="Hours" className='tooltipdashboard'>{value.hours.substr(0,12)}<span className="tooltiptextdashboard">{value.hours}</span></td></tr>)
         }
 
         this.setState({
@@ -152,8 +152,9 @@ class Dashboard extends Component {
         })
 
         for(let [index, value] of userData.data.results.entries()){
-            // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item'><i className='fas fa-skull' aria-hidden="true"></i></td><td>{value.id}</td><td className='' onClick={()=> this.adminGetUsersSaves(value.email, value.id)}><span className='dashboard-admin-display-user-email'>{value.email}</span></td><td>{value.lastLogin}</td><td>{value.ipv4}</td></tr>)
+            var d = new Date(Date.parse(value.lastLogin)).toString().split(' ');
+
+            items.push(<tr key={index}><td data-label="Remove" onClick={()=> this.removeUser(value.id)} className='dashboard-remove-item'><i className='fas fa-skull' aria-hidden="true"></i></td><td data-label="Email" className='' onClick={()=> this.adminGetUsersSaves(value.email, value.id)}><span className='dashboard-admin-display-user-email'>{value.email}</span></td><td data-label="Last Login">{d[0]+' '+d[1]+', '+d[2]+' '+d[3]}</td><td data-label="IP">{value.ipv4}</td></tr>)
         }
 
         this.setState({
@@ -261,9 +262,9 @@ class Dashboard extends Component {
                             <caption className='red white-text'>Favorite Businesses</caption>
                             <thead>
                             <tr>
-                                <th className='black-text'>Remove</th>
-                                <th className='black-text'>Business Name</th>
-                                <th className='black-text'>Location</th>
+                                <th>Remove</th>
+                                <th>Business Name</th>
+                                <th>Location</th>
                             </tr>
                             </thead>
 
@@ -277,12 +278,11 @@ class Dashboard extends Component {
                     {
                         this.state.email == 'admin@admin.com' ?
                             <Fragment>
-                                <h6 className='deep-orange-text'>[Admin Display]</h6>
-                                <table className='responsive-table'>
+                                <table className='table'>
+                                    <caption className='deep-orange white-text'>[Admin Display]</caption>
                                     <thead>
-                                    <tr className='white-text'>
-                                        <th></th>
-                                        <th>#</th>
+                                    <tr>
+                                        <th>Remove</th>
                                         <th>Email</th>
                                         <th>Last Login</th>
                                         <th>IP</th>
