@@ -18,7 +18,6 @@ require('dotenv').config();
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
 const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
-console.log( walkscore );
 
 const app = express();
 
