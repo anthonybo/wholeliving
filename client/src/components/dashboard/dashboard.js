@@ -3,6 +3,7 @@ import Modal from '../general/modal';
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import './dashboard.scss';
+import redMap from './redMapSmall.jpg';
 
 class Dashboard extends Component {
 
@@ -40,7 +41,8 @@ class Dashboard extends Component {
         });
 
         for(let [index, value] of userFavorites.data.queryResults.entries()){
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeBusiness(value.business_id, value.business_name)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/busLookup/' + value.business_id}>{value.business_name}</Link></td><td>{value.business_addr}</td></tr>)
+            let currCity = value.business_addr.split(',').length == 4 ? value.business_addr.split(',')[1] : value.business_addr.split(',')[2];
+            items.push(<tr key={index}><td className='dashboard-remove-item' onClick={()=> this.removeBusiness(value.business_id, value.business_name)} data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="Business Name"><Link to={'/busLookup/' + value.business_id}>{value.business_name}</Link></td><td data-label="Location" className='black-text'>{currCity}</td></tr>)
 
         }
 
@@ -75,7 +77,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='white-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item'><i className='far fa-trash-alt' aria-hidden="true"></i></td><td><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td>{value.state}</td><td>{value.address}</td><td>{value.city}</td><td>{value.zip}</td><td>{value.phone}</td><td className='tooltip'>{value.hours.substr(0,12)}<span className="tooltiptext">{value.hours}</span></td></tr>)
+            items.push(<tr className='black-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item' data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="#"><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td data-label="State">{value.state}</td><td data-label="City">{value.city}</td><td data-label="Phone">{value.phone}</td><td data-label="Hours" className='tooltipdashboard'>{value.hours.substr(0,12)}<span className="tooltiptextdashboard">{value.hours}</span></td></tr>)
         }
 
         this.setState({
@@ -101,9 +103,28 @@ class Dashboard extends Component {
             }
         }
 
+        // if(this.props.location.pathname == '/dashboard'){
+        //     console.log('We are on the dashbaord');
+        //     const mainStyle = {
+        //         backgroundImage: 'url(' + redMap + ')',
+        //     };
+        //
+        //     let main = document.querySelector('main');
+        //     if(main !== undefined){
+        //         main.setAttribute('style', 'background: url(' + redMap + ')');
+        //     }
+        // }
+
         let adminModal = document.getElementById('dashboard-admin-modal');
         if(adminModal !== null){
             adminModal.classList.remove('closed-admin-modal');
+        }
+    }
+
+    componentWillUnmount() {
+        let main = document.querySelector('main');
+        if(main !== undefined){
+            main.setAttribute('style', '');
         }
     }
 
@@ -209,19 +230,18 @@ class Dashboard extends Component {
             return(
                 <Fragment>
                     <div className='dashboard-header'>
-                        <h4 className='dashboard-title white-text'>Hello, {this.state.email}</h4>
+                        <h4 className='dashboard-title'>Hello, {this.state.email}</h4>
                     </div>
                     {
                         this.state.userFavorites.length > 0 ?
-                        <table className='responsive-table'>
+                        <table className='table'>
+                            <caption className='green white-text'>Favorite Whole Foods</caption>
                             <thead>
-                            <tr className='white-text'>
-                                <th></th>
-                                <th>#</th>
+                            <tr>
+                                <th>Remove</th>
+                                <th>ID</th>
                                 <th>State</th>
-                                <th>Address</th>
                                 <th>City</th>
-                                <th>Zip</th>
                                 <th>Phone</th>
                                 <th>Hours</th>
                             </tr>
@@ -237,12 +257,13 @@ class Dashboard extends Component {
                         this.state.userBusinessFavorites.length > 0 ?
                          <Fragment>
                              <hr/>
-                        <table className='responsive-table'>
+                        <table className='table'>
+                            <caption className='red white-text'>Favorite Businesses</caption>
                             <thead>
-                            <tr className='white-text'>
-                                <th></th>
-                                <th>Business Name</th>
-                                <th>Location</th>
+                            <tr>
+                                <th className='black-text'>Remove</th>
+                                <th className='black-text'>Business Name</th>
+                                <th className='black-text'>Location</th>
                             </tr>
                             </thead>
 

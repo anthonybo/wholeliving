@@ -190,3 +190,8 @@ span#favoriteLocation {
   left: 47%;
   top: 0;
 }
+
+span#favoriteLocation:hover {
+  cursor: pointer;
+  color: green;
+}

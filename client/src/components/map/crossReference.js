@@ -327,13 +327,6 @@ class CrossReference extends Component {
                         loading: false
                     })
                 })
-
-                // this.createFeatureButtonLink();
-                // new mapboxgl.Popup()
-                //     .setLngLat(e.features[0].geometry.coordinates)
-                //     .setHTML('<b>'+ e.features[0].properties.Name +'</b>' + '<br><b>Rating:</b> ' + e.features[0].properties.Rating + '<br><b>Address:</b> ' + e.features[0].properties.Address + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Hours:</b> ' + e.features[0].properties.Hours)
-                //     .addTo(this.map);
-                // var features = e.features[0];
             });
             this.setState({
                 loading: false
