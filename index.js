@@ -253,6 +253,21 @@ app.post('/api/places', async (req,res,next) => {
     }
 })
 
+app.post('/api/places/getImage', async (req,res,next) => {
+    try{
+        fetch(`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${req.body.photoreference}&sensor=false&key=${googlePlaces}`)
+            .then(res => res)
+            .then(data=> {
+                res.send({
+                    success:true,
+                    url: data.url
+                });
+            })
+    } catch (error){
+        res.status(500).send('Server Error');
+    }
+})
+
 app.post('/api/housing/median', async (req,res,next) => {
     //ZHVIAH -All home data code
     //MLPAH -Median home data code
