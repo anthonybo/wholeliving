@@ -988,12 +988,22 @@ class WholeFoodsTable extends Component {
             placeId = original_value.properties.PlaceId;
             // console.log(userInputData.photos[0].photo_reference);
             // userInput.push(<tr className='white-text' key={index}><td><Link to={'/busLookup/'+ placeId}>[{index+1}]</Link></td><td>{userInputData.name}</td><td>{userInputData.formatted_address}</td><td>{phone}</td><td>{hours}</td><td>{website}</td></tr>)
+            const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
+            console.log(googlePlaces);
+            console.log(process.env);
 
             let photoLink = '';
             if('photos' in userInputData){
                 let photoLength = userInputData.photos.length;
                 photoLength = Math.floor(Math.random() * photoLength);
-                photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${keys.googlePlaces}`;
+
+                let photoSrc = await axios.post('/api/places/getImage', {
+                    photoreference: userInputData.photos[photoLength].photo_reference
+                })
+
+                photoLink = photoSrc.data.url;
+
+                // photoLink = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${userInputData.photos[photoLength].photo_reference}&sensor=false&key=${googlePlaces}`;
             } else {
                 photoLink = `https://cdn.pixabay.com/photo/2018/06/26/01/20/connection-lost-3498366_960_720.png`;
             }
