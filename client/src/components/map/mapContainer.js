@@ -30,7 +30,7 @@ class MapContainer extends Component {
         } else if (path.match('/crossReference/')) {
             mapType = <CrossReference email={this.props.email} user_id={this.props.user_id}/>;
         } else if (path.match('/busLookup/')){
-            mapType = <LocateByBusId/>
+            mapType = <LocateByBusId email={this.props.email} user_id={this.props.user_id}/>
         }
 
         return(
