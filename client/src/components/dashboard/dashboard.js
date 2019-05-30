@@ -42,7 +42,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userFavorites.data.queryResults.entries()){
             let currCity = value.business_addr.split(',').length == 4 ? value.business_addr.split(',')[1] : value.business_addr.split(',')[2];
-            items.push(<tr key={index}><td className='dashboard-remove-item' onClick={()=> this.removeBusiness(value.business_id, value.business_name)} data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="Business Name"><Link to={'/busLookup/' + value.business_id}>{value.business_name}</Link></td><td data-label="Location" className='black-text'>{currCity}</td></tr>)
+            items.push(<tr key={index} className='userBusinessFavoritesRow'><td className='dashboard-remove-item' onClick={()=> this.removeBusiness(value.business_id, value.business_name)} data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="Business Name"><Link to={'/busLookup/' + value.business_id}>{value.business_name}</Link></td><td data-label="Location" className='black-text'>{currCity}</td></tr>)
 
         }
 
@@ -77,7 +77,7 @@ class Dashboard extends Component {
 
         for(let [index, value] of userRecords.data.results.entries()){
             // console.log(value);
-            items.push(<tr className='black-text' key={index}><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item' data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="ID"><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td data-label="State">{value.state}</td><td data-label="City">{value.city}</td><td data-label="Phone">{value.phone}</td><td data-label="Hours" className='tooltipdashboard'>{value.hours.substr(0,12)}<span className="tooltiptextdashboard">{value.hours}</span></td></tr>)
+            items.push(<tr key={index} className='userWholeFoodsFavoritesRow'><td onClick={()=> this.removeItem(value.id, value.city)} className='dashboard-remove-item' data-label="Remove"><i className='far fa-trash-alt' aria-hidden="true"></i></td><td data-label="ID"><Link to={'/location/' + value.id}>[{value.id}]</Link></td><td data-label="State">{value.state}</td><td data-label="City">{value.city}</td><td data-label="Phone">{value.phone}</td><td data-label="Hours" className='tooltipdashboard'>{value.hours.substr(0,12)}<span className="tooltiptextdashboard">{value.hours}</span></td></tr>)
         }
 
         this.setState({
