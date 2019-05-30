@@ -115,6 +115,52 @@
   table-layout: fixed;
 }
 
+@keyframes  random {
+  15% { border-left: 3px solid #1c616c; }
+  30% { border-left: 3px solid #1d6e4b; }
+  45% { border-left: 3px solid rgba(157, 121, 25, 0.7); }
+  60% { border-left: 3px solid #67952a; }
+  75% { border-left: 3px solid #952f12; }
+  90% { border-left: 3px solid #952950; }
+  100% { border-left: 3px solid #322695; }
+}
+
+@keyframes wholeFoodColors {
+  0% { border-left: 3px solid #4CAF50;}
+  20% { border-left: 3px solid rgba( 76,175, 82,1); }
+  40% { border-left: 3px solid rgba(169,226,173,1); }
+  65% { border-left: 3px solid rgba(119,204,125,1); }
+  80% { border-left: 3px solid rgba( 45,148, 52,1); }
+  100% { border-left: 3px solid rgba( 21,119, 27,1); }
+}
+
+@keyframes businessColors {
+  0% { border-left: 3px solid #F44336;}
+  20% { border-left: 3px solid rgba(244, 68, 54,1); }
+  40% { border-left: 3px solid rgba(255,143,134,1); }
+  65% { border-left: 3px solid rgba(255,104, 92,1); }
+  80% { border-left: 3px solid rgba(216, 29, 15,1); }
+  100% { border-left: 3px solid rgba(169, 15,  3,1); }
+}
+
+.userWholeFoodsFavoritesRow:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.userBusinessFavoritesRow:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.userWholeFoodsFavoritesRow {
+  animation: wholeFoodColors 5s infinite;
+  -webkit-animation: wholeFoodColors 5s infinite;
+}
+
+.userBusinessFavoritesRow {
+  animation: businessColors 5s infinite;
+  -webkit-animation: businessColors 5s infinite;
+}
+
 .table caption {
   font-size: 1.5em;
   //margin: .5em 0 .75em;
@@ -124,6 +170,7 @@
   background-color: #f8f8f8;
   border: 1px solid #ddd;
   padding: .35em;
+
 }
 
 .table th,
