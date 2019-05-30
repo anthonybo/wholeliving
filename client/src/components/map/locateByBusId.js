@@ -15,7 +15,8 @@ class LocateByBusId extends Component {
         id: '',
         state: '',
         city: '',
-        directionsOpen: false
+        directionsOpen: false,
+        loading: false
     }
 
     async getData() {
@@ -323,40 +324,130 @@ class LocateByBusId extends Component {
             }, 'waterway-label');
 
             this.map.on('click', 'business-point', (e) => {
-                // console.log(e.features[0].properties);
-                let busInfo = e.features[0].properties;
-                let hours = busInfo.Hours;
-                let website = 'unavailable';
-                // console.log(value.data.data.result);
-                if(busInfo.website) {
-                    // console.log('We have a website');
-                    website = '<a target="_blank" href="' + busInfo.website + '">' + 'Link' + '</a>';
-                }
-
-                // this.createFeatureButtonLink();
-                new mapboxgl.Popup()
-                    .setLngLat(e.features[0].geometry.coordinates)
-                    .setHTML('<b>' + busInfo.Name + '</b>' + '<br><b>Rating:</b> ' + busInfo.Rating + '<br><b>Address:</b> ' + busInfo.Address + '<br><b>Phone:</b> ' + e.features[0].properties.Phone + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours )
-                    .addTo(this.map);
-                // var features = e.features[0];
+                this.createPopup(e);
             });
 
-            let busInfo = this.state.business.features[0].properties;
-            let hours = busInfo.Hours;
-            let website = 'unavailable';
-            // console.log(value.data.data.result);
-            if(busInfo.website) {
-                // console.log('We have a website');
-                website = '<a target="_blank" href="' + busInfo.website + '">' + 'Link' + '</a>';
-            }
-
-            new mapboxgl.Popup()
-                .setLngLat(this.state.business.features[0].geometry.coordinates)
-                .setHTML('<b>' + busInfo.Name + '</b>' + '<br><b>Rating:</b> ' + busInfo.Rating + '<br><b>Address:</b> ' + busInfo.Address + '<br><b>Phone:</b> ' + busInfo.Phone + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours )
-                .addTo(this.map);
+            this.createPopup(this.state.business);
         });
 
         // this.displayCurrentState();
+    }
+
+    createPopup(e){
+        let path = this.props.history.location.pathname.split('/');
+        let id = path[2];
+        var favoriteElem = null;
+        var self = this;
+        if(this.state.email !== '' && this.state.user_id !== 0){
+            let star_type = this.businessCheckFavorites(id);
+            star_type.then(doWork.bind(null, e.features));
+        } else {
+            favoriteElem = '';
+            var popupValues = e;
+            doWork(popupValues.features,'');
+        }
+
+        function doWork (popValue, data) {
+            if(data !== ''){
+                favoriteElem = '<span id="favoriteLocation">' + data + '</span>';
+            } else {
+                favoriteElem = '';
+            }
+
+            self.setState({
+                loading: true
+            })
+            let keyword = popValue[0];
+            let detailedData = self.getDetailedData(id);
+
+            detailedData.then((value)=>{
+                let hours = 'unavailable';
+                let website = 'unavailable';
+                if(value.data.data.result.opening_hours){
+                    var d = new Date();
+                    hours = value.data.data.result.opening_hours.weekday_text[d.getDay()-1 ];
+                }
+                if(value.data.data.result.website) {
+                    website = '<a target="_blank" href="' + value.data.data.result.website + '">' + 'Link' + '</a>';
+                }
+
+                var popup = new mapboxgl.Popup()
+                    .setLngLat(keyword.geometry.coordinates)
+                    .setHTML('<b>' + '<a href="/busLookup/'+ id +'">' + keyword.properties.Name + '</a>' +'</b>' + '<br><b>Rating:</b> ' + keyword.properties.Rating + '<br><b>Address:</b> ' + keyword.properties.Address + '<br><b>Phone:</b> ' + value.data.data.result.formatted_phone_number + '<br><b>Website: </b>' + website + '<br><b>Hours:</b> ' + hours + '<br/>' + favoriteElem)
+                    .addTo(self.map);
+
+                self.setState({
+                    loading: false,
+                    popup: popup,
+                    coords: keyword.geometry.coordinates
+                })
+
+                if(self.state.email !== '' && self.state.user_id !== 0){
+                    var target = id;
+                    var name = keyword.properties.Name;
+                    var address = keyword.properties.Address;
+                    var elem = document.getElementById("favoriteLocation");
+                    if(elem !== null){
+                        elem.addEventListener('click', ()=>self.businessFavoriteLocation(target,name,address));
+                    }
+                }
+            })
+        }
+    }
+
+    async businessFavoriteLocation (target,name,addr) {
+        if(this.state.email !== ''){
+            let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+                user_id: this.state.user_id,
+                business_id: target
+            })
+
+            if(!checkBusinessFavorite.data.success){
+                let insertFavorite = await axios.post('/api/user/insert/business/favorites', {
+                    user_id: this.state.user_id,
+                    business_id: target,
+                    business_name: name,
+                    business_addr: addr
+                })
+            } else {
+                let removeFavorite = await axios.post('/api/user/delete/business/favorites', {
+                    user_id: this.state.user_id,
+                    business_id: target
+                })
+            }
+
+            if(this.state.popup.isOpen()){
+                this.state.popup.remove();
+                this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+            }
+        } else {
+            console.log('You must be logged in!')
+        }
+    }
+
+    async businessCheckFavorites (target) {
+        let checkBusinessFavorite = await axios.post('/api/user/get/business/favorites', {
+            user_id: this.state.user_id,
+            business_id: target
+        })
+
+        let star_type = '<i class="far fa-star"></i>';
+
+        if(checkBusinessFavorite.data.success){
+            star_type = '<i class="fas fa-star"></i>'
+        }
+
+        return star_type;
+    }
+
+    async getDetailedData(places_id){
+        // console.log('Getting Detailed Data...')
+        let detailedData = await axios.post(`/api/places/details`, {
+            places_id: places_id
+        });
+        // console.log(detailedData);
+
+        return detailedData;
     }
 
     componentDidMount() {
@@ -367,6 +458,20 @@ class LocateByBusId extends Component {
         if(prevProps.location.pathname !== this.props.location.pathname) {
             if(this.map !== undefined){
                 this.map.remove();
+            }
+        }
+
+        if(this.props.email !== prevState.email && this.props.user_id !== prevState.user_id){
+            this.setState( {
+                email: this.props.email,
+                user_id: this.props.user_id
+            })
+
+            if(this.map !== undefined && this.state.popup !== null){
+                if(this.state.popup.isOpen()){
+                    this.state.popup.remove();
+                    this.map.fire('click', {lngLat: this.state.popup._lngLat, point: this.state.popup._pos});
+                }
             }
         }
     }

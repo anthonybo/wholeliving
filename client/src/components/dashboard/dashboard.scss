@@ -115,16 +115,6 @@
   table-layout: fixed;
 }
 
-@keyframes  random {
-  15% { border-left: 3px solid #1c616c; }
-  30% { border-left: 3px solid #1d6e4b; }
-  45% { border-left: 3px solid rgba(157, 121, 25, 0.7); }
-  60% { border-left: 3px solid #67952a; }
-  75% { border-left: 3px solid #952f12; }
-  90% { border-left: 3px solid #952950; }
-  100% { border-left: 3px solid #322695; }
-}
-
 @keyframes wholeFoodColors {
   0% { border-left: 3px solid #4CAF50;}
   20% { border-left: 3px solid rgba( 76,175, 82,1); }

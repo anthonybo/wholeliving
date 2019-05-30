@@ -354,7 +354,6 @@ class CrossReference extends Component {
                             var elem = document.getElementById("favoriteLocation");
                             if(elem !== null){
                                 elem.addEventListener('click', ()=>self.businessFavoriteLocation(target,name,address));
-
                             }
                         }
                     })
