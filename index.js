@@ -27,7 +27,7 @@ var io = require('socket.io')(server, {
     serveClient: false,
     cookie: false,
     pingInterval: 10000,
-    pingTimeout: 5000
+    pingTimeout: 60000
 });
 
 app.use( cors({
@@ -40,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'client', 'dist')));
 var userCount = 0;
 
 io.sockets.on('connection', function (socket) {
-    console.log('In socket function?', socket.id, ' ', socket.conn.remoteAddress);
+    console.log('In socket function?', socket.id);
     userCount++;
     console.log(userCount);
     io.sockets.emit('userCount', { userCount: userCount });

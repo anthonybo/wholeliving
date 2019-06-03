@@ -19,6 +19,7 @@ class App extends Component {
 
     componentDidMount() {
         const socket = io( {
+            reconnect: true,
             transports: ['polling','websocket'],
             perMessageDeflate: false,
             secure: true
