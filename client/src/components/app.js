@@ -18,7 +18,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        const socket = io("http://" + document.domain + ":" + location.port, {
+        const socket = io(document.domain + ":" + location.port, {
             transports: ['polling','websocket'],
             perMessageDeflate: false,
             secure: true
