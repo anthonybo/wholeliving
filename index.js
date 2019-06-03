@@ -13,7 +13,6 @@ const sha1 = require('sha1');
 const http = require('http');
 const path = require('path');
 require('dotenv').config();
-// var io = require('socket.io').listen(http);
 
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
@@ -21,9 +20,64 @@ const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
 
 const app = express();
 
-app.use( cors() );
+var server = http.createServer(app);
+var io = require('socket.io')(server, {
+    transports: ['polling', 'websocket'],
+    perMessageDeflate: false,
+    serveClient: false,
+    cookie: false,
+    pingInterval: 10000,
+    pingTimeout: 5000
+});
+
+app.use( cors({
+    // origin: (origin, callback) => callback(null, '*')
+}) );
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
+
+// console.log(io.sockets);
+var userCount = 0;
+
+io.sockets.on('connection', function (socket) {
+    console.log('In socket function?', socket.id, ' ', socket.conn.remoteAddress);
+    userCount++;
+    console.log(userCount);
+    io.sockets.emit('userCount', { userCount: userCount });
+    socket.on('disconnect', function() {
+        userCount--;
+        console.log(userCount);
+        io.sockets.emit('userCount', { userCount: userCount });
+    });
+});
+
+//
+// io.on('connection', function(socket) {
+//     console.log('In HEre?');
+//     // Use socket to communicate with this particular client only, sending it it's own id
+//     socket.emit('welcome', { message: 'Welcome!', id: socket.id });
+//
+//     socket.on('i am client', console.log);
+// });
+
+// io.on("connection", socket => {
+//     console.log("New client connected"), setInterval(
+//         () => getApiAndEmit(socket),
+//         10000
+//     );
+//     socket.on("disconnect", () => console.log("Client disconnected"));
+// });
+
+// setInterval( function() {
+//     // var msg = Math.random();
+//     // io.emit('message', msg);
+//     // console.log (msg);
+//
+//     var numClients = io.sockets.clients().length;
+//     console.log(numClients);
+//
+// }, 1000);
+
 
 // const parser = parse({
 //     delimiter:','
@@ -833,7 +887,7 @@ function handleError( response, error ){
 //    res.send(req.user);
 // });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('Server Running at localhost: ' + PORT);
 }).on('error', (err)=>{
     console.log('You probably already have a server running on that PORT: ' + PORT);
