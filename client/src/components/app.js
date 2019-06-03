@@ -20,7 +20,8 @@ class App extends Component {
     componentDidMount() {
         const socket = io("http://" + document.domain + ":" + location.port, {
             transports: ['polling','websocket'],
-            perMessageDeflate: false
+            perMessageDeflate: false,
+            secure: true
         });
         socket.on("userCount", data => this.setState({response: data}));
 
