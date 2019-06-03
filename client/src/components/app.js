@@ -18,12 +18,10 @@ class App extends Component {
     }
 
     componentDidMount() {
-        const url = window.location.href.split('/');
-        console.log(url[0]+'//'+url[2]);
-
-        const socket = io(url[0]+'//'+url[2], {
+        const socket = io( {
             reconnect: true,
             transports: ['polling','websocket'],
+            rejectUnauthorized: false,
             perMessageDeflate: false,
             secure: true
         });
