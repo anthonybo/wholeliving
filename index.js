@@ -26,7 +26,7 @@ var io = require('socket.io')(server, {
     serveClient: false,
     cookie: false,
     pingInterval: 10000,
-    pingTimeout: 60000
+    pingTimeout: 30000
 });
 
 app.use( cors({
