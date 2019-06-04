@@ -6,6 +6,11 @@
   "proxy": {
     "/api/*": {
       "target": "http://localhost:9000"
+    },
+    "/socket.io": {
+      "target": "http://localhost:9000/",
+      "changeOrigin": true,
+      "ws": true
     }
   },
   "scripts": {
