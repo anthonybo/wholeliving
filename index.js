@@ -41,9 +41,11 @@ var users = [];
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
     console.log( socket.request.connection.remoteAddress );
+    console.log( socket.request.connection._peername.address );
     var userInfo = {
         socketID: socket.id,
-        socketIP: socket.request.connection.remoteAddress
+        socketIP: socket.request.connection.remoteAddress,
+        socketIP2: socket.request.connection._peername.address
     }
     users.push(userInfo);
     userCount++;
@@ -898,7 +900,7 @@ function handleError( response, error ){
 //    res.send(req.user);
 // });
 
-server.listen(PORT, () => {
+server.listen(PORT,'0.0.0.0', () => {
     console.log('Server Running at localhost: ' + PORT);
 }).on('error', (err)=>{
     console.log('You probably already have a server running on that PORT: ' + PORT);
