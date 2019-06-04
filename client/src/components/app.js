@@ -26,8 +26,6 @@ class App extends Component {
             secure: true
         });
         socket.on("userCount", data => this.setState({response: data}));
-
-        
     }
 
     render(){
