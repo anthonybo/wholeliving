@@ -243,7 +243,7 @@ class Dashboard extends Component {
 
         if(this.props.users !== undefined){
             for(let [index, value] of this.props.users.entries()){
-                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td></tr>)
+                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td><td data-label="IP2">{value.socketIP2}</td></tr>)
             }
 
             this.setState({
@@ -319,6 +319,7 @@ class Dashboard extends Component {
                                     <tr>
                                         <th>ID</th>
                                         <th>IP</th>
+                                        <th>IP2</th>
                                     </tr>
                                     </thead>
 
