@@ -14,7 +14,7 @@ import io from "socket.io-client";
 
 class App extends Component {
     state = {
-        response: 0
+        response: {}
     }
 
     componentDidMount() {
@@ -54,7 +54,7 @@ class App extends Component {
                         <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
                         <Route path='/busLookup/:id' component={Homepage}/>
                         {/*<Route path='/dashboard' component={Dashboard}/>*/}
-                        <Route path='/dashboard' render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} />} />
+                        <Route path='/dashboard' render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users} />} />
 
 
                         <Route component={Error404}/>

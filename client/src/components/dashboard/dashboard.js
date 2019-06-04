@@ -15,7 +15,8 @@ class Dashboard extends Component {
         adminUserFavorites: [],
         adminUserFavoritesCurrentUser: '',
         userBusinessFavorites: [],
-        userCount: 0
+        userCount: 0,
+        users: []
     }
 
     handleEmailChange=(email)=>{
@@ -89,6 +90,7 @@ class Dashboard extends Component {
     componentDidMount() {
         this.getUserRecords();
         this.getUserBusinessFavorites();
+        this.userCount();
 
         if(this.state.email == 'admin@admin.com'){
             this.getUsers();
@@ -101,6 +103,15 @@ class Dashboard extends Component {
             this.setState({
                 userCount: this.props.userCount
             })
+            if(this.props.userCount > prevProps.userCount){
+                M.toast({
+                    html: `We have a new user!`,
+                    displayLength: 2000,
+                    classes: 'pulse, dashboard-toast'
+                })
+            }
+
+            this.userCount();
         }
 
         if(prevState.email !== this.state.email){
@@ -228,12 +239,22 @@ class Dashboard extends Component {
     }
 
     userCount =()=> {
-        var port = "Port: " + location.port;
+        let items = [];
+
+        if(this.props.users !== undefined){
+            for(let [index, value] of this.props.users.entries()){
+                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td></tr>)
+            }
+
+            this.setState({
+                users: items
+            })
+        }
+
 
     }
 
     render(){
-        // console.log(this.state.userCount , ' ' , this.props.userCount);
         if(this.state.email == ''){
             return (
                 <Fragment>
@@ -293,7 +314,21 @@ class Dashboard extends Component {
                         this.state.email == 'admin@admin.com' ?
                             <Fragment>
                                 <table className='table'>
-                                    <caption className='deep-orange white-text'>[Admin Display][{this.props.userCount}]</caption>
+                                    <caption className='pink white-text'>[Online Users] -> [{this.props.userCount}]</caption>
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IP</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {this.state.users}
+                                    </tbody>
+                                </table>
+
+                                <table className='table'>
+                                    <caption className='deep-orange white-text'>[Admin Display]</caption>
                                     <thead>
                                     <tr>
                                         <th>Remove</th>
