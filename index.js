@@ -40,26 +40,40 @@ var users = [];
 
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
-    console.log( socket.request.connection.remoteAddress );
-    console.log( socket.request.connection._peername.address );
-    var userInfo = {
-        socketID: socket.id,
-        socketIP: socket.request.connection.remoteAddress,
-        socketIP2: socket.request.connection._peername.address
-    }
-    users.push(userInfo);
-    userCount++;
-    console.log(userCount);
-    io.sockets.emit('userCount', { userCount: userCount, users: users });
-    socket.on('disconnect', function() {
-        users.map((value,index) => {
-            if(socket.id == value.socketID){
-                users.splice(index, 1);
+
+    let ipv4 = "127.0.0.1";
+    var options = {
+        host: 'ipv4bot.whatismyipaddress.com',
+        port: 80,
+        path: '/'
+    };
+
+    http.get(options, function(httpRes) {
+        httpRes.setEncoding('binary');
+        httpRes.on("data", async function(chunk) {
+            // console.log("BODY: " + chunk);
+            ipv4 = chunk;
+            var userInfo = {
+                socketID: socket.id,
+                socketIP: ipv4
             }
-        })
-        userCount--;
-        console.log(userCount);
-        io.sockets.emit('userCount', { userCount: userCount, users: users });
+            users.push(userInfo);
+            userCount++;
+            console.log(userCount);
+            io.sockets.emit('userCount', { userCount: userCount, users: users });
+            socket.on('disconnect', function() {
+                users.map((value,index) => {
+                    if(socket.id == value.socketID){
+                        users.splice(index, 1);
+                    }
+                })
+                userCount--;
+                console.log(userCount);
+                io.sockets.emit('userCount', { userCount: userCount, users: users });
+            });
+        });
+    }).on('error', function(e) {
+        console.log("error: " + e.message);
     });
 });
 
