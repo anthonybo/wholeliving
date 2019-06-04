@@ -35,18 +35,29 @@ app.use( cors({
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
-// console.log(io.sockets);
 var userCount = 0;
+var users = [];
 
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
+    console.log( socket.request.connection.remoteAddress );
+    var userInfo = {
+        socketID: socket.id,
+        socketIP: socket.request.connection.remoteAddress
+    }
+    users.push(userInfo);
     userCount++;
     console.log(userCount);
-    io.sockets.emit('userCount', { userCount: userCount });
+    io.sockets.emit('userCount', { userCount: userCount, users: users });
     socket.on('disconnect', function() {
+        users.map((value,index) => {
+            if(socket.id == value.socketID){
+                users.splice(index, 1);
+            }
+        })
         userCount--;
         console.log(userCount);
-        io.sockets.emit('userCount', { userCount: userCount });
+        io.sockets.emit('userCount', { userCount: userCount, users: users });
     });
 });
 
@@ -66,7 +77,7 @@ io.sockets.on('connection', function (socket) {
 //     );
 //     socket.on("disconnect", () => console.log("Client disconnected"));
 // });
-
+//
 // setInterval( function() {
 //     // var msg = Math.random();
 //     // io.emit('message', msg);
@@ -74,8 +85,9 @@ io.sockets.on('connection', function (socket) {
 //
 //     var numClients = io.sockets.clients().length;
 //     console.log(numClients);
+//     // console.log(io.sockets.clients().server)
 //
-// }, 1000);
+// }, 10000);
 
 
 // const parser = parse({
