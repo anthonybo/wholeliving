@@ -22,7 +22,6 @@ const app = express();
 
 var server = http.createServer(app);
 var io = require('socket.io')(server, {
-    transports: ['polling', 'websocket'],
     perMessageDeflate: false,
     serveClient: false,
     cookie: false,

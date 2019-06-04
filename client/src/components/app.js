@@ -19,26 +19,15 @@ class App extends Component {
 
     componentDidMount() {
         const url = window.location.href.split('/');
-        let newUrl = '';
-        // console.log(url[0]+'//'+url[2]);
-        if(url[0] == 'https'){
-            newUrl = 'wss://' + url[2];
-        } else {
-            newUrl = url[0]+'//'+url[2];
-        }
 
-        const socket = io( newUrl, {
+        const socket = io( {
             reconnect: true,
-            transports: ['polling','websocket'],
             perMessageDeflate: false,
             secure: true
         });
         socket.on("userCount", data => this.setState({response: data}));
 
-        socket.on('reconnect_attempt', () => {
-            console.log('In the reconnect attempt');
-            socket.io.opts.transports = ['polling', 'websocket'];
-        });
+        
     }
 
     render(){
