@@ -14,7 +14,8 @@ class Dashboard extends Component {
         usersList: [],
         adminUserFavorites: [],
         adminUserFavoritesCurrentUser: '',
-        userBusinessFavorites: []
+        userBusinessFavorites: [],
+        userCount: 0
     }
 
     handleEmailChange=(email)=>{
@@ -95,6 +96,13 @@ class Dashboard extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+
+        if(this.props.userCount !== prevProps.userCount){
+            this.setState({
+                userCount: this.props.userCount
+            })
+        }
+
         if(prevState.email !== this.state.email){
             this.getUserRecords();
             this.getUserBusinessFavorites();
@@ -219,7 +227,13 @@ class Dashboard extends Component {
         adminModal.classList.add('closed-admin-modal');
     }
 
+    userCount =()=> {
+        var port = "Port: " + location.port;
+
+    }
+
     render(){
+        // console.log(this.state.userCount , ' ' , this.props.userCount);
         if(this.state.email == ''){
             return (
                 <Fragment>
@@ -279,7 +293,7 @@ class Dashboard extends Component {
                         this.state.email == 'admin@admin.com' ?
                             <Fragment>
                                 <table className='table'>
-                                    <caption className='deep-orange white-text'>[Admin Display]</caption>
+                                    <caption className='deep-orange white-text'>[Admin Display][{this.props.userCount}]</caption>
                                     <thead>
                                     <tr>
                                         <th>Remove</th>
