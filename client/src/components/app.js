@@ -29,6 +29,7 @@ class App extends Component {
         console.log(url[2]);
 
         if(url[2] !== 'wholeliving.info'){
+            console.log('Resetting URL');
             newURL = '';
         }
 
