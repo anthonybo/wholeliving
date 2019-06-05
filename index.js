@@ -69,7 +69,17 @@ io.sockets.on('connection', function (socket) {
 });
 
 app.get('/api/user/ip', async (req,res) => {
-    console.log(req.ip);
+    console.log(req.body);
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }console.log("client IP is *********************" + ip);
+
+    console.log(ip);
     let ipv4 = "127.0.0.1";
 
     var options = {
