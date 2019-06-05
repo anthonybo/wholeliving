@@ -42,12 +42,6 @@ var users = [];
 
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
-    console.log( socket.handshake.query.IP );
-    console.log( socket.request.connection.remoteAddress );
-    console.log( socket.request.connection._peername.address );
-    console.log( socket.handshake.address );
-    console.log( socket.conn.transport.socket._socket.remoteAddress );
-    console.log( socket.handshake.headers["x-real-ip"] );
     var userInfo = {
         socketID: socket.id,
         socketIP: socket.handshake.query.IP,
@@ -76,40 +70,12 @@ app.get('/api/user/ip', async (req,res) => {
         ip = req.connection.remoteAddress;
     } else {
         ip = req.ip;
-
     }console.log("client IP is *********************" + ip);
 
     res.send({
         success: true,
         ip: ip
     })
-
-
-    // console.log(ip);
-    // let ipv4 = "127.0.0.1";
-    //
-    // var options = {
-    //     host: 'ipv4bot.whatismyipaddress.com',
-    //     port: 80,
-    //     path: '/'
-    // };
-    //
-    // http.get(options, function(httpRes) {
-    //     httpRes.setEncoding('binary');
-    //     httpRes.on("data", async function(chunk) {
-    //         ipv4 = chunk;
-    //         try {
-    //             res.send({
-    //                 success: true,
-    //                 ip: ipv4
-    //             })
-    //         } catch (error){
-    //             res.status(500).send('Server Error');
-    //         }
-    //     });
-    // }).on('error', function(e) {
-    //     console.log("error: " + e.message);
-    // });
 });
 
 //
@@ -548,17 +514,14 @@ app.post('/api/new/user', async (req,res) => {
     password = sha1(password);
 
     delete req.body.password;
-    // console.log(req.body);
-    // var ip;
-    // if (req.headers['x-forwarded-for']) {
-    //     ip = req.headers['x-forwarded-for'].split(",")[0];
-    // } else if (req.connection && req.connection.remoteAddress) {
-    //     ip = req.connection.remoteAddress;
-    // } else {
-    //     ip = req.ip;
-    // }console.log("client IP is *********************" + ip);
-    //
-    // console.log(ip);
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }console.log("client IP is *********************" + ip);
 
     var options = {
         host: 'ipv4bot.whatismyipaddress.com',
@@ -585,7 +548,7 @@ app.post('/api/new/user', async (req,res) => {
 
             try {
                 const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`, `ipv4`, `token`) VALUES (?, ?, ?, ?, ?)';
-                const inserts = [email, password, lastLogin, ipv4, generatedToken];
+                const inserts = [email, password, lastLogin, ip, generatedToken];
 
                 const query = mysql.format(sql, inserts);
 
@@ -605,6 +568,15 @@ app.post('/api/new/user', async (req,res) => {
 });
 
 app.post('/api/login', (request, response) => {
+    var ip;
+    if (request.headers['x-forwarded-for']) {
+        ip = request.headers['x-forwarded-for'].split(",")[0];
+    } else if (request.connection && request.connection.remoteAddress) {
+        ip = request.connection.remoteAddress;
+    } else {
+        ip = request.ip;
+    }console.log("client IP is *********************" + ip);
+
     try {
         const email = request.body.email;
         if (email === undefined || request.body.password === undefined) {
@@ -640,7 +612,7 @@ app.post('/api/login', (request, response) => {
 
                                 try {
                                     const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ?, token = ? WHERE id = ?`;
-                                    const inserts = [ipv4, request.body.lastLogin, generatedToken, data[0].id];
+                                    const inserts = [ip, request.body.lastLogin, generatedToken, data[0].id];
                                     const updateIpQuery = mysql.format(updateIpSql, inserts);
                                     const insertResults = db.query(updateIpQuery);
 
