@@ -27,7 +27,7 @@ class App extends Component {
     async getIP(){
         let userIP = await axios.get('/api/user/ip');
 
-        const socket = io( {
+        const socket = io('wholeliving.info', {
             reconnect: true,
             perMessageDeflate: false,
             secure: true,
