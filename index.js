@@ -34,7 +34,7 @@ app.use( cors({
 }) );
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
-app.enable('trust proxy');
+app.set('trust proxy', true);
 
 var userCount = 0;
 var users = [];
