@@ -35,19 +35,19 @@ app.use( cors({
 }) );
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
-// app.set('trust proxy', true);
+app.set('trust proxy', true);
 
 var userCount = 0;
 var users = [];
 
 io.sockets.on('connection', function (socket) {
-    console.log(socket.handshake.query.IP);
     console.log('In socket function?', socket.id);
+    console.log( socket.handshake.query.IP );
     console.log( socket.request.connection.remoteAddress );
-    // console.log( socket.request.connection._peername.address );
-    // console.log( socket.handshake.address );
-    // console.log( socket.conn.transport.socket._socket.remoteAddress );
-    // console.log( socket.handshake.headers["x-real-ip"] );
+    console.log( socket.request.connection._peername.address );
+    console.log( socket.handshake.address );
+    console.log( socket.conn.transport.socket._socket.remoteAddress );
+    console.log( socket.handshake.headers["x-real-ip"] );
     var userInfo = {
         socketID: socket.id,
         socketIP: socket.handshake.query.IP,
@@ -69,6 +69,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 app.get('/api/user/ip', async (req,res) => {
+    console.log(req.ip);
     let ipv4 = "127.0.0.1";
 
     var options = {

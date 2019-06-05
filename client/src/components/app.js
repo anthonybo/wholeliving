@@ -26,17 +26,6 @@ class App extends Component {
 
     async getIP(){
         let userIP = await axios.get('/api/user/ip');
-        // var users = [];
-        //
-        // var userInfo = {
-        //     socketID: data.socket
-        // }
-        // users.push(userInfo);
-
-        // users[users.length-1].socketIP = userIP.data.ip;
-        // delete data.socket;
-        // data.users = users;
-
 
         const socket = io( {
             reconnect: true,
