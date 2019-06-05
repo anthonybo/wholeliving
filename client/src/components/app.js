@@ -26,10 +26,8 @@ class App extends Component {
         let url = window.location.href.split('/');
         let newURL= 'wholeliving.info';
         let userIP = await axios.get('/api/user/ip');
-        console.log(url[2]);
 
         if(url[2] == 'localhost:3000'){
-            console.log('Resetting URL');
             newURL = '';
         }
 
