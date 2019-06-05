@@ -46,6 +46,7 @@ io.sockets.on('connection', function (socket) {
     console.log( socket.request.connection._peername.address );
     console.log( socket.handshake.address );
     console.log( socket.conn.transport.socket._socket.remoteAddress );
+    console.log( socket.handshake.headers["x-real-ip"] );
     var userInfo = {
         socketID: socket.id,
         socketIP: socket.request.connection.remoteAddress,
