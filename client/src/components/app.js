@@ -24,16 +24,15 @@ class App extends Component {
 
     async getIP(){
         let url = window.location.href.split('/');
+        let newURL= 'wholeliving.info';
         let userIP = await axios.get('/api/user/ip');
         console.log(url[2]);
 
         if(url[2] !== 'wholeliving.info'){
-            url = ''
-        } else {
-            url = 'wholeliving.info'
+            newURL = '';
         }
 
-        const socket = io( 'wholeliving.info', {
+        const socket = io( newURL, {
             reconnect: true,
             perMessageDeflate: false,
             secure: true,
