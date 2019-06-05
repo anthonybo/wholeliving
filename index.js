@@ -14,10 +14,6 @@ const http = require('http');
 const path = require('path');
 require('dotenv').config();
 
-console.log(process.env.NODE_ENV || 'development');
-console.log(process.env.NODE_ENV || 'development');
-
-
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
 const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
@@ -39,7 +35,7 @@ app.use( cors({
 }) );
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
-app.set('trust proxy', true);
+// app.set('trust proxy', true);
 
 var userCount = 0;
 var users = [];
