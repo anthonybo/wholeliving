@@ -33,7 +33,7 @@ class App extends Component {
             url = 'wholeliving.info'
         }
 
-        const socket = io( url, {
+        const socket = io( 'wholeliving.info', {
             reconnect: true,
             perMessageDeflate: false,
             secure: true,
