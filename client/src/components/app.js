@@ -23,7 +23,8 @@ class App extends Component {
         const socket = io( {
             reconnect: true,
             perMessageDeflate: false,
-            secure: true
+            secure: true,
+            transports: ['websocket']
         });
         socket.on("userCount", data => this.setState({response: data}));
     }

@@ -26,7 +26,8 @@ var io = require('socket.io')(server, {
     serveClient: false,
     cookie: false,
     pingInterval: 10000,
-    pingTimeout: 30000
+    pingTimeout: 30000,
+    transports: ['websocket']
 });
 
 app.use( cors({
@@ -44,6 +45,7 @@ io.sockets.on('connection', function (socket) {
     console.log( socket.request.connection.remoteAddress );
     console.log( socket.request.connection._peername.address );
     console.log( socket.handshake.address );
+    console.log( socket.conn.transport.socket._socket.remoteAddress );
     var userInfo = {
         socketID: socket.id,
         socketIP: socket.request.connection.remoteAddress,
