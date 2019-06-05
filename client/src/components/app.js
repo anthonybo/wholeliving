@@ -11,6 +11,7 @@ import './app.scss';
 import logo from '../../dist/logo_transparent2.png';
 import Error404 from './general/error404';
 import io from "socket.io-client";
+import axios from 'axios';
 
 class App extends Component {
     state = {
@@ -20,13 +21,34 @@ class App extends Component {
     componentDidMount() {
         const url = window.location.href.split('/');
 
+        this.getIP();
+    }
+
+    async getIP(){
+        let userIP = await axios.get('/api/user/ip');
+        // var users = [];
+        //
+        // var userInfo = {
+        //     socketID: data.socket
+        // }
+        // users.push(userInfo);
+
+        // users[users.length-1].socketIP = userIP.data.ip;
+        // delete data.socket;
+        // data.users = users;
+
+
         const socket = io( {
             reconnect: true,
             perMessageDeflate: false,
             secure: true,
-            transports: ['websocket']
+            transports: ['websocket'],
+            query: `IP=${userIP.data.ip}`
         });
-        socket.on("userCount", data => this.setState({response: data}));
+
+        socket.on("userCount", (data) => {
+            this.setState({response: data})
+        });
     }
 
     render(){

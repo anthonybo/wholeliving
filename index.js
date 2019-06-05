@@ -41,16 +41,16 @@ var userCount = 0;
 var users = [];
 
 io.sockets.on('connection', function (socket) {
+    console.log(socket.handshake.query.IP);
     console.log('In socket function?', socket.id);
     console.log( socket.request.connection.remoteAddress );
-    console.log( socket.request.connection._peername.address );
-    console.log( socket.handshake.address );
-    console.log( socket.conn.transport.socket._socket.remoteAddress );
-    console.log( socket.handshake.headers["x-real-ip"] );
+    // console.log( socket.request.connection._peername.address );
+    // console.log( socket.handshake.address );
+    // console.log( socket.conn.transport.socket._socket.remoteAddress );
+    // console.log( socket.handshake.headers["x-real-ip"] );
     var userInfo = {
         socketID: socket.id,
-        socketIP: socket.request.connection.remoteAddress,
-        socketIP2: socket.request.connection._peername.address
+        socketIP: socket.handshake.query.IP,
     }
     users.push(userInfo);
     userCount++;
@@ -65,6 +65,33 @@ io.sockets.on('connection', function (socket) {
         userCount--;
         console.log(userCount);
         io.sockets.emit('userCount', { userCount: userCount, users: users });
+    });
+});
+
+app.get('/api/user/ip', async (req,res) => {
+    let ipv4 = "127.0.0.1";
+
+    var options = {
+        host: 'ipv4bot.whatismyipaddress.com',
+        port: 80,
+        path: '/'
+    };
+
+    http.get(options, function(httpRes) {
+        httpRes.setEncoding('binary');
+        httpRes.on("data", async function(chunk) {
+            ipv4 = chunk;
+            try {
+                res.send({
+                    success: true,
+                    ip: ipv4
+                })
+            } catch (error){
+                res.status(500).send('Server Error');
+            }
+        });
+    }).on('error', function(e) {
+        console.log("error: " + e.message);
     });
 });
 
