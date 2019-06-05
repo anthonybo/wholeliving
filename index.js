@@ -26,7 +26,8 @@ var io = require('socket.io')(server, {
     serveClient: false,
     cookie: false,
     pingInterval: 10000,
-    pingTimeout: 30000
+    pingTimeout: 30000,
+    transports: ['websocket']
 });
 
 app.use( cors({
@@ -34,47 +35,47 @@ app.use( cors({
 }) );
 app.use( express.json() );
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
+app.set('trust proxy', true);
 
 var userCount = 0;
 var users = [];
 
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
-
-    let ipv4 = "127.0.0.1";
-    var options = {
-        host: 'ipv4bot.whatismyipaddress.com',
-        port: 80,
-        path: '/'
-    };
-
-    http.get(options, function(httpRes) {
-        httpRes.setEncoding('binary');
-        httpRes.on("data", async function(chunk) {
-            // console.log("BODY: " + chunk);
-            ipv4 = chunk;
-            var userInfo = {
-                socketID: socket.id,
-                socketIP: ipv4
+    var userInfo = {
+        socketID: socket.id,
+        socketIP: socket.handshake.query.IP,
+    }
+    users.push(userInfo);
+    userCount++;
+    console.log(userCount);
+    io.sockets.emit('userCount', { userCount: userCount, users: users });
+    socket.on('disconnect', function() {
+        users.map((value,index) => {
+            if(socket.id == value.socketID){
+                users.splice(index, 1);
             }
-            users.push(userInfo);
-            userCount++;
-            console.log(userCount);
-            io.sockets.emit('userCount', { userCount: userCount, users: users });
-            socket.on('disconnect', function() {
-                users.map((value,index) => {
-                    if(socket.id == value.socketID){
-                        users.splice(index, 1);
-                    }
-                })
-                userCount--;
-                console.log(userCount);
-                io.sockets.emit('userCount', { userCount: userCount, users: users });
-            });
-        });
-    }).on('error', function(e) {
-        console.log("error: " + e.message);
+        })
+        userCount--;
+        console.log(userCount);
+        io.sockets.emit('userCount', { userCount: userCount, users: users });
     });
+});
+
+app.get('/api/user/ip', async (req,res) => {
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }console.log("client IP is *********************" + ip);
+
+    res.send({
+        success: true,
+        ip: ip
+    })
 });
 
 //
@@ -509,21 +510,17 @@ app.post('/api/geoSpacial', async(req,res,next) => {
 
 app.post('/api/new/user', async (req,res) => {
     let {email, password, lastLogin} = req.body;
-    let ipv4 = "127.0.0.1";
     password = sha1(password);
 
     delete req.body.password;
-    // console.log(req.body);
-    // var ip;
-    // if (req.headers['x-forwarded-for']) {
-    //     ip = req.headers['x-forwarded-for'].split(",")[0];
-    // } else if (req.connection && req.connection.remoteAddress) {
-    //     ip = req.connection.remoteAddress;
-    // } else {
-    //     ip = req.ip;
-    // }console.log("client IP is *********************" + ip);
-    //
-    // console.log(ip);
+    var ip;
+    if (req.headers['x-forwarded-for']) {
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    } else if (req.connection && req.connection.remoteAddress) {
+        ip = req.connection.remoteAddress;
+    } else {
+        ip = req.ip;
+    }console.log("client IP is *********************" + ip);
 
     var options = {
         host: 'ipv4bot.whatismyipaddress.com',
@@ -531,45 +528,43 @@ app.post('/api/new/user', async (req,res) => {
         path: '/'
     };
 
-    http.get(options, function(httpRes) {
-        // console.log("status: " + httpRes.statusCode);
+    var rand = function() {
+        return Math.random().toString(36).substr(2); // remove `0.`
+    };
 
-        httpRes.on("data", async function(chunk) {
-            // console.log("BODY: " + chunk);
-            ipv4 = chunk;
+    var token = function() {
+        return rand() + rand(); // to make it longer
+    };
 
-            var rand = function() {
-                return Math.random().toString(36).substr(2); // remove `0.`
-            };
+    var generatedToken = token();
 
-            var token = function() {
-                return rand() + rand(); // to make it longer
-            };
+    try {
+        const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`, `ipv4`, `token`) VALUES (?, ?, ?, ?, ?)';
+        const inserts = [email, password, lastLogin, ip, generatedToken];
 
-            var generatedToken = token();
+        const query = mysql.format(sql, inserts);
 
-            try {
-                const sql = 'INSERT INTO `users` (`email`, `password`, `lastLogin`, `ipv4`, `token`) VALUES (?, ?, ?, ?, ?)';
-                const inserts = [email, password, lastLogin, ipv4, generatedToken];
+        const insertResults = await db.query(query);
 
-                const query = mysql.format(sql, inserts);
-
-                const insertResults = await db.query(query);
-
-                res.send({
-                    success: true,
-                    insertId: insertResults.insertId
-                })
-            } catch (error){
-                res.status(500).send('Server Error');
-            }
-        });
-    }).on('error', function(e) {
-        console.log("error: " + e.message);
-    });
+        res.send({
+            success: true,
+            insertId: insertResults.insertId
+        })
+    } catch (error){
+        res.status(500).send('Server Error');
+    }
 });
 
 app.post('/api/login', (request, response) => {
+    var ip;
+    if (request.headers['x-forwarded-for']) {
+        ip = request.headers['x-forwarded-for'].split(",")[0];
+    } else if (request.connection && request.connection.remoteAddress) {
+        ip = request.connection.remoteAddress;
+    } else {
+        ip = request.ip;
+    }console.log("client IP is *********************" + ip);
+
     try {
         const email = request.body.email;
         if (email === undefined || request.body.password === undefined) {
@@ -583,49 +578,34 @@ app.post('/api/login', (request, response) => {
             try {
                 if (!error) {
                     if (data.length === 1) {
-                        var options = {
-                            host: 'ipv4bot.whatismyipaddress.com',
-                            port: 80,
-                            path: '/'
+                        var rand = function() {
+                            return Math.random().toString(36).substr(2); // remove `0.`
                         };
 
-                        http.get(options, function(httpRes) {
-                            httpRes.on("data", async function(chunk) {
-                                var ipv4 = chunk;
+                        var token = function() {
+                            return rand() + rand(); // to make it longer
+                        };
 
-                                var rand = function() {
-                                    return Math.random().toString(36).substr(2); // remove `0.`
-                                };
+                        var generatedToken = token();
 
-                                var token = function() {
-                                    return rand() + rand(); // to make it longer
-                                };
+                        try {
+                            const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ?, token = ? WHERE id = ?`;
+                            const inserts = [ip, request.body.lastLogin, generatedToken, data[0].id];
+                            const updateIpQuery = mysql.format(updateIpSql, inserts);
+                            const insertResults = db.query(updateIpQuery);
 
-                                var generatedToken = token();
-
-                                try {
-                                    const updateIpSql = `UPDATE users SET ipv4 = ?, lastLogin = ?, token = ? WHERE id = ?`;
-                                    const inserts = [ipv4, request.body.lastLogin, generatedToken, data[0].id];
-                                    const updateIpQuery = mysql.format(updateIpSql, inserts);
-                                    const insertResults = db.query(updateIpQuery);
-
-                                    response.send({
-                                        success: true,
-                                        user: {
-                                            id: data[0].id,
-                                            email: data[0].email,
-                                            token: generatedToken,
-                                            message: 'User exists'
-                                        }
-                                    });
-                                } catch (error){
-                                    response.status(500).send('Server Error');
+                            response.send({
+                                success: true,
+                                user: {
+                                    id: data[0].id,
+                                    email: data[0].email,
+                                    token: generatedToken,
+                                    message: 'User exists'
                                 }
                             });
-                        }).on('error', function(e) {
-                            console.log("error: " + e.message);
-                        });
-
+                        } catch (error){
+                            response.status(500).send('Server Error');
+                        }
                     } else {
                         response.send({
                             success: false,
