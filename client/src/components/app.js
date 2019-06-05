@@ -28,7 +28,7 @@ class App extends Component {
         let userIP = await axios.get('/api/user/ip');
         console.log(url[2]);
 
-        if(url[2] !== 'wholeliving.info' || url[2] !== 'www.wholeliving.info'){
+        if(url[2] == 'localhost:3000'){
             console.log('Resetting URL');
             newURL = '';
         }
