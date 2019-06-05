@@ -14,6 +14,8 @@ const http = require('http');
 const path = require('path');
 require('dotenv').config();
 
+console.log(PORT);
+
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
 const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
