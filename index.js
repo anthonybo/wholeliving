@@ -14,7 +14,9 @@ const http = require('http');
 const path = require('path');
 require('dotenv').config();
 
-console.log(PORT);
+console.log(process.env.NODE_ENV || 'development');
+console.log(process.env.NODE_ENV || 'development');
+
 
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
