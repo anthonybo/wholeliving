@@ -30,7 +30,7 @@ class App extends Component {
         if(url[2] !== 'wholeliving.info'){
             url = ''
         } else {
-            url = 'wholiving.info'
+            url = 'wholeliving.info'
         }
 
         const socket = io( url, {
