@@ -69,7 +69,6 @@ io.sockets.on('connection', function (socket) {
 });
 
 app.get('/api/user/ip', async (req,res) => {
-    console.log(req.body);
     var ip;
     if (req.headers['x-forwarded-for']) {
         ip = req.headers['x-forwarded-for'].split(",")[0];
@@ -77,33 +76,40 @@ app.get('/api/user/ip', async (req,res) => {
         ip = req.connection.remoteAddress;
     } else {
         ip = req.ip;
+
     }console.log("client IP is *********************" + ip);
 
-    console.log(ip);
-    let ipv4 = "127.0.0.1";
+    res.send({
+        success: true,
+        ip: ip
+    })
 
-    var options = {
-        host: 'ipv4bot.whatismyipaddress.com',
-        port: 80,
-        path: '/'
-    };
 
-    http.get(options, function(httpRes) {
-        httpRes.setEncoding('binary');
-        httpRes.on("data", async function(chunk) {
-            ipv4 = chunk;
-            try {
-                res.send({
-                    success: true,
-                    ip: ipv4
-                })
-            } catch (error){
-                res.status(500).send('Server Error');
-            }
-        });
-    }).on('error', function(e) {
-        console.log("error: " + e.message);
-    });
+    // console.log(ip);
+    // let ipv4 = "127.0.0.1";
+    //
+    // var options = {
+    //     host: 'ipv4bot.whatismyipaddress.com',
+    //     port: 80,
+    //     path: '/'
+    // };
+    //
+    // http.get(options, function(httpRes) {
+    //     httpRes.setEncoding('binary');
+    //     httpRes.on("data", async function(chunk) {
+    //         ipv4 = chunk;
+    //         try {
+    //             res.send({
+    //                 success: true,
+    //                 ip: ipv4
+    //             })
+    //         } catch (error){
+    //             res.status(500).send('Server Error');
+    //         }
+    //     });
+    // }).on('error', function(e) {
+    //     console.log("error: " + e.message);
+    // });
 });
 
 //
