@@ -11,12 +11,15 @@ const request = require('request');
 const fetch = require('node-fetch');
 const sha1 = require('sha1');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 require('dotenv').config();
 
 const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
 const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
+
+
 
 const app = express();
 

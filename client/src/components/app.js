@@ -19,15 +19,19 @@ class App extends Component {
     }
 
     componentDidMount() {
-        const url = window.location.href.split('/');
-
         this.getIP();
     }
 
     async getIP(){
+        let url = window.location.href.split('/');
+        let newURL= 'wholeliving.info';
         let userIP = await axios.get('/api/user/ip');
 
-        const socket = io( {
+        if(url[2] == 'localhost:3000'){
+            newURL = '';
+        }
+
+        const socket = io( newURL, {
             reconnect: true,
             perMessageDeflate: false,
             secure: true,
