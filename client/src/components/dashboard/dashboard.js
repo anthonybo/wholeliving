@@ -4,6 +4,7 @@ import axios from 'axios';
 import {Link} from "react-router-dom";
 import './dashboard.scss';
 import redMap from './redMapSmall.jpg';
+import UserMap from '../map/userMap';
 
 class Dashboard extends Component {
 
@@ -243,7 +244,7 @@ class Dashboard extends Component {
 
         if(this.props.users !== undefined){
             for(let [index, value] of this.props.users.entries()){
-                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td></tr>)
+                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td><td data-label="City">{value.city}</td><td data-label="State">{value.state}</td><td data-label="Address">{value.house_number + ' ' + value.road}</td></tr>)
             }
 
             this.setState({
@@ -311,12 +312,16 @@ class Dashboard extends Component {
                     {
                         this.state.email == 'admin@admin.com' ?
                             <Fragment>
+                                {/*<UserMap users={this.props.users}/>*/}
                                 <table className='table'>
                                     <caption className='pink white-text'>[Online Users] -> [{this.props.userCount}]</caption>
                                     <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>IP</th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                        <th>Address</th>
                                     </tr>
                                     </thead>
 
@@ -326,7 +331,7 @@ class Dashboard extends Component {
                                 </table>
 
                                 <table className='table'>
-                                    <caption className='deep-orange white-text'>[Admin Display]</caption>
+                                    <caption className='deep-orange white-text'>[Registered Users]</caption>
                                     <thead>
                                     <tr>
                                         <th>Remove</th>

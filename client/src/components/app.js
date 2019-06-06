@@ -19,16 +19,37 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.getIP();
+        this.getLocation();
+
     }
 
-    async getIP(){
+    async getIP(locationData){
         let url = window.location.href.split('/');
         let newURL= 'wholeliving.info';
         let userIP = await axios.get('/api/user/ip');
+        let city = '';
+        let state = '';
+        let lat = '';
+        let lng = '';
+        let house_number = '';
+        let road = '';
 
         if(url[2] == 'localhost:3000'){
             newURL = '';
+        }
+
+        if(locationData == undefined){
+            city = 'denied';
+            state = 'denied';
+            road = 'denied';
+        } else {
+            // console.log(locationData);
+            city = locationData.data.address.city;
+            state = locationData.data.address.state;
+            house_number = locationData.data.address.house_number;
+            road = locationData.data.address.road;
+            lat = locationData.data.lat;
+            lng = locationData.data.lon;
         }
 
         const socket = io( newURL, {
@@ -36,12 +57,45 @@ class App extends Component {
             perMessageDeflate: false,
             secure: true,
             transports: ['websocket'],
-            query: `IP=${userIP.data.ip}`
+            query: `IP=${userIP.data.ip}`,
         });
+
+        socket.emit('location', {city: city, state: state, lat: lat, lng: lng, house_number: house_number, road:road });
 
         socket.on("userCount", (data) => {
             this.setState({response: data})
         });
+
+        socket.on("reconnect_attempt", (data) => {
+            // console.log('Reconnection occurring');
+            // socket.emit('disconnectALL', {data: data});
+            // this.getLocation();
+
+            location.reload();
+        });
+    }
+
+    async getLocation() {
+        var options = {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: Infinity
+        }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position, error, options)=>{
+                // console.log(position);
+                var locationData = await axios.post('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + position.coords.latitude + '&lon=' + position.coords.longitude + '&zoom=18&addressdetails=1',{
+                    dataType: 'json',
+                });
+                this.getIP(locationData);
+                return locationData;
+                }, (error) => {
+                this.getIP();
+            });
+        } else {
+            console.log("Geolocation is not supported by this browser.");
+            this.getIP();
+        }
     }
 
     render(){
@@ -70,7 +124,7 @@ class App extends Component {
                         <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
                         <Route path='/busLookup/:id' component={Homepage}/>
                         {/*<Route path='/dashboard' component={Dashboard}/>*/}
-                        <Route path='/dashboard' render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users} />} />
+                        <Route path='/dashboard' render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users}/>} />
 
 
                         <Route component={Error404}/>

@@ -19,8 +19,6 @@ const googlePlaces = process.env.REACT_APP_GOOGLE_API_KEY;
 const quandl = process.env.REACT_APP_QUANDL_API_KEY;
 const walkscore = process.env.REACT_APP_WALKSCORE_API_KEY;
 
-
-
 const app = express();
 
 var server = http.createServer(app);
@@ -45,14 +43,26 @@ var users = [];
 
 io.sockets.on('connection', function (socket) {
     console.log('In socket function?', socket.id);
-    var userInfo = {
-        socketID: socket.id,
-        socketIP: socket.handshake.query.IP,
-    }
-    users.push(userInfo);
+    console.log('Length**************:',io.engine.clientsCount);
     userCount++;
-    console.log(userCount);
-    io.sockets.emit('userCount', { userCount: userCount, users: users });
+    socket.on('location', function(data) {
+        // console.log(data);
+        // console.log(socket.handshake);
+        var userInfo = {
+            socketID: socket.id,
+            socketIP: socket.handshake.query.IP,
+            city: data.city,
+            state: data.state,
+            lat: data.lat,
+            lng: data.lng,
+            house_number: data.house_number,
+            road: data.road
+        }
+        users.push(userInfo);
+
+        io.sockets.emit('userCount', { userCount: io.engine.clientsCount, users: users });
+    });
+
     socket.on('disconnect', function() {
         users.map((value,index) => {
             if(socket.id == value.socketID){
@@ -60,9 +70,19 @@ io.sockets.on('connection', function (socket) {
             }
         })
         userCount--;
-        console.log(userCount);
-        io.sockets.emit('userCount', { userCount: userCount, users: users });
+        // console.log(userCount);
+        console.log('Length**************:',io.engine.clientsCount);
+        io.sockets.emit('userCount', { userCount: io.engine.clientsCount, users: users });
     });
+
+    socket.on('disconnectALL', function(data) {
+        console.log('Reconnect****',data);
+        Object.keys(io.sockets.sockets).forEach(function(s) {
+            // console.log('Disconnect: ',s)
+            // console.log(io.sockets.sockets[s]);
+            io.sockets.sockets[s].disconnect(true);
+        });
+    })
 });
 
 app.get('/api/user/ip', async (req,res) => {
@@ -80,35 +100,6 @@ app.get('/api/user/ip', async (req,res) => {
         ip: ip
     })
 });
-
-//
-// io.on('connection', function(socket) {
-//     console.log('In HEre?');
-//     // Use socket to communicate with this particular client only, sending it it's own id
-//     socket.emit('welcome', { message: 'Welcome!', id: socket.id });
-//
-//     socket.on('i am client', console.log);
-// });
-
-// io.on("connection", socket => {
-//     console.log("New client connected"), setInterval(
-//         () => getApiAndEmit(socket),
-//         10000
-//     );
-//     socket.on("disconnect", () => console.log("Client disconnected"));
-// });
-//
-// setInterval( function() {
-//     // var msg = Math.random();
-//     // io.emit('message', msg);
-//     // console.log (msg);
-//
-//     var numClients = io.sockets.clients().length;
-//     console.log(numClients);
-//     // console.log(io.sockets.clients().server)
-//
-// }, 10000);
-
 
 // const parser = parse({
 //     delimiter:','
