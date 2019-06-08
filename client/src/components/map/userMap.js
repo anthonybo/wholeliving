@@ -99,6 +99,46 @@ class userMap extends Component {
         this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
 
         this.map.on('style.load', () => {
+            class MapboxGLButtonControl {
+                constructor({
+                                className = "",
+                                title = "",
+                                eventHandler = evtHndlr
+                            }) {
+                    this._className = className;
+                    this._title = title;
+                    this._eventHandler = eventHandler;
+                }
+
+                onAdd(map) {
+                    this._btn = document.createElement("button");
+                    this._btn.className = "mapboxgl-ctrl-icon" + " " + this._className;
+                    this._btn.type = "button";
+                    this._btn.title = this._title;
+                    this._btn.onclick = this._eventHandler;
+
+                    this._container = document.createElement("div");
+                    this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+                    this._container.appendChild(this._btn);
+
+                    return this._container;
+                }
+
+                onRemove() {
+                    this._container.parentNode.removeChild(this._container);
+                    this._map = undefined;
+                }
+            }
+
+            const ctrlCenter = new MapboxGLButtonControl({
+                className: "mapbox-gl-center",
+                title: "Center camera",
+                eventHandler: ()=>{this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);}
+            });
+
+            this.map.addControl(ctrlCenter, "top-left");
+
+
             /**
              * Allow the ability to create 3D Buildings
              * */
@@ -196,7 +236,33 @@ class userMap extends Component {
                     .addTo(this.map);
             });
 
+            this.map.on('click', (e) => {
+                const coordinates = e.lngLat;
+                const currentZoom = this.map.getZoom();
 
+                var zoom = this.map.getZoom();
+                if(zoom < 17){
+                    this.flyIntoCluster(this.map, coordinates, currentZoom);
+                }
+            });
+        });
+    }
+
+    flyIntoCluster(map, coordinates, currentZoom){
+        var zoom = map.getZoom();
+        const maxZoom = 16;
+
+        map.flyTo({
+            center: coordinates,
+            zoom: zoom < 17 ? zoom+2 : zoom,
+            bearing: 0,
+            maxZoom: 18,
+            speed: 1, // make the flying slow
+            curve: 1, // change the speed at which it zooms out
+
+            easing: function (t) {
+                return t;
+            }
         });
     }
 
