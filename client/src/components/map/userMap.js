@@ -5,27 +5,26 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIze
 class userMap extends Component {
 
     state = {
-        usersObj: {}
+        usersObj: {},
+        userCount: 0
     }
 
     createUserData() {
         if(this.props.users !== undefined){
-            console.log(this.props.users)
-
-            let users = this.props.users;
-
+            let users = JSON.parse(JSON.stringify(this.props.users));
             users = users.map(item =>{
                 if(item.lat !== ''){
-                    console.log(item)
                     item.type = "Feature",
                         item.geometry = {
                             type:"Point",
                             coordinates:[item.lng, item.lat]
                         };
                     item.properties = {
-                        Address: item['house_number']+item['road'],
+                        Address: item['house_number']+ ' ' +item['road'],
                         City: item['city'],
                         State: item['state'],
+                        SocketIP: item.socketIP,
+                        SocketID: item.socketID
                     }
 
                     delete item.lng;
@@ -34,9 +33,34 @@ class userMap extends Component {
                     delete item.house_number;
                     delete item.city;
                     delete item.state;
+                    delete item.socketID;
+                    delete item.socketIP;
                     return item;
                 }
             })
+
+            for(var index = 0; index < users.length; index++){
+                if (users[index] == undefined){
+                    users.splice(index, 1);
+                }
+            }
+
+            // if(this.map !== undefined){
+            //     // console.log('Map Exists!');
+            //     var testRec = {
+            //         type: "Feature",
+            //         geometry: {
+            //             type:"Point",
+            //             coordinates:[-111.641, 35.1913]
+            //         },
+            //     properties: {
+            //         Address: 'test',
+            //         City: 'test',
+            //         State: 'test',
+            //     }
+            //     }
+            //     users.push(testRec)
+            // }
 
             var usersObj = {
                 geoJson: {
@@ -45,9 +69,19 @@ class userMap extends Component {
                 }
             }
 
+            usersObj = usersObj.geoJson;
+
             this.setState({
-                usersObj: usersObj
+                usersObj: usersObj,
+                userCount: usersObj.features.length
             })
+
+            if(this.map !== undefined){
+                // console.log('Map Exists!');
+                this.map.getSource('users').setData(usersObj);
+            } else {
+                this.createMap();
+            }
         }
     }
 
@@ -114,6 +148,15 @@ class userMap extends Component {
                 data: this.state.usersObj
             });
 
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
             // add circle layer here
             this.map.addLayer({
                 id: 'user-point',
@@ -132,8 +175,8 @@ class userMap extends Component {
                             [{ zoom: 22, value: 62 }, 50],
                         ]
                     },
-                    'circle-color': 'rgb(48,108,9)',
-                    'circle-stroke-color': 'rgb(116,255,10)',
+                    'circle-color': getRandomColor(),
+                    'circle-stroke-color': getRandomColor(),
                     'circle-stroke-width': 3,
                     'circle-opacity': {
                         stops: [
@@ -145,7 +188,12 @@ class userMap extends Component {
             }, 'waterway-label');
 
             this.map.on('click', 'user-point', (e) => {
+                e = e.features[0];
 
+                var popup = new mapboxgl.Popup()
+                    .setLngLat(e.geometry.coordinates)
+                    .setHTML('<b>City:</b> ' + e.properties.City + '<br><b>State:</b> ' + e.properties.State + '<br><b>Address:</b> ' + e.properties.Address + '<br><b>IP:</b> ' + e.properties.SocketIP + '<br><b>Socket:</b> ' + e.properties.SocketID)
+                    .addTo(this.map);
             });
 
 
@@ -157,17 +205,19 @@ class userMap extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log(prevProps.users , ' ' , this.props.users)
         if(prevProps.users !== this.props.users){
             this.createUserData();
         }
+
+        // if(this.map !== undefined){
+        //     console.log('Map Exists!')
+        // }
     }
 
     render(){
         return(
             <div id='map'>
-                <span className="new badge red" data-badge-caption="Found">5</span>
-                <span className="new badge green" data-badge-caption="Found">10</span>
+                <span className="new badge green" data-badge-caption="Found">{this.state.userCount}</span>
             </div>
         )
     }
