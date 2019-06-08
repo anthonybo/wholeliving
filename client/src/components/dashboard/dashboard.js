@@ -312,7 +312,7 @@ class Dashboard extends Component {
                     {
                         this.state.email == 'admin@admin.com' ?
                             <Fragment>
-                                {/*<UserMap users={this.props.users}/>*/}
+                                <UserMap users={this.props.users}/>
                                 <table className='table'>
                                     <caption className='pink white-text'>[Online Users] -> [{this.props.userCount}]</caption>
                                     <thead>
