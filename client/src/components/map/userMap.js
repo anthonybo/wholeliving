@@ -79,10 +79,38 @@ class userMap extends Component {
             if(this.map !== undefined){
                 // console.log('Map Exists!');
                 this.map.getSource('users').setData(usersObj);
+                this.map.setPaintProperty('user-point', 'circle-color', this.getRandomColor());
+                this.map.setPaintProperty('user-point', 'circle-stroke-color', this.getRandomColor());
+
+                this.map.panTo(usersObj.features[usersObj.features.length-1].geometry.coordinates);
+
+                this.map.flyTo({
+                    center: usersObj.features[usersObj.features.length-1].geometry.coordinates,
+                    zoom: 18,
+                    bearing: 45,
+                    maxZoom: 18,
+                    pitch: 45,
+                    speed: 2, // make the flying slow
+                    curve: 1, // change the speed at which it zooms out
+
+                    easing: function (t) {
+                        return t;
+                    }
+                });
+
             } else {
                 this.createMap();
             }
         }
+    }
+
+    getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 
     createMap =()=> {
@@ -93,7 +121,7 @@ class userMap extends Component {
             // zoom: 10.6,
             // pitch: 45,
             // minZoom: 7,
-            // maxZoom: 20
+            maxZoom: 18
         });
 
         this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
@@ -133,7 +161,10 @@ class userMap extends Component {
             const ctrlCenter = new MapboxGLButtonControl({
                 className: "mapbox-gl-center",
                 title: "Center camera",
-                eventHandler: ()=>{this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);}
+                eventHandler: ()=>{
+                    this.map.setPitch(0);
+                    this.map.fitBounds([-125.0011, 24.9493, -66.9326, 49.5904]);
+                }
             });
 
             this.map.addControl(ctrlCenter, "top-left");
@@ -188,15 +219,6 @@ class userMap extends Component {
                 data: this.state.usersObj
             });
 
-            function getRandomColor() {
-                var letters = '0123456789ABCDEF';
-                var color = '#';
-                for (var i = 0; i < 6; i++) {
-                    color += letters[Math.floor(Math.random() * 16)];
-                }
-                return color;
-            }
-
             // add circle layer here
             this.map.addLayer({
                 id: 'user-point',
@@ -215,8 +237,8 @@ class userMap extends Component {
                             [{ zoom: 22, value: 62 }, 50],
                         ]
                     },
-                    'circle-color': getRandomColor(),
-                    'circle-stroke-color': getRandomColor(),
+                    'circle-color': this.getRandomColor(),
+                    'circle-stroke-color': this.getRandomColor(),
                     'circle-stroke-width': 3,
                     'circle-opacity': {
                         stops: [
@@ -245,6 +267,16 @@ class userMap extends Component {
                     this.flyIntoCluster(this.map, coordinates, currentZoom);
                 }
             });
+
+            this.map.on('zoomend', (e)=>{
+                var zoom = this.map.getZoom();
+                // console.log(zoom);
+                if(zoom < 8){
+                    // this.map.setPitch(0);
+                    // this.map.easeTo(latlng, zoom, bearing, 0, options);
+                    this.map.easeTo({bearing:0, duration:1200, pitch:0});
+                }
+            })
         });
     }
 
