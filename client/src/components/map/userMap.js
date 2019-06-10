@@ -17,14 +17,16 @@ class userMap extends Component {
                     item.type = "Feature",
                         item.geometry = {
                             type:"Point",
-                            coordinates:[item.lng, item.lat]
+                            coordinates: [item.lng, item.lat]
                         };
                     item.properties = {
-                        Address: item['house_number']+ ' ' +item['road'],
+                        Address: item['house_number'] + ' ' + item['road'],
                         City: item['city'],
                         State: item['state'],
                         SocketIP: item.socketIP,
-                        SocketID: item.socketID
+                        SocketID: item.socketID,
+                        lng: item.lng,
+                        lat: item.lat
                     }
 
                     delete item.lng;
@@ -249,22 +251,41 @@ class userMap extends Component {
                 }
             }, 'waterway-label');
 
+            var popup = null;
+
             this.map.on('click', 'user-point', (e) => {
                 e = e.features[0];
+                var zoomLocation = [e.properties.lng, e.properties.lat]
 
-                var popup = new mapboxgl.Popup()
-                    .setLngLat(e.geometry.coordinates)
+                popup = new mapboxgl.Popup()
+                    .setLngLat(zoomLocation)
                     .setHTML('<b>City:</b> ' + e.properties.City + '<br><b>State:</b> ' + e.properties.State + '<br><b>Address:</b> ' + e.properties.Address + '<br><b>IP:</b> ' + e.properties.SocketIP + '<br><b>Socket:</b> ' + e.properties.SocketID)
                     .addTo(this.map);
+
+                this.map.flyTo({
+                    center: zoomLocation,
+                    zoom: 18,
+                    bearing: 45,
+                    pitch: 45,
+                    maxZoom: 18,
+                    speed: 1, // make the flying slow
+                    curve: 1, // change the speed at which it zooms out
+
+                    easing: function (t) {
+                        return t;
+                    }
+                });
             });
 
             this.map.on('click', (e) => {
-                const coordinates = e.lngLat;
-                const currentZoom = this.map.getZoom();
+                if( !popup.isOpen() ){
+                    const coordinates = e.lngLat;
+                    const currentZoom = this.map.getZoom();
 
-                var zoom = this.map.getZoom();
-                if(zoom < 17){
-                    this.flyIntoCluster(this.map, coordinates, currentZoom);
+                    var zoom = this.map.getZoom();
+                    if(zoom < 17){
+                        this.flyIntoCluster(this.map, coordinates, currentZoom);
+                    }
                 }
             });
 
