@@ -124,7 +124,8 @@ class App extends Component {
                         <Route path ='/crossReference/:keyword/:location/:range' component={Homepage}/>
                         <Route path='/busLookup/:id' component={Homepage}/>
                         {/*<Route path='/dashboard' component={Dashboard}/>*/}
-                        <Route path='/dashboard' render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users}/>} />
+                        <Route exact path={['/dashboard']} render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users}/>} />
+                        <Route path={['/dashboard/:socket']} render={(props) => <Dashboard {...props} userCount={this.state.response.userCount} users={this.state.response.users}/>} />
 
 
                         <Route component={Error404}/>
