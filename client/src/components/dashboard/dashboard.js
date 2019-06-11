@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import './dashboard.scss';
 import redMap from './redMapSmall.jpg';
 import UserMap from '../map/userMap';
+import {withRouter} from 'react-router-dom';
 
 class Dashboard extends Component {
 
@@ -244,7 +245,7 @@ class Dashboard extends Component {
 
         if(this.props.users !== undefined){
             for(let [index, value] of this.props.users.entries()){
-                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td><td data-label="City">{value.city}</td><td data-label="State">{value.state}</td><td data-label="Address">{value.house_number + ' ' + value.road}</td></tr>)
+                items.push(<tr key={index} className='userBusinessFavoritesRow'><td data-label="Socket">{value.socketID}</td><td data-label="IP">{value.socketIP}</td><td data-label="City">{value.city}</td><td data-label="State">{value.state}</td><td data-label="Address"><Link to={`/dashboard/${value.socketID}`}>{value.house_number + ' ' + value.road}</Link></td></tr>)
             }
 
             this.setState({
@@ -382,4 +383,4 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard;
+export default withRouter(Dashboard);
