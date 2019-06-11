@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = 'pk.eyJ1IjoiZXBhZGlsbGExODg2IiwiYSI6ImNqc2t6dzdrMTFvdzIzeW41NDE1MTA5cW8ifQ.wmQbGUhoixLzuiulKHZEaQ';
+import {withRouter} from 'react-router-dom';
 
 class userMap extends Component {
 
@@ -27,7 +28,7 @@ class userMap extends Component {
                         SocketID: item.socketID,
                         lng: item.lng,
                         lat: item.lat
-                    }
+                    };
 
                     delete item.lng;
                     delete item.lat;
@@ -251,6 +252,12 @@ class userMap extends Component {
                 }
             }, 'waterway-label');
 
+            // this.state.usersObj.features.forEach((loc, index) =>{
+            //     setTimeout(() => {
+            //         this.map.jumpTo({center: loc.geometry.coordinates});
+            //     }, 2000 * index);
+            // });
+
             var popup = null;
 
             this.map.on('click', 'user-point', (e) => {
@@ -292,10 +299,12 @@ class userMap extends Component {
             this.map.on('zoomend', (e)=>{
                 var zoom = this.map.getZoom();
                 // console.log(zoom);
-                if(zoom < 8){
+                if(zoom < 16){
                     // this.map.setPitch(0);
                     // this.map.easeTo(latlng, zoom, bearing, 0, options);
                     this.map.easeTo({bearing:0, duration:1200, pitch:0});
+                } else {
+                    this.map.easeTo({bearing:45, duration:1200, pitch:45});
                 }
             })
         });
@@ -328,6 +337,25 @@ class userMap extends Component {
             this.createUserData();
         }
 
+        if(prevProps.location !== this.props.location && this.props.match.params.socket !== undefined){
+            for(let index = 0; index < this.props.users.length; index++){
+                if(this.props.users[index].socketID == this.props.match.params.socket){
+                    this.map.flyTo({
+                        center: [this.props.users[index].lng, this.props.users[index].lat],
+                        zoom: 18,
+                        bearing: 45,
+                        maxZoom: 18,
+                        pitch: 45,
+                        speed: 2, // make the flying slow
+                        curve: 1, // change the speed at which it zooms out
+
+                        easing: function (t) {
+                            return t;
+                        }
+                    });
+                }
+            }
+        }
         // if(this.map !== undefined){
         //     console.log('Map Exists!')
         // }
@@ -342,4 +370,4 @@ class userMap extends Component {
     }
 }
 
-export default userMap;
+export default withRouter(userMap);
